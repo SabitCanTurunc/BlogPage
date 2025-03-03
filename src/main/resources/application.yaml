@@ -1,0 +1,17 @@
+s pring:
+  application:
+    name: spring-data-jpa
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 1244
+
+  jpa:
+    properties:
+      hibernate:
+        default_schema: blog
+        format_sql: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
