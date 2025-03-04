@@ -17,10 +17,6 @@ public class UserService extends BaseService<User, Integer, UserRepository>{
         this.userMapper = userMapper;
     }
 
-    public BaseDto save(UserRequestDto userRequestDto) {
-        User user = userMapper.convertToEntity(userRequestDto);
-        return userMapper.convertToDto(super.save(user));
 
-    }
 
 }

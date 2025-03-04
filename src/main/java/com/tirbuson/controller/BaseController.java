@@ -9,8 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Console;
+import java.util.ArrayList;
 import java.util.List;
-public abstract class  BaseController <S extends BaseService<E,ID,R>, E extends BaseEntity, ID, R extends BaseRepository<E,ID>, DTO extends BaseDto, M extends BaseMapper<E, DTO>> {
+public abstract class BaseController<
+        S extends BaseService<E, ID, R>,
+        E extends BaseEntity,
+        ID,
+        R extends BaseRepository<E, ID>,
+        ResDto extends BaseDto,
+        ReqDto extends BaseDto,
+        M extends BaseMapper<E, ResDto, ReqDto>> {
+
 
     private final S service;
     private final M mapper;
@@ -20,27 +30,38 @@ public abstract class  BaseController <S extends BaseService<E,ID,R>, E extends 
         this.mapper = mapper;
     }
     @PostMapping
-    public ResponseEntity<DTO> create(@RequestBody E entity) {
-        DTO dto = mapper.convertToDto(service.save(entity));
+    public ResponseEntity<ResDto> create(@RequestBody ReqDto dtoEntity) {
+        E entity= mapper.convertToEntity(dtoEntity);
+        ResDto dto = mapper.convertToDto(service.save(entity));
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<E> getById(@PathVariable ID id) {
-        return ResponseEntity.ok(service.findById(id));
+    public ResponseEntity<ResDto> getById(@PathVariable ID id) {
+        ResDto dto =mapper.convertToDto(service.findById(id));
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping
-    public ResponseEntity<List<E>> getAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<ResDto>> getAll() {
+        List<ResDto> dtos=new ArrayList<>();
+        for(E entity:service.findAll()){
+            ResDto newDto= mapper.convertToDto(entity);
+            dtos.add(newDto);
+        }
+        return ResponseEntity.ok(dtos);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<E> update(@PathVariable ID id, @RequestBody E entity) {
-        if (!id.equals(entity.getId())) {
+    public ResponseEntity<ResDto> update(@PathVariable ID id, @RequestBody ReqDto reqDto) {
+
+        E dtoEntity = mapper.convertToEntity(reqDto);
+        if (!id.equals(dtoEntity.getId())) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(service.save(entity));
+        ResDto dto = mapper.convertToDto(service.save(dtoEntity));
+
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/{id}")
