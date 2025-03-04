@@ -20,5 +20,4 @@ public class UserRequestDto extends BaseDto {
     private String password;
     private Role role;
 
-
 }

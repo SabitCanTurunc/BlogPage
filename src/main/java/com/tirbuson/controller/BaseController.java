@@ -56,10 +56,8 @@ public abstract class BaseController<
     public ResponseEntity<ResDto> update(@PathVariable ID id, @RequestBody ReqDto reqDto) {
 
         E dtoEntity = mapper.convertToEntity(reqDto);
-        if (!id.equals(dtoEntity.getId())) {
-            return ResponseEntity.badRequest().build();
-        }
-        ResDto dto = mapper.convertToDto(service.save(dtoEntity));
+        dtoEntity.setId(Integer.parseInt(id.toString()));
+        ResDto dto = mapper.convertToDto(service.update(dtoEntity));
 
         return ResponseEntity.ok(dto);
     }

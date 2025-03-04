@@ -2,9 +2,6 @@ package com.tirbuson.model;
 
 import com.tirbuson.model.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 
@@ -22,7 +19,7 @@ public class User extends BaseEntity {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private Role roles= Role.USER;
+    private Role role = Role.USER;
 
     public User() {
     }
@@ -31,7 +28,7 @@ public class User extends BaseEntity {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.roles = roles;
+        this.role = roles;
     }
 
     public String getUsername() {
@@ -58,12 +55,12 @@ public class User extends BaseEntity {
         this.email = email;
     }
 
-    public Role getRoles() {
-        return roles;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoles(Role roles) {
-        this.roles = roles;
+    public void setRole(Role role) {
+        this.role = role;
     }
 
 

@@ -1,13 +1,12 @@
 package com.tirbuson.controller;
 
-import com.tirbuson.dto.BaseDto;
 import com.tirbuson.dto.request.UserRequestDto;
 import com.tirbuson.dto.response.UserResponseDto;
 import com.tirbuson.mapper.UserMapper;
 import com.tirbuson.model.User;
 import com.tirbuson.repository.UserRepository;
 import com.tirbuson.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +14,19 @@ import org.springframework.web.bind.annotation.*;
 public class UserController extends BaseController<UserService,User,Integer, UserRepository, UserResponseDto, UserRequestDto, UserMapper> {
 
 
-    protected UserController(UserService service, UserMapper mapper) {
+    private final UserService userService;
+    private final UserMapper userMapper;
+
+    protected UserController(UserService service, UserMapper mapper, UserService userService, UserMapper userMapper) {
         super(service, mapper);
+        this.userService = userService;
+        this.userMapper = userMapper;
+    }
+
+    @PostMapping("/setRole/{id}")
+    public ResponseEntity<UserResponseDto> setRole(@PathVariable(name="id") Integer id, @RequestBody UserRequestDto userRequestDto) {
+        return ResponseEntity.ok(userService.updateRole(id, userRequestDto)) ;
+
+
     }
 }

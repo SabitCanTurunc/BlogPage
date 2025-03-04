@@ -1,6 +1,5 @@
 package com.tirbuson.mapper;
 
-import com.tirbuson.dto.BaseDto;
 import com.tirbuson.dto.request.UserRequestDto;
 import com.tirbuson.dto.response.UserResponseDto;
 import com.tirbuson.model.User;
@@ -17,26 +16,13 @@ public class UserMapper implements BaseMapper<User, UserResponseDto,UserRequestD
             return null;
         }
 
-        // BaseDto'nun doğru türde olduğundan emin olalım.
-        if (baseDto instanceof UserRequestDto) {
-            UserRequestDto requestDto = (UserRequestDto) baseDto;
-            User user = new User();
+        User user = new User();
+        user.setEmail(baseDto.getEmail());
+        user.setRole(baseDto.getRole());
+        user.setUsername(baseDto.getUsername());
+        user.setPassword(baseDto.getPassword());
 
-            // Dönüştürme işlemi
-            user.setEmail(requestDto.getEmail());
-            user.setRoles(requestDto.getRole());
-            user.setUsername(requestDto.getUsername());
-            user.setPassword(requestDto.getPassword());
-
-            // Tarih bilgisi varsa ekleyebilirsiniz
-            // user.setCreatedAt(requestDto.getCreatedAt());
-            // user.setUpdatedAt(requestDto.getUpdatedAt());
-
-            return user;
-        }
-
-        // Eğer baseDto beklenen türde değilse, null döndür.
-        return null;
+        return user;
     }
 
     @Override
@@ -46,7 +32,7 @@ public class UserMapper implements BaseMapper<User, UserResponseDto,UserRequestD
         UserResponseDto responseDto = new UserResponseDto();
         responseDto.setEmail(entity.getEmail());
         responseDto.setUsername(entity.getUsername());
-        responseDto.setRole(entity.getRoles());
+        responseDto.setRole(entity.getRole());
         return responseDto;
     }
 }
