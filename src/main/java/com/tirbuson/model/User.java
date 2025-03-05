@@ -2,11 +2,17 @@ package com.tirbuson.model;
 
 import com.tirbuson.model.enums.Role;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 
 @Table(name="user")
 
+@Getter
+@Setter
 public class User extends BaseEntity {
 
     @Column(nullable = false)
@@ -21,6 +27,9 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Post> posts;
+
     public User() {
     }
 
@@ -31,38 +40,12 @@ public class User extends BaseEntity {
         this.role = roles;
     }
 
-    public String getUsername() {
-        return username;
-    }
 
-    public void setUsername(String username) {
+    public User(String username, String password, String email, Role role, List<Post> posts) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
         this.role = role;
+        this.posts = posts;
     }
-
-
-
 }
