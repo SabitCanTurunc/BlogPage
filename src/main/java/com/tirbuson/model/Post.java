@@ -25,6 +25,14 @@ public class Post extends BaseEntity {
     @JoinColumn(name="category_id")
     private Category category;
 
+    @OneToMany
+    private List<Image> images;
+
+
+    @OneToMany
+    private List<Comment> comments;
+
+
     public Post(String title, String content, User user, Category category, List<Image> images, List<Comment> comments) {
         this.title = title;
         this.content = content;
@@ -34,12 +42,6 @@ public class Post extends BaseEntity {
         this.comments = comments;
     }
 
-    @OneToMany
-    private List<Image> images;
-
-
-    @OneToMany
-    private List<Comment> comments;
 
 
 
