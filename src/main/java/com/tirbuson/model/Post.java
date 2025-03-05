@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,7 +14,9 @@ import java.util.List;
 
 public class Post extends BaseEntity {
 
+    @Column(nullable = false)
     private String title;
+    @Column(nullable = false)
     private String content;
 
 
@@ -26,7 +29,7 @@ public class Post extends BaseEntity {
     private Category category;
 
     @OneToMany
-    private List<Image> images;
+    private List<Image> images= new ArrayList<>();
 
 
     @OneToMany
