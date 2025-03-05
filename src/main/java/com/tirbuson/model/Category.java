@@ -1,7 +1,9 @@
 package com.tirbuson.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "category")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Category extends BaseEntity {
 
     @Column(nullable = false)
@@ -19,14 +23,7 @@ public class Category extends BaseEntity {
     private List<Post> posts;
 
 
-    public Category(String name, List<Post> posts) {
-        name = name;
-        this.posts = posts;
-    }
 
-
-    public Category() {
-    }
 
 
 }

@@ -1,31 +1,27 @@
 package com.tirbuson.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "comment")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Comment extends BaseEntity {
+
     @Column(nullable = false)
     private String comment;
 
-    @Column(nullable = false)
-    private Integer postId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade= CascadeType.PERSIST)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Post post;
 
-    @Column(nullable = false)
-    private Integer userId;
 
-    public Comment() {
-    }
 
-    public Comment(String comment, Integer postId, Integer userId) {
-        this.comment = comment;
-        this.postId = postId;
-        this.userId = userId;
-    }
+
 }

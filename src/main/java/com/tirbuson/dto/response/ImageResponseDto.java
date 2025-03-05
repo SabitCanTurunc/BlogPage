@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ImageResponseDto extends BaseDto {
     private String url;
+
 }
 

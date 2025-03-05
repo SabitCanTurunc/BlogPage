@@ -11,6 +11,7 @@ public class ImageMapper implements BaseMapper<Image, ImageResponseDto, ImageReq
     public Image convertToEntity(ImageRequestDto imageRequestDto) {
         Image image = new Image();
         image.setUrl(imageRequestDto.getUrl());
+
         return image;
     }
 
