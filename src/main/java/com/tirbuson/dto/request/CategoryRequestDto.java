@@ -1,6 +1,8 @@
 package com.tirbuson.dto.request;
 
 import com.tirbuson.dto.BaseDto;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +10,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class CategoryRequestDto extends BaseDto {
-private String name;
+
+    @NotBlank(message = "name can not be empty")
+    @Size(min = 2, max = 50, message = "name should be betweeen 2 and 50 characters ")
+    private String name;
 }

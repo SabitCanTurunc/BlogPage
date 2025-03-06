@@ -24,7 +24,7 @@ public class UserController extends BaseController<UserService,User,Integer, Use
     }
 
     @PostMapping("/setRole/{id}")
-    public ResponseEntity<UserResponseDto> setRole(@PathVariable(name="id") Integer id, @RequestBody UserRequestDto userRequestDto) {
+    public ResponseEntity<UserResponseDto> updateRole(@PathVariable(name="id") Integer id, @RequestBody UserRequestDto userRequestDto) {
         return ResponseEntity.ok(userService.updateRole(id, userRequestDto)) ;
 
 

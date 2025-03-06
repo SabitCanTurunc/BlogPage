@@ -5,6 +5,7 @@ import com.tirbuson.mapper.BaseMapper;
 import com.tirbuson.model.BaseEntity;
 import com.tirbuson.repository.BaseRepository;
 import com.tirbuson.service.BaseService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,14 +31,14 @@ public abstract class BaseController<
         this.mapper = mapper;
     }
     @PostMapping
-    public ResponseEntity<ResDto> create(@RequestBody ReqDto dtoEntity) {
+    public ResponseEntity<ResDto> create(@Valid @RequestBody ReqDto dtoEntity) {
         E entity= mapper.convertToEntity(dtoEntity);
         ResDto dto = mapper.convertToDto(service.save(entity));
         return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResDto> getById(@PathVariable ID id) {
+    public ResponseEntity<ResDto> getById(@Valid @PathVariable ID id) {
         ResDto dto =mapper.convertToDto(service.findById(id));
         return ResponseEntity.ok(dto);
     }
@@ -53,7 +54,7 @@ public abstract class BaseController<
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResDto> update(@PathVariable ID id, @RequestBody ReqDto reqDto) {
+    public ResponseEntity<ResDto> update(@Valid @PathVariable ID id, @RequestBody ReqDto reqDto) {
 
         E dtoEntity = mapper.convertToEntity(reqDto);
         dtoEntity.setId(Integer.parseInt(id.toString()));
@@ -63,7 +64,7 @@ public abstract class BaseController<
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable ID id) {
+    public ResponseEntity<Void> delete(@Valid @PathVariable ID id) {
         service.deleteById(id);
         return ResponseEntity.noContent().build();
     }

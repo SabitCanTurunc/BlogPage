@@ -1,5 +1,8 @@
 package com.tirbuson.service;
 
+import com.tirbuson.exception.BaseException;
+import com.tirbuson.exception.ErrorMessage;
+import com.tirbuson.exception.MessageType;
 import com.tirbuson.model.BaseEntity;
 import com.tirbuson.repository.BaseRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -31,7 +34,9 @@ public class BaseService<E extends BaseEntity, ID, R extends BaseRepository<E, I
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found with ID: " + id));
+        return repository
+                .findById(id)
+                .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, id.toString())));
     }
 
     @Transactional
@@ -46,7 +51,9 @@ public class BaseService<E extends BaseEntity, ID, R extends BaseRepository<E, I
 
     @Transactional
     public E update(E entity) {
-        E oldEntity= repository.findById((ID) entity.getId()).orElseThrow(()-> new EntityNotFoundException("Entity not found"));
+        E oldEntity= repository
+                .findById((ID) entity.getId())
+                .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, entity.getId().toString())));
         entity.setCreatedAt(oldEntity.getCreatedAt());
         return repository.save(entity);  // JpaRepository save hem insert hem update yapar.
     }

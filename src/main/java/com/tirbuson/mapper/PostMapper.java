@@ -39,6 +39,7 @@ public class PostMapper implements BaseMapper<Post, PostResponseDto, PostRequest
             Image savedImage=imageService.save(imageEntity);
             images.add(savedImage);
         }
+        post.setImages(images);
 
         return post;
     }

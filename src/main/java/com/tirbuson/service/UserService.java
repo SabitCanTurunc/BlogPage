@@ -2,6 +2,9 @@ package com.tirbuson.service;
 
 import com.tirbuson.dto.request.UserRequestDto;
 import com.tirbuson.dto.response.UserResponseDto;
+import com.tirbuson.exception.BaseException;
+import com.tirbuson.exception.ErrorMessage;
+import com.tirbuson.exception.MessageType;
 import com.tirbuson.mapper.UserMapper;
 import com.tirbuson.model.User;
 import com.tirbuson.model.enums.Role;
@@ -26,10 +29,24 @@ public class UserService extends BaseService<User, Integer, UserRepository> {
     @Transactional
     public UserResponseDto updateRole(Integer id, UserRequestDto dto) {
 
-        User user = userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, id.toString())));
         user.setRole(dto.getRole());
         super.update(user);
         return userMapper.convertToDto(user);
+    }
+
+    @Override
+    @Transactional
+    public User save(User user) {
+        long userCount = userRepository.count();
+        if (userCount == 0) {
+            user.setRole(Role.ADMIN);
+        } else if (user.getRole() != Role.ADMIN) {
+            user.setRole(Role.USER);
+        }
+        return userRepository.save(user);
     }
 
 
