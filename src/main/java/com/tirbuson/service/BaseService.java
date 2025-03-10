@@ -5,14 +5,10 @@ import com.tirbuson.exception.ErrorMessage;
 import com.tirbuson.exception.MessageType;
 import com.tirbuson.model.BaseEntity;
 import com.tirbuson.repository.BaseRepository;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 public class BaseService<E extends BaseEntity, ID, R extends BaseRepository<E, ID>>{
 

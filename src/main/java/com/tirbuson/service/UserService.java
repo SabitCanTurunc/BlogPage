@@ -9,8 +9,7 @@ import com.tirbuson.mapper.UserMapper;
 import com.tirbuson.model.User;
 import com.tirbuson.model.enums.Role;
 import com.tirbuson.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.Null;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
