@@ -22,10 +22,7 @@ public class UserRequestDto extends BaseDto {
     @Size(min = 2, max = 50, message = "name should be betweeen 2 and 50 characters ")
     private String username;
 
-    @NotBlank(message = "email can not be empty")
-    @Email(message="content must be an email")
-    @Size(min = 2, max = 50, message = "email should be betweeen 2 and 50 characters ")
-    private String email;
+
 
     @NotBlank(message = "password can not be empty")
     private String password;

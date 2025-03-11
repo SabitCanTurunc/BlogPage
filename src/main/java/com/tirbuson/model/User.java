@@ -21,8 +21,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String email;
+
 
     @Enumerated(EnumType.STRING)
     private Role role ;
@@ -36,7 +35,6 @@ public class User extends BaseEntity {
     public User(String username, String password, String email, Role roles) {
         this.username = username;
         this.password = password;
-        this.email = email;
         this.role = roles;
     }
 
@@ -44,7 +42,6 @@ public class User extends BaseEntity {
     public User(String username, String password, String email, Role role, List<Post> posts) {
         this.username = username;
         this.password = password;
-        this.email = email;
         this.role = role;
         this.posts = posts;
     }

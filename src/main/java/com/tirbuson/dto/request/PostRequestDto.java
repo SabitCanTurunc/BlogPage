@@ -21,10 +21,10 @@ public class PostRequestDto extends BaseDto {
     @NotBlank(message = "content can not be empty")
     private String content;
 
-    @NotBlank(message = "userId can not be empty")
+//    @NotBlank(message = "userId can not be empty")
     private Integer userId;
 
-    @NotBlank(message = "categoryId can not be empty")
+//    @NotBlank(message = "categoryId can not be empty")
     private Integer categoryId;
     private List<String> images;
 }

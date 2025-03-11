@@ -17,7 +17,6 @@ public class UserMapper implements BaseMapper<User, UserResponseDto,UserRequestD
         }
 
         User user = new User();
-        user.setEmail(baseDto.getEmail());
         user.setRole(baseDto.getRole());
         user.setUsername(baseDto.getUsername());
         user.setPassword(baseDto.getPassword());
@@ -30,7 +29,6 @@ public class UserMapper implements BaseMapper<User, UserResponseDto,UserRequestD
         if (entity == null) return null;
 
         UserResponseDto responseDto = new UserResponseDto();
-        responseDto.setEmail(entity.getEmail());
         responseDto.setUsername(entity.getUsername());
         responseDto.setRole(entity.getRole());
         return responseDto;
