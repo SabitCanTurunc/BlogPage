@@ -20,4 +20,6 @@ public class CategoryContoller extends BaseController<CategoryService, Category,
     protected CategoryContoller(CategoryService service, CategoryMapper mapper) {
         super(service, mapper);
     }
+
+
 }

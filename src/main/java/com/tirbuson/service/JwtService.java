@@ -44,9 +44,6 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-//       User user userRepository.findByUsername(userDetails.getUsername())
-
-
         return generateToken(new HashMap<>(), userDetails);
     }
 
