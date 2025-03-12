@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class UserResponseDto extends BaseDto {
     private Integer id;
     private String username;
+    private String email;
     private Role role;
 
 }

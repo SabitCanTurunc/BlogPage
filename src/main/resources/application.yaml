@@ -15,3 +15,22 @@ s pring:
     show-sql: true
     hibernate:
       ddl-auto: update
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: denemedenemecioglu8@gmail.com
+    password: pkfxypnpugqqftxz
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enabled: true
+
+
+
+security:
+  jwt:
+    secret-key: "dGhlc2VjcmV0a2V5bXVzdGJldGhpc2xvbmcyNTZiaXRz"
+    expiration-time: 3600000
