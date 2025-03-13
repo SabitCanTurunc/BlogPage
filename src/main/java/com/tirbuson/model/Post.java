@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post extends BaseEntity {
+public class Post extends BaseEntity implements Ownable{
 
     @Column(nullable = false)
     private String title;
@@ -39,7 +39,8 @@ public class Post extends BaseEntity {
     private List<Comment> comments;
 
 
-
-
-
+    @Override
+    public User getOwner() {
+        return user;
+    }
 }

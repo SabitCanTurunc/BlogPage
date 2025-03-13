@@ -7,7 +7,6 @@ import java.util.List;
 
 @Repository
 public interface PostRepository extends BaseRepository<Post, Integer> {
-    List<Post> getPostsByUser_Id(Integer userİd);
+    List<Post> getPostsByUser_Id(Integer userId);
 
-    Integer id(Integer id);
 }
