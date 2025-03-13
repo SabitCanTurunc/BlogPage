@@ -2,6 +2,9 @@ package com.tirbuson.service;
 
 import com.tirbuson.dto.VerifyUserDto;
 import com.tirbuson.dto.request.UserRequestDto;
+import com.tirbuson.exception.BaseException;
+import com.tirbuson.exception.ErrorMessage;
+import com.tirbuson.exception.MessageType;
 import com.tirbuson.mapper.UserMapper;
 import com.tirbuson.model.User;
 import com.tirbuson.repository.UserRepository;
@@ -49,9 +52,9 @@ public class AuthenticationService {
 
     public User authenticate(UserRequestDto input){
         User user = userRepository.findByEmail(input.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, input.getEmail())));
         if(!user.isEnabled()) {
-            throw new UsernameNotFoundException("User not found");
+            throw new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, input.getEmail()));
         }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -59,27 +62,37 @@ public class AuthenticationService {
                         input.getPassword()
                 )
         );
-//        user.setUsername(input.getEmail());
         return user;
     }
 
-    public void verifyUser(VerifyUserDto input){
+    public void verifyUser(VerifyUserDto input) {
         Optional<User> optionalUser = userRepository.findByEmail(input.getEmail());
-        if(optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            if(user.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())){
-                throw new RuntimeException("Verification code expired");
+            LocalDateTime expiresAt = user.getVerificationCodeExpiresAt();
+
+            if (user.isEnabled() && expiresAt == null) {
+                throw new BaseException(new ErrorMessage(MessageType.ALREADY_VERIFIED, input.getEmail()));
             }
-            if(user.getVerificationCode().equals(input.getVerificationCode())){
+
+            if (expiresAt == null) {
+                throw new BaseException(new ErrorMessage(MessageType.VERIFICATION_CODE_NOT_SET, "Verification code is not set for " + input.getEmail()));
+            }
+
+            if (expiresAt.isBefore(LocalDateTime.now())) {
+                throw new BaseException(new ErrorMessage(MessageType.CODE_EXPIRED, input.getVerificationCode()));
+            }
+
+            if (user.getVerificationCode().equals(input.getVerificationCode())) {
                 user.setEnabled(true);
                 user.setVerificationCode(null);
                 user.setVerificationCodeExpiresAt(null);
                 userRepository.save(user);
-            }else{
-                throw new RuntimeException("Invalid verification code");
+            } else {
+                throw new BaseException(new ErrorMessage(MessageType.INVALIC_VERICIFATION_CODE, input.getVerificationCode()));
             }
-        }else{
-            throw new RuntimeException("User not found");
+        } else {
+            throw new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, input.getEmail()));
         }
     }
 
@@ -88,14 +101,14 @@ public class AuthenticationService {
         if(optionalUser.isPresent()){
             User user = optionalUser.get();
             if(user.isEnabled()) {
-                throw new RuntimeException("User already verified");
+                throw new BaseException( new ErrorMessage(MessageType.ALREADY_VERIFIED,email));
             }
             user.setVerificationCode(generateVerificationCode());
             user.setVerificationCodeExpiresAt(LocalDateTime.now().plusHours(1));
             sendVerificationEmail(user);
             userRepository.save(user);
         }else{
-            throw new RuntimeException("User not found");
+            throw new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST,email));
         }
     }
 
@@ -105,7 +118,7 @@ public class AuthenticationService {
         String htmlMessage = "<html>"
                 + "<body style=\"font-family: Arial, sans-serif;\">"
                 + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
-                + "<h2 style=\"color: #333;\">Welcome to our app!</h2>"
+                + "<h2 style=\"color: #333;\">Welcome to myBLogApp !</h2>"
                 + "<p style=\"font-size: 16px;\">Please enter the verification code below to continue:</p>"
                 + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
                 + "<h3 style=\"color: #333;\">Verification Code:</h3>"
@@ -118,7 +131,7 @@ public class AuthenticationService {
             emailService.sendVerificationEmail(user.getEmail(),subject, htmlMessage);
 
         }catch(MessagingException e){
-            e.printStackTrace();
+            throw new BaseException(new ErrorMessage(MessageType.EMAIL_SENDING_FAILED,  user.getEmail()));
         }
     }
 

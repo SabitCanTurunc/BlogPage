@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class ApiError<E> {
 private Integer status;
-private Exception<E> exception;
+private CustomException<E> customException;
 }

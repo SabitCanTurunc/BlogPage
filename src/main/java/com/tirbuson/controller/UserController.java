@@ -7,6 +7,7 @@ import com.tirbuson.model.User;
 import com.tirbuson.repository.UserRepository;
 import com.tirbuson.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,6 +25,7 @@ public class UserController extends BaseController<UserService,User,Integer, Use
     }
 
     @PostMapping("/setRole/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDto> updateRole(@PathVariable(name="id") Integer id, @RequestBody UserRequestDto userRequestDto) {
         return ResponseEntity.ok(userService.updateRole(id, userRequestDto)) ;
 

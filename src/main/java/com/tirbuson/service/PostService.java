@@ -11,13 +11,11 @@ import java.util.List;
 public class PostService extends BaseService<Post,Integer, PostRepository>{
     private final PostRepository repository;
     private final OwnershipService ownershipService;
-    private final PostRepository postRepository;
 
-    public PostService(PostRepository repository, PostRepository repository1, OwnershipService ownershipService, PostRepository postRepository) {
+    public PostService(PostRepository repository, OwnershipService ownershipService) {
         super(repository);
-        this.repository = repository1;
+        this.repository = repository;
         this.ownershipService = ownershipService;
-        this.postRepository = postRepository;
     }
 
     public List<Post> getPostByUserId(int userId) {
@@ -27,14 +25,14 @@ public class PostService extends BaseService<Post,Integer, PostRepository>{
     @Override
     @Transactional
     public void deleteById(Integer id) {
-        ownershipService.verifyOwnership(id, postRepository);
+        ownershipService.verifyOwnership(id, repository);
         super.deleteById(id);
     }
 
     @Override
     @Transactional
     public Post update(Post entity) {
-        ownershipService.verifyOwnership((Integer) entity.getId(), postRepository);
+        ownershipService.verifyOwnership((Integer) entity.getId(), repository);
         return super.update(entity);
     }
 
