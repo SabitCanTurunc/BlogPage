@@ -7,6 +7,7 @@ import com.tirbuson.exception.ErrorMessage;
 import com.tirbuson.exception.MessageType;
 import com.tirbuson.mapper.UserMapper;
 import com.tirbuson.model.User;
+import com.tirbuson.model.enums.Role;
 import com.tirbuson.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -39,29 +41,46 @@ public class AuthenticationService {
         this.userService = userService;
     }
 
+    @Transactional
     public User signup(UserRequestDto userRequestDto) {
-        User user = userMapper.convertToEntity(userRequestDto);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        try {
+            if (userRepository.findByEmail(userRequestDto.getEmail()).isPresent()) {
+                throw new BaseException("Email address is already registered.");
+            }
+            if (userRepository.findByUsername(userRequestDto.getUsername()).isPresent()) {
+                throw new BaseException("Username is already taken.");
+            }
 
-        user.setVerificationCode(generateVerificationCode());
-        user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
-        user.setEnabled(false);
-        sendVerificationEmail(user);
-    return    userService.save(user);
+            User user = userMapper.convertToEntity(userRequestDto);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setVerificationCode(generateVerificationCode());
+            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+            user.setEnabled(false);
+            user.setRole(Role.USER); // Varsayılan rol ataması
+
+            sendVerificationEmail(user);
+            return userService.save(user);
+        } catch (Exception e) {
+            throw new BaseException("Registration failed: " + e.getMessage());
+        }
     }
 
     public User authenticate(UserRequestDto input){
         User user = userRepository.findByEmail(input.getEmail())
-                .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, input.getEmail())));
+                .orElseThrow(() -> new BaseException("Invalid email or password"));
         if(!user.isEnabled()) {
-            throw new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, input.getEmail()));
+            throw new BaseException("Invalid email or password");
         }
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        input.getEmail(),
-                        input.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            input.getEmail(),
+                            input.getPassword()
+                    )
+            );
+        } catch (Exception e) {
+            throw new BaseException("Invalid email or password");
+        }
         return user;
     }
 
@@ -72,15 +91,15 @@ public class AuthenticationService {
             LocalDateTime expiresAt = user.getVerificationCodeExpiresAt();
 
             if (user.isEnabled() && expiresAt == null) {
-                throw new BaseException(new ErrorMessage(MessageType.ALREADY_VERIFIED, input.getEmail()));
+                throw new BaseException("This email address is already verified.");
             }
 
             if (expiresAt == null) {
-                throw new BaseException(new ErrorMessage(MessageType.VERIFICATION_CODE_NOT_SET, "Verification code is not set for " + input.getEmail()));
+                throw new BaseException("Verification code is not set for " + input.getEmail());
             }
 
             if (expiresAt.isBefore(LocalDateTime.now())) {
-                throw new BaseException(new ErrorMessage(MessageType.CODE_EXPIRED, input.getVerificationCode()));
+                throw new BaseException("Verification code has expired. Please request a new code.");
             }
 
             if (user.getVerificationCode().equals(input.getVerificationCode())) {
@@ -89,10 +108,10 @@ public class AuthenticationService {
                 user.setVerificationCodeExpiresAt(null);
                 userRepository.save(user);
             } else {
-                throw new BaseException(new ErrorMessage(MessageType.INVALIC_VERICIFATION_CODE, input.getVerificationCode()));
+                throw new BaseException("Invalid verification code. Please try again.");
             }
         } else {
-            throw new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, input.getEmail()));
+            throw new BaseException("No user found with this email address.");
         }
     }
 

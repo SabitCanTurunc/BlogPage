@@ -1,6 +1,7 @@
 package com.tirbuson.handler;
 
 import com.tirbuson.exception.BaseException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -27,16 +28,30 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createApiError(message, HttpStatus.UNAUTHORIZED, request));
     }
 
-    @ExceptionHandler(value = {Exception.class}) // java.lang.Exception
+    @ExceptionHandler(value = {ExpiredJwtException.class})
+    public ResponseEntity<ApiError<String>> handleExpiredJwtException(ExpiredJwtException e, WebRequest request) {
+        String message = "JWT token has expired. Please login again.";
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createApiError(message, HttpStatus.UNAUTHORIZED, request));
+    }
+
+    @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<ApiError<String>> handleGenericException(Exception e, WebRequest request) {
-        String message = "Internal server error: " + e.getMessage();
+        String message;
+        if (e.getMessage() != null && e.getMessage().contains("JSON parse error")) {
+            message = "Invalid JSON format. Please check your request data.";
+        } else if (e.getMessage() != null && e.getMessage().contains("Required request body is missing")) {
+            message = "Request body is missing. Please provide the required data.";
+        } else if (e.getMessage() != null && e.getMessage().contains("duplicate key value")) {
+            message = "A record with this information already exists.";
+        } else {
+            message = "An error occurred: " + e.getMessage();
+        }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(createApiError(message, HttpStatus.INTERNAL_SERVER_ERROR, request));
     }
 
     @ExceptionHandler(value = {DataIntegrityViolationException.class})
     public ResponseEntity<ApiError<String>> handleDataIntegrityViolationException(DataIntegrityViolationException e, WebRequest request) {
-        System.out.println("Database error: " + e.getMessage()); // Veya bir logger kullanın
         String message = extractUserFriendlyMessage(e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(createApiError(message, HttpStatus.CONFLICT, request));
@@ -46,7 +61,6 @@ public class GlobalExceptionHandler {
         try {
             return InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            System.out.println("Error occurred while retrieving hostname: " + e.getMessage());
             return "Unknown host";
         }
     }
@@ -69,6 +83,10 @@ public class GlobalExceptionHandler {
         if (errorMessage.contains("duplicate key value violates unique constraint \"user_email_key\"")) {
             String email = errorMessage.split("Key \\(email\\)=\\(")[1].split("\\)")[0];
             return "The email address '" + email + "' is already registered.";
+        }
+        if (errorMessage.contains("duplicate key value violates unique constraint \"user_username_key\"")) {
+            String username = errorMessage.split("Key \\(username\\)=\\(")[1].split("\\)")[0];
+            return "The username '" + username + "' is already taken.";
         }
         return "A database error occurred.";
     }
