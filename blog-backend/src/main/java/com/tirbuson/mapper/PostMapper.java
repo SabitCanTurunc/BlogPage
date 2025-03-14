@@ -57,6 +57,8 @@ public class PostMapper implements BaseMapper<Post, PostResponseDto, PostRequest
         postResponseDto.setUserEmail(entity.getUser().getEmail());
         postResponseDto.setCategoryId(entity.getCategory().getId());
         postResponseDto.setCategoryName(entity.getCategory().getName());
+        postResponseDto.setCreatedAt(entity.getCreatedAt());
+        postResponseDto.setUpdatedAt(entity.getUpdatedAt());
         
         List<String> imageUrls = new ArrayList<>();
         if (entity.getImages() != null) {
