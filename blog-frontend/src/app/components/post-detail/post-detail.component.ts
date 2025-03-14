@@ -14,12 +14,12 @@ import { Post } from '../../models/post.model';
         <div class="post-header">
           <div class="post-meta">
             <span class="post-date">{{ post.createdAt | date:'mediumDate' }}</span>
-            <span class="post-category">{{ post.category }}</span>
+            <span class="post-category">{{ post.categoryName }}</span>
           </div>
           <h1>{{ post.title }}</h1>
           <div class="post-author">
-            <img [src]="'https://ui-avatars.com/api/?name=' + post.username" alt="Yazar" class="author-avatar">
-            <span class="author-name">{{ post.username }}</span>
+            <img [src]="'https://ui-avatars.com/api/?name=' + post.userEmail" alt="Yazar" class="author-avatar">
+            <span class="author-name">{{ post.userEmail }}</span>
           </div>
         </div>
         
@@ -58,15 +58,22 @@ import { Post } from '../../models/post.model';
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      min-height: 100vh;
+      background: #FEFAE0;
+      padding: 2rem 0;
+    }
+
     .container {
       max-width: 800px;
       margin: 0 auto;
-      padding: 2rem;
+      padding: 0 1rem;
     }
 
     .post-detail {
-      background: #FEFAE0;
-      padding: 3rem;
+      background: #fff;
+      padding: 2rem;
       border-radius: 16px;
       box-shadow: 0 8px 32px rgba(212, 163, 115, 0.2);
       border: 1px solid rgba(212, 163, 115, 0.3);

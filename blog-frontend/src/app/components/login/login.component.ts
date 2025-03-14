@@ -32,10 +32,10 @@ export class LoginComponent {
       this.isLoading = true;
       this.error = '';
       
-      const formData = this.loginForm.value;
-      console.log('Form verileri:', formData);
+      const { email, password } = this.loginForm.value;
+      console.log('Form verileri:', { email, password });
       
-      this.authService.login(formData).subscribe({
+      this.authService.login(email, password).subscribe({
         next: (response) => {
           console.log('Login başarılı:', response);
           this.isLoading = false;

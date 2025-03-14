@@ -89,14 +89,14 @@ import { Post } from '../../models/post.model';
                 <div class="card-body">
                   <div class="post-meta">
                     <span class="post-date">{{ post.createdAt | date:'mediumDate' }}</span>
-                    <span class="post-category">{{ post.category }}</span>
+                    <span class="post-category">{{ post.categoryName }}</span>
                   </div>
                   <h2 class="post-title">{{ post.title }}</h2>
                   <p class="post-excerpt">{{ post.content | slice:0:200 }}{{ post.content.length > 200 ? '...' : '' }}</p>
                   <div class="post-footer">
                     <div class="post-author">
-                      <img [src]="'https://ui-avatars.com/api/?name=' + post.username" alt="Yazar" class="author-avatar">
-                      <span class="author-name">{{ post.username }}</span>
+                      <img [src]="'https://ui-avatars.com/api/?name=' + post.userEmail" alt="Yazar" class="author-avatar">
+                      <span class="author-name">{{ post.userEmail }}</span>
                     </div>
                     <a [routerLink]="['/post', post.id]" class="read-more">
                       Devamını Oku
@@ -646,6 +646,7 @@ export class HomeComponent implements OnInit {
   isLoggedIn: boolean = false;
   popularAuthors: string[] = [];
   recentPosts: Post[] = [];
+  authorStats: { [key: string]: number } = {};
 
   constructor(
     private postService: PostService,
@@ -666,15 +667,15 @@ export class HomeComponent implements OnInit {
       next: (posts) => {
         this.posts = posts;
         this.filteredPosts = posts;
-        this.categories = [...new Set(posts.map(post => post.category))].sort();
+        this.categories = [...new Set(posts.map(post => post.categoryName))].sort();
         
         // Popüler yazarları hesapla (en çok yazı yazanlar)
-        const authorCounts = posts.reduce((acc, post) => {
-          acc[post.username] = (acc[post.username] || 0) + 1;
+        this.authorStats = posts.reduce((acc: { [key: string]: number }, post) => {
+          acc[post.userEmail] = (acc[post.userEmail] || 0) + 1;
           return acc;
-        }, {} as { [key: string]: number });
+        }, {});
         
-        this.popularAuthors = Object.entries(authorCounts)
+        this.popularAuthors = Object.entries(this.authorStats)
           .sort(([,a], [,b]) => b - a)
           .slice(0, 5)
           .map(([author]) => author);
@@ -697,7 +698,7 @@ export class HomeComponent implements OnInit {
   filterByCategory(category: string | null) {
     this.selectedCategory = category;
     this.filteredPosts = category 
-      ? this.posts.filter(post => post.category === category)
+      ? this.posts.filter(post => post.categoryName === category)
       : this.posts;
   }
 
@@ -713,7 +714,7 @@ export class HomeComponent implements OnInit {
     if (!this.isLoggedIn) {
       this.router.navigate(['/login']);
     } else {
-      this.router.navigate(['/post/create']);
+      this.router.navigate(['/create-post']);
     }
   }
 

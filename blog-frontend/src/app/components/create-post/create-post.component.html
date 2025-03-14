@@ -1,0 +1,63 @@
+<div class="container">
+  <div class="create-post-form">
+    <h2>Yeni Blog Yazısı Oluştur</h2>
+    
+    <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="title">Başlık</label>
+        <input 
+          type="text" 
+          id="title" 
+          class="form-control" 
+          formControlName="title" 
+          placeholder="Blog yazınızın başlığını girin">
+        <div class="error-message" *ngIf="postForm.get('title')?.errors?.['required'] && postForm.get('title')?.touched">
+          Başlık alanı zorunludur
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="content">İçerik</label>
+        <textarea 
+          id="content" 
+          class="form-control" 
+          formControlName="content" 
+          placeholder="Blog yazınızın içeriğini girin"></textarea>
+        <div class="error-message" *ngIf="postForm.get('content')?.errors?.['required'] && postForm.get('content')?.touched">
+          İçerik alanı zorunludur
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="categoryId">Kategori</label>
+        <select id="categoryId" class="form-control" formControlName="categoryId">
+          <option value="">Kategori seçin</option>
+          <option *ngFor="let category of categories" [value]="category.id">
+            {{category.name}}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="images">Görseller (virgülle ayırın)</label>
+        <input 
+          type="text" 
+          id="images" 
+          class="form-control" 
+          formControlName="images" 
+          placeholder="Görsel URL'lerini virgülle ayırarak girin">
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/">İptal</button>
+        <button type="submit" class="btn btn-primary" [disabled]="postForm.invalid || isSubmitting">
+          {{ isSubmitting ? 'Gönderiliyor...' : 'Gönder' }}
+        </button>
+      </div>
+    </form>
+
+    <div class="alert alert-danger" *ngIf="submitError">
+      {{ submitError }}
+    </div>
+  </div>
+</div> 

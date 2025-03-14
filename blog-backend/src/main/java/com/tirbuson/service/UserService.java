@@ -13,6 +13,7 @@ import com.tirbuson.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 public class UserService extends BaseService<User, Integer, UserRepository> {
 
@@ -23,6 +24,10 @@ public class UserService extends BaseService<User, Integer, UserRepository> {
         super(repository);
         this.userMapper = userMapper;
         this.userRepository = userRepository;
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email) .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, email)));
     }
 
     @Transactional

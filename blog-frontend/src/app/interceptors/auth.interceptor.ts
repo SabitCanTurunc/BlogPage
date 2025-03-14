@@ -27,8 +27,11 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError(error => {
       if (error.status === 401) {
-        authService.logout();
-        router.navigate(['/login']);
+        // Token geçersiz olduğunda, isteği token olmadan tekrar gönder
+        const newReq = req.clone({
+          headers: req.headers.delete('Authorization')
+        });
+        return next(newReq);
       }
       return throwError(() => error);
     })

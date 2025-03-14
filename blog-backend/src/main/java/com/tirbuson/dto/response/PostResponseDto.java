@@ -14,7 +14,8 @@ public class PostResponseDto extends BaseDto {
     private Integer id;
     private String title;
     private String content;
-    private String username;
-    private String category;
+    private String userEmail;
+    private Integer categoryId;
+    private String categoryName;
     private List<String> images;
 }

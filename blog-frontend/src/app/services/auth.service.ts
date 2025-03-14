@@ -1,8 +1,9 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, tap, catchError } from 'rxjs';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 
 export interface UserRequestDto {
   username: string;
@@ -27,114 +28,117 @@ export interface VerifyUserDto {
   verificationCode: string;
 }
 
+export interface LoginResponse {
+  status: number;
+  customException?: {
+    hostname: string;
+    path: string;
+    createTime: string;
+    message: string;
+  };
+  token?: string;
+  expiresIn?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl;
-  private tokenKey = 'auth_token';
-  private platformId = inject(PLATFORM_ID);
+  private currentUserSubject = new BehaviorSubject<LoginResponse | null>(null);
+  currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) { }
-
-  signup(userData: UserRequestDto): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/signup`, userData);
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private router: Router
+  ) {
+    if (isPlatformBrowser(this.platformId)) {
+      const storedUser = localStorage.getItem('currentUser');
+      if (storedUser) {
+        this.currentUserSubject.next(JSON.parse(storedUser));
+      }
+    }
   }
 
-  login(credentials: { email: string; password: string }): Observable<LoginResponseDto> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    });
+  signup(userData: UserRequestDto): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/signup`, userData);
+  }
 
-    console.log('Login isteği gönderiliyor:', {
-      url: `${this.apiUrl}/auth/login`,
-      credentials: credentials,
-      headers: headers
-    });
-
-    return this.http.post<LoginResponseDto>(`${this.apiUrl}/auth/login`, credentials, { 
-      headers
-    }).pipe(
-      tap(response => {
-        console.log('Login yanıtı:', response);
-        if (response.status === 200 && response.token) {
-          if (isPlatformBrowser(this.platformId)) {
-            localStorage.setItem(this.tokenKey, response.token);
+  login(email: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, { email, password })
+      .pipe(
+        tap(response => {
+          if (response && response.token) {
+            if (isPlatformBrowser(this.platformId)) {
+              localStorage.setItem('currentUser', JSON.stringify(response));
+            }
+            this.currentUserSubject.next(response);
           }
-        }
-      }),
-      catchError((error: HttpErrorResponse) => {
-        console.error('Login hatası:', {
-          status: error.status,
-          statusText: error.statusText,
-          error: error.error,
-          message: error.message,
-          headers: error.headers
-        });
-        throw error;
-      })
-    );
+        })
+      );
   }
 
   verifyEmail(data: { email: string; verificationCode: string }) {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    });
-
-    console.log('Doğrulama isteği gönderiliyor:', {
-      url: `${this.apiUrl}/auth/verify`,
-      data: data,
-      headers: headers
-    });
-
-    return this.http.post<{message: string, success: boolean}>(`${this.apiUrl}/verify`, data, { 
-      headers
-    }).pipe(
-      tap(response => {
-        console.log('E-posta doğrulama yanıtı:', response);
-      }),
-      catchError((error: HttpErrorResponse) => {
-        console.error('E-posta doğrulama hatası:', error);
-        throw error;
-      })
-    );
+    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/verify`, data);
   }
 
   resendVerificationCode(email: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/resend`, email);
+    return this.http.post(`${environment.apiUrl}/resend`, email);
   }
 
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem('currentUser');
     }
+    this.currentUserSubject.next(null);
+    this.router.navigate(['/']);
   }
 
   isLoggedIn(): boolean {
-    if (isPlatformBrowser(this.platformId)) {
-      return !!localStorage.getItem(this.tokenKey);
-    }
-    return false;
+    return !!this.currentUserSubject.value;
   }
 
   getToken(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem(this.tokenKey);
+    const user = this.currentUserSubject.value;
+    if (!user || !user.token) {
+      return null;
     }
-    return null;
+    return user.token;
   }
 
-  setToken(token: string): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem(this.tokenKey, token);
+  getCurrentUser(): LoginResponse | null {
+    return this.currentUserSubject.value;
+  }
+
+  private parseJwt(token: string): any {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      return null;
     }
   }
 
-  removeToken(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem(this.tokenKey);
+  getUserEmail(): string {
+    const user = this.currentUserSubject.value;
+    console.log('Current User in getUserEmail:', user);
+    
+    if (!user || !user.token) {
+      console.log('No user or token found');
+      return '';
+    }
+    
+    try {
+      const decodedToken = this.parseJwt(user.token);
+      console.log('Decoded Token:', decodedToken);
+      return decodedToken?.sub || '';
+    } catch (e) {
+      console.error('Error parsing token:', e);
+      return '';
     }
   }
 } 

@@ -35,11 +35,14 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/post/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/post/**", "/category/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/post").hasRole("USER")
                         .requestMatchers(HttpMethod.PUT, "/post").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/post").hasRole("USER")
-                        .requestMatchers("/admin/**", "/category/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/category/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/category/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/category/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

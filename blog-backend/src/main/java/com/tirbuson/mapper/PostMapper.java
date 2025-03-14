@@ -19,10 +19,10 @@ public class PostMapper implements BaseMapper<Post, PostResponseDto, PostRequest
     private final CategoryService categoryService;
     private final ImageService imageService;
 
-    public PostMapper(UserService userService, CategoryService categoryService, ImageService imageService, ImageService imageService1) {
+    public PostMapper(UserService userService, CategoryService categoryService, ImageService imageService) {
         this.userService = userService;
         this.categoryService = categoryService;
-        this.imageService = imageService1;
+        this.imageService = imageService;
     }
 
     @Override
@@ -30,14 +30,18 @@ public class PostMapper implements BaseMapper<Post, PostResponseDto, PostRequest
         Post post = new Post();
         post.setTitle(postRequestDto.getTitle());
         post.setContent(postRequestDto.getContent());
-        post.setUser(userService.findById((Integer) postRequestDto.getUserId()));
-        post.setCategory(categoryService.findById((Integer) postRequestDto.getCategoryId()));
+        
+        post.setUser(userService.findByEmail(postRequestDto.getUserEmail()));
+        post.setCategory(categoryService.findById(postRequestDto.getCategoryId()));
+        
         List<Image> images = new ArrayList<>();
-        for (String image : postRequestDto.getImages()) {
-            Image imageEntity = new Image();
-            imageEntity.setUrl(image);
-            Image savedImage=imageService.save(imageEntity);
-            images.add(savedImage);
+        if (postRequestDto.getImages() != null) {
+            for (String imageUrl : postRequestDto.getImages()) {
+                Image imageEntity = new Image();
+                imageEntity.setUrl(imageUrl);
+                Image savedImage = imageService.save(imageEntity);
+                images.add(savedImage);
+            }
         }
         post.setImages(images);
 
@@ -50,16 +54,18 @@ public class PostMapper implements BaseMapper<Post, PostResponseDto, PostRequest
         postResponseDto.setId(entity.getId());
         postResponseDto.setTitle(entity.getTitle());
         postResponseDto.setContent(entity.getContent());
-
-
-
-        postResponseDto.setUsername(userService.findById(entity.getUser().getId()).getUsername());
-        postResponseDto.setCategory(categoryService.findById(entity.getCategory().getId()).getName());
-        List<String> images = new ArrayList<>();
-        for (Image image : entity.getImages()) {
-            images.add(image.getUrl());
+        postResponseDto.setUserEmail(entity.getUser().getEmail());
+        postResponseDto.setCategoryId(entity.getCategory().getId());
+        postResponseDto.setCategoryName(entity.getCategory().getName());
+        
+        List<String> imageUrls = new ArrayList<>();
+        if (entity.getImages() != null) {
+            for (Image image : entity.getImages()) {
+                imageUrls.add(image.getUrl());
+            }
         }
-        postResponseDto.setImages(images);
+        postResponseDto.setImages(imageUrls);
+        
         return postResponseDto;
     }
 }

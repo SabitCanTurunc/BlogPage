@@ -20,10 +20,10 @@ public class PostController extends BaseController<PostService, Post,Integer, Po
     private final PostService postService;
     private final PostMapper postMapper;
 
-    protected PostController(PostService service, PostMapper mapper, PostService postService, PostMapper postMapper) {
+    protected PostController(PostService service, PostMapper mapper) {
         super(service, mapper);
-        this.postService = postService;
-        this.postMapper = postMapper;
+        this.postService = service;
+        this.postMapper = mapper;
     }
 
     @GetMapping("/user/{userId}")

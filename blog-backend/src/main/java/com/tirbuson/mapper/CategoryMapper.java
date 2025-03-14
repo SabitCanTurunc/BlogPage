@@ -19,7 +19,10 @@ public class CategoryMapper implements BaseMapper<Category, CategoryResponseDto,
     @Override
     public CategoryResponseDto convertToDto(Category entity) {
         CategoryResponseDto categoryResponseDto = new CategoryResponseDto();
+        categoryResponseDto.setId(entity.getId());
         categoryResponseDto.setName(entity.getName());
+        categoryResponseDto.setCreatedAt(entity.getCreatedAt());
+        categoryResponseDto.setUpdatedAt(entity.getUpdatedAt());
         return categoryResponseDto;
     }
 }

@@ -22,7 +22,7 @@ public class PostRequestDto extends BaseDto {
     private String content;
 
 //    @NotBlank(message = "userId can not be empty")
-    private Integer userId;
+    private String userEmail;
 
 //    @NotBlank(message = "categoryId can not be empty")
     private Integer categoryId;

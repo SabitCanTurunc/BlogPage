@@ -2,8 +2,9 @@ export interface Post {
     id: number;
     title: string;
     content: string;
-    username: string;
-    category: string;
+    userEmail: string;
+    categoryId: number;
+    categoryName: string;
     images: string[];
     createdAt: string;
     updatedAt: string;
