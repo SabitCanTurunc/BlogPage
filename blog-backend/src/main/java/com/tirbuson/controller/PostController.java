@@ -26,7 +26,7 @@ public class PostController extends BaseController<PostService, Post,Integer, Po
         this.postMapper = postMapper;
     }
 
-    @GetMapping("user/{userId}")
+    @GetMapping("/user/{userId}")
     public List<PostResponseDto> getPostByUserId(@PathVariable Integer userId) {
         List<PostResponseDto> posts= new ArrayList<>();
         for(Post post : postService.getPostByUserId(userId)) {

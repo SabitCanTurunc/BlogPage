@@ -11,9 +11,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostResponseDto extends BaseDto {
+    private Integer id;
     private String title;
     private String content;
-    private Integer userId;
-    private Integer categoryId;
+    private String username;
+    private String category;
     private List<String> images;
 }

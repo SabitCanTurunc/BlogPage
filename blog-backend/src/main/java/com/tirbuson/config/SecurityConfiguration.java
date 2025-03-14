@@ -3,6 +3,7 @@ package com.tirbuson.config;
 import com.tirbuson.service.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,6 +35,10 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/post/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/post").hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/post").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/post").hasRole("USER")
                         .requestMatchers("/admin/**", "/category/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

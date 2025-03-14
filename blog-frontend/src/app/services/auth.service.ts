@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, tap, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { isPlatformBrowser } from '@angular/common';
 
 export interface UserRequestDto {
   username: string;
@@ -30,13 +31,14 @@ export interface VerifyUserDto {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}/auth`;
+  private apiUrl = environment.apiUrl;
   private tokenKey = 'auth_token';
+  private platformId = inject(PLATFORM_ID);
 
   constructor(private http: HttpClient) { }
 
   signup(userData: UserRequestDto): Observable<any> {
-    return this.http.post(`${this.apiUrl}/signup`, userData);
+    return this.http.post(`${this.apiUrl}/auth/signup`, userData);
   }
 
   login(credentials: { email: string; password: string }): Observable<LoginResponseDto> {
@@ -46,18 +48,20 @@ export class AuthService {
     });
 
     console.log('Login isteği gönderiliyor:', {
-      url: `${this.apiUrl}/login`,
+      url: `${this.apiUrl}/auth/login`,
       credentials: credentials,
       headers: headers
     });
 
-    return this.http.post<LoginResponseDto>(`${this.apiUrl}/login`, credentials, { 
+    return this.http.post<LoginResponseDto>(`${this.apiUrl}/auth/login`, credentials, { 
       headers
     }).pipe(
       tap(response => {
         console.log('Login yanıtı:', response);
         if (response.status === 200 && response.token) {
-          localStorage.setItem(this.tokenKey, response.token);
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem(this.tokenKey, response.token);
+          }
         }
       }),
       catchError((error: HttpErrorResponse) => {
@@ -80,7 +84,7 @@ export class AuthService {
     });
 
     console.log('Doğrulama isteği gönderiliyor:', {
-      url: `${this.apiUrl}/verify`,
+      url: `${this.apiUrl}/auth/verify`,
       data: data,
       headers: headers
     });
@@ -103,14 +107,34 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(this.tokenKey);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem(this.tokenKey);
+    }
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem(this.tokenKey);
+    if (isPlatformBrowser(this.platformId)) {
+      return !!localStorage.getItem(this.tokenKey);
+    }
+    return false;
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem(this.tokenKey);
+    }
+    return null;
+  }
+
+  setToken(token: string): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem(this.tokenKey, token);
+    }
+  }
+
+  removeToken(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem(this.tokenKey);
+    }
   }
 } 

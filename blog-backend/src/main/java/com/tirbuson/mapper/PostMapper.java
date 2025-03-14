@@ -47,10 +47,14 @@ public class PostMapper implements BaseMapper<Post, PostResponseDto, PostRequest
     @Override
     public PostResponseDto convertToDto(Post entity) {
         PostResponseDto postResponseDto = new PostResponseDto();
+        postResponseDto.setId(entity.getId());
         postResponseDto.setTitle(entity.getTitle());
         postResponseDto.setContent(entity.getContent());
-        postResponseDto.setUserId(entity.getUser().getId());
-        postResponseDto.setCategoryId(entity.getCategory().getId());
+
+
+
+        postResponseDto.setUsername(userService.findById(entity.getUser().getId()).getUsername());
+        postResponseDto.setCategory(categoryService.findById(entity.getCategory().getId()).getName());
         List<String> images = new ArrayList<>();
         for (Image image : entity.getImages()) {
             images.add(image.getUrl());
