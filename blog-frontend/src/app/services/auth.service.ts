@@ -141,4 +141,34 @@ export class AuthService {
       return '';
     }
   }
+
+  isAdmin(): boolean {
+    const user = this.currentUserSubject.value;
+    if (!user || !user.token) {
+      return false;
+    }
+    
+    try {
+      const decodedToken = this.parseJwt(user.token);
+      return decodedToken?.role === 'ADMIN';
+    } catch (e) {
+      console.error('Error parsing token:', e);
+      return false;
+    }
+  }
+
+  getUserId(): number | null {
+    const user = this.currentUserSubject.value;
+    if (!user || !user.token) {
+      return null;
+    }
+    
+    try {
+      const decodedToken = this.parseJwt(user.token);
+      return decodedToken?.userId || null;
+    } catch (e) {
+      console.error('Error parsing token:', e);
+      return null;
+    }
+  }
 } 

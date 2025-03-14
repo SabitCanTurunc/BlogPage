@@ -12,7 +12,7 @@ import { AuthService } from '../../services/auth.service';
     <div class="verify-container">
       <div class="verify-box">
         <h2>E-posta Doğrulama</h2>
-        <p class="subtitle">E-posta adresinize gönderilen doğrulama kodunu giriniz.</p>
+        <p>E-posta adresinize gönderilen doğrulama kodunu giriniz.</p>
         
         <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
           <div class="form-group">
@@ -59,16 +59,15 @@ import { AuthService } from '../../services/auth.service';
             type="submit" 
             class="btn btn-primary" 
             [disabled]="!verifyForm.valid || isLoading">
-            <span *ngIf="!isLoading">Doğrula</span>
-            <span *ngIf="isLoading">Doğrulanıyor...</span>
+            {{ isLoading ? 'Doğrulanıyor...' : 'Doğrula' }}
           </button>
         </form>
 
-        <div *ngIf="error" class="alert alert-danger">
+        <div *ngIf="error" class="alert alert-danger mt-3">
           {{ error }}
         </div>
 
-        <div *ngIf="success" class="alert alert-success">
+        <div *ngIf="success" class="alert alert-success mt-3">
           {{ success }}
         </div>
 
@@ -83,257 +82,106 @@ import { AuthService } from '../../services/auth.service';
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: calc(100vh - 64px);
-      background-color: #FEFAE0;
-      background-image: 
-        radial-gradient(circle at 10% 20%, rgba(212, 163, 115, 0.1) 0%, transparent 20%),
-        radial-gradient(circle at 90% 80%, rgba(204, 213, 174, 0.1) 0%, transparent 20%);
-      padding: 2rem;
-      position: relative;
+      min-height: 100vh;
+      background-color: #f5f5f5;
     }
 
     .verify-box {
-      background: rgba(233, 237, 201, 0.9);
-      padding: 3rem;
-      border-radius: 24px;
-      box-shadow: 
-        0 10px 40px rgba(212, 163, 115, 0.2),
-        0 0 0 1px rgba(212, 163, 115, 0.1);
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       width: 100%;
-      max-width: 450px;
-      position: relative;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      transform: translateY(0);
-      transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .verify-box::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, rgba(212, 163, 115, 0.3), rgba(204, 213, 174, 0.3), rgba(233, 237, 201, 0.3));
-      border-radius: 26px;
-      z-index: -1;
-      opacity: 0.6;
-      filter: blur(8px);
-    }
-
-    .verify-box:hover {
-      transform: translateY(-5px);
-      box-shadow: 
-        0 15px 50px rgba(212, 163, 115, 0.3),
-        0 0 0 1px rgba(212, 163, 115, 0.2);
+      max-width: 400px;
     }
 
     h2 {
-      color: #2C3E50;
       text-align: center;
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(45deg, #2C3E50, #D4A373);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      position: relative;
-      padding-bottom: 1rem;
+      color: #333;
+      margin-bottom: 1rem;
     }
 
-    h2::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100px;
-      height: 3px;
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
-      border-radius: 3px;
-    }
-
-    .subtitle {
-      color: #2C3E50;
+    p {
       text-align: center;
-      font-size: 1.1rem;
-      margin-bottom: 2.5rem;
-      opacity: 0.8;
-      line-height: 1.6;
+      color: #666;
+      margin-bottom: 2rem;
     }
 
     .form-group {
-      margin-bottom: 1.8rem;
-      position: relative;
+      margin-bottom: 1rem;
     }
 
     label {
       display: block;
       margin-bottom: 0.5rem;
-      color: #2C3E50;
-      font-weight: 500;
-      font-size: 0.95rem;
+      color: #333;
     }
 
     .form-control {
       width: 100%;
-      padding: 0.9rem;
-      border: 2px solid #D4A373;
-      border-radius: 12px;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
       font-size: 1rem;
-      background: #FEFAE0;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(212, 163, 115, 0.1);
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: #CCD5AE;
-      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.2);
-      transform: translateY(-1px);
-    }
-
-    .is-invalid {
-      border-color: #D4A373;
-      background: #FFF5F5;
-    }
-
-    .invalid-feedback {
-      color: #2C3E50;
-      font-size: 0.875rem;
-      margin-top: 0.5rem;
-      padding-left: 0.5rem;
     }
 
     .btn {
       width: 100%;
-      padding: 1.1rem;
+      padding: 0.75rem;
       border: none;
-      border-radius: 12px;
+      border-radius: 4px;
       font-size: 1rem;
-      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-top: 1rem;
+      transition: background-color 0.3s;
     }
 
     .btn-primary {
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
-      color: #2C3E50;
-      box-shadow: 0 4px 15px rgba(212, 163, 115, 0.3);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(212, 163, 115, 0.4);
+      background-color: #007bff;
+      color: white;
     }
 
     .btn-primary:disabled {
-      opacity: 0.7;
+      background-color: #ccc;
       cursor: not-allowed;
     }
 
     .alert {
-      margin-top: 1.5rem;
       padding: 1rem;
-      border-radius: 12px;
-      text-align: center;
-      animation: slideIn 0.3s ease;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      border-radius: 4px;
+      margin-top: 1rem;
     }
 
     .alert-danger {
-      background: #FEFAE0;
-      color: #2C3E50;
-      border: 2px solid #D4A373;
-      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1);
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
     }
 
     .alert-success {
-      background: #FEFAE0;
-      color: #2C3E50;
-      border: 2px solid #CCD5AE;
-      box-shadow: 0 4px 12px rgba(204, 213, 174, 0.1);
-    }
-
-    .mt-3 {
-      margin-top: 2rem;
-      text-align: center;
-      color: #2C3E50;
-      font-size: 0.95rem;
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
     }
 
     a {
-      color: #D4A373;
+      color: #007bff;
       text-decoration: none;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-
-    a::after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
-      transform: scaleX(0);
-      transition: transform 0.3s ease;
     }
 
     a:hover {
-      color: #CCD5AE;
+      text-decoration: underline;
     }
 
-    a:hover::after {
-      transform: scaleX(1);
+    .is-invalid {
+      border-color: #dc3545;
     }
 
-    @media (max-width: 768px) {
-      .verify-container {
-        padding: 1rem;
-        min-height: calc(100vh - 56px);
-      }
-
-      .verify-box {
-        padding: 2rem;
-        background: rgba(233, 237, 201, 0.95);
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
-      }
-
-      .verify-box::before {
-        filter: blur(4px);
-        opacity: 0.4;
-      }
-
-      h2 {
-        font-size: 2rem;
-      }
-
-      .form-control {
-        padding: 0.8rem;
-      }
-
-      .btn {
-        padding: 0.9rem;
-      }
+    .invalid-feedback {
+      display: block;
+      width: 100%;
+      margin-top: 0.25rem;
+      font-size: 0.875em;
+      color: #dc3545;
     }
   `]
 })

@@ -42,4 +42,8 @@ export class PostService {
 
     return this.http.post<any>(`${this.apiUrl}`, postData, { headers });
   }
+
+  deletePost(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 } 
