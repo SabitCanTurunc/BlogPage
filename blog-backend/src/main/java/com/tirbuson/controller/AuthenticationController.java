@@ -8,7 +8,6 @@ import com.tirbuson.dto.response.CustomException;
 import com.tirbuson.model.User;
 import com.tirbuson.service.AuthenticationService;
 import com.tirbuson.service.JwtService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

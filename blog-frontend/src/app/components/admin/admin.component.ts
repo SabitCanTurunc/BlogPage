@@ -9,6 +9,8 @@ import { UserRequestDto } from '../../models/user-request.dto';
 import { CategoryService } from '../../services/category.service';
 import { CategoryResponseDto } from '../../models/category-response.dto';
 import { CategoryRequestDto } from '../../models/category-request.dto';
+import { PostService } from '../../services/post.service';
+import { PostResponseDto } from '../../models/post-response.dto';
 
 @Component({
   selector: 'app-admin',
@@ -40,6 +42,16 @@ import { CategoryRequestDto } from '../../models/category-request.dto';
               <path d="M2.267 14.854a.5.5 0 0 1-.708-.708l7.434-7.433a.5.5 0 0 1 .708.708L2.267 14.854z"/>
             </svg>
             Kategori Yönetimi
+          </button>
+          <button 
+            (click)="selectSection('posts')" 
+            [class.active]="selectedSection === 'posts'"
+            class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+              <path d="M3.5 3.5a.5.5 0 0 1 1 0v8.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L3.5 12.293V3.5z"/>
+            </svg>
+            Post Yönetimi
           </button>
         </nav>
         <div class="sidebar-footer">
@@ -146,6 +158,41 @@ import { CategoryRequestDto } from '../../models/category-request.dto';
                     <td>
                       <button 
                         (click)="deleteCategory(category.id)"
+                        class="btn btn-danger">
+                        Sil
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Post Yönetimi -->
+          <div *ngIf="selectedSection === 'posts'" class="admin-section">
+            <h3>Post Yönetimi</h3>
+            <div class="posts-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Başlık</th>
+                    <th>Yazar</th>
+                    <th>Kategori</th>
+                    <th>Oluşturulma Tarihi</th>
+                    <th>İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let post of posts">
+                    <td>{{ post.id }}</td>
+                    <td>{{ post.title }}</td>
+                    <td>{{ post.userEmail }}</td>
+                    <td>{{ post.categoryName }}</td>
+                    <td>{{ post.createdAt ? (post.createdAt | date:'dd.MM.yyyy HH:mm') : 'Tarih yok' }}</td>
+                    <td>
+                      <button 
+                        (click)="deletePost(post.id)"
                         class="btn btn-danger">
                         Sil
                       </button>
@@ -434,6 +481,33 @@ import { CategoryRequestDto } from '../../models/category-request.dto';
       overflow-x: auto;
     }
 
+    .posts-table {
+      overflow-x: auto;
+    }
+
+    .posts-table table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .posts-table th,
+    .posts-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #D4A373;
+    }
+
+    .posts-table th {
+      background: #FEFAE0;
+      color: #2C3E50;
+      font-weight: 600;
+    }
+
+    .posts-table tr:hover {
+      background: #FEFAE0;
+    }
+
     @media (max-width: 768px) {
       .admin-container {
         flex-direction: column;
@@ -464,14 +538,16 @@ import { CategoryRequestDto } from '../../models/category-request.dto';
 export class AdminComponent implements OnInit {
   users: UserResponseDto[] = [];
   categories: CategoryResponseDto[] = [];
+  posts: PostResponseDto[] = [];
   isAdmin: boolean = false;
   currentUserId: number | null = null;
   newCategoryName: string = '';
-  selectedSection: string = 'users'; // Varsayılan olarak kullanıcı yönetimi seçili
+  selectedSection: string = 'users';
 
   constructor(
     private adminService: AdminService,
     private categoryService: CategoryService,
+    private postService: PostService,
     private authService: AuthService,
     private router: Router
   ) {}
@@ -492,6 +568,7 @@ export class AdminComponent implements OnInit {
     console.log('Admin erişimi onaylandı');
     this.loadUsers();
     this.loadCategories();
+    this.loadPosts();
   }
 
   loadUsers() {
@@ -618,6 +695,32 @@ export class AdminComponent implements OnInit {
         },
         error: (error) => {
           console.error('Kategori silinirken hata:', error);
+        }
+      });
+    }
+  }
+
+  loadPosts() {
+    this.postService.getAllPosts().subscribe({
+      next: (posts) => {
+        console.log('Postlar yüklendi:', JSON.stringify(posts, null, 2));
+        this.posts = posts;
+      },
+      error: (error) => {
+        console.error('Postlar yüklenirken hata:', error);
+      }
+    });
+  }
+
+  deletePost(id: number) {
+    if (confirm('Bu postu silmek istediğinizden emin misiniz?')) {
+      this.postService.deletePost(id).subscribe({
+        next: () => {
+          console.log('Post silindi:', id);
+          this.posts = this.posts.filter(p => p.id !== id);
+        },
+        error: (error) => {
+          console.error('Post silinirken hata:', error);
         }
       });
     }

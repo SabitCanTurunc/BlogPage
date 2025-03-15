@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { Post } from '../../models/post.model';
+import { PostResponseDto } from '../../models/post-response.dto';
 
 @Component({
   selector: 'app-post-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="container mt-4">
       <div *ngIf="post" class="post-detail">
@@ -299,13 +301,14 @@ export class PostDetailComponent implements OnInit {
     this.error = '';
 
     this.postService.getPostById(id).subscribe({
-      next: (post) => {
+      next: (post: PostResponseDto) => {
+        console.log('Post detayı yüklendi:', post);
         this.post = post;
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Post yükleme hatası:', err);
-        this.error = 'Post yüklenirken bir hata oluştu.';
+      error: (error) => {
+        console.error('Post detayı yüklenirken hata:', error);
+        this.error = 'Blog yazısı yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
         this.loading = false;
       }
     });

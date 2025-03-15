@@ -1,16 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { AuthService } from '../../services/auth.service';
 import { Post } from '../../models/post.model';
+import { PostResponseDto } from '../../models/post-response.dto';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="blog-container">
+      <!-- Admin Button -->
+      <div class="admin-button-container">
+        <button *ngIf="isAdmin" (click)="navigateToAdmin()" class="btn-admin-small">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+          </svg>
+          Admin
+        </button>
+      </div>
+
       <!-- Hero Section -->
       <div class="hero-section">
         <div class="hero-content">
@@ -240,6 +252,25 @@ import { Post } from '../../models/post.model';
       background: linear-gradient(45deg, #CCD5AE, #D4A373);
       transform: translateY(-3px);
       box-shadow: 0 6px 20px rgba(212, 163, 115, 0.4);
+    }
+
+    .btn-admin {
+      background: linear-gradient(45deg, #2C3E50, #34495E);
+      color: #fff;
+      border: none;
+      padding: 1rem 2.5rem;
+      font-weight: 600;
+      border-radius: 50px;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-admin:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4);
+      background: linear-gradient(45deg, #34495E, #2C3E50);
     }
 
     /* Main Content Layout */
@@ -634,28 +665,82 @@ import { Post } from '../../models/post.model';
       background: rgba(212, 163, 115, 0.1);
       transform: translateY(-3px);
     }
+
+    /* Admin Button Styles */
+    .admin-button-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+    }
+
+    .btn-admin-small {
+      background: linear-gradient(45deg, #2C3E50, #34495E);
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-admin-small:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4);
+      background: linear-gradient(45deg, #34495E, #2C3E50);
+    }
+
+    .btn-admin-small svg {
+      transition: transform 0.3s;
+    }
+
+    .btn-admin-small:hover svg {
+      transform: rotate(360deg);
+    }
+
+    @media (max-width: 768px) {
+      .admin-button-container {
+        top: 0.5rem;
+        right: 0.5rem;
+      }
+
+      .btn-admin-small {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.7rem;
+      }
+    }
   `]
 })
 export class HomeComponent implements OnInit {
-  posts: Post[] = [];
-  filteredPosts: Post[] = [];
+  posts: PostResponseDto[] = [];
+  filteredPosts: PostResponseDto[] = [];
   categories: string[] = [];
   selectedCategory: string | null = null;
   error: string = '';
   loading: boolean = true;
   isLoggedIn: boolean = false;
+  isAdmin: boolean = false;
   popularAuthors: string[] = [];
-  recentPosts: Post[] = [];
+  recentPosts: PostResponseDto[] = [];
   authorStats: { [key: string]: number } = {};
 
   constructor(
     private postService: PostService,
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+    this.isLoggedIn = this.authService.isLoggedIn();
+    this.isAdmin = this.authService.isAdmin();
+  }
 
   ngOnInit() {
-    this.isLoggedIn = this.authService.isLoggedIn();
     this.loadPosts();
   }
 
@@ -663,33 +748,39 @@ export class HomeComponent implements OnInit {
     this.loading = true;
     this.error = '';
 
+    if (!this.authService.isLoggedIn()) {
+      this.error = 'Blog yazılarını görüntülemek için giriş yapmalısınız.';
+      this.loading = false;
+      return;
+    }
+
     this.postService.getAllPosts().subscribe({
-      next: (posts) => {
+      next: (posts: PostResponseDto[]) => {
+        console.log('Postlar yüklendi:', posts);
         this.posts = posts;
         this.filteredPosts = posts;
         this.categories = [...new Set(posts.map(post => post.categoryName))].sort();
-        
-        // Popüler yazarları hesapla (en çok yazı yazanlar)
         this.authorStats = posts.reduce((acc: { [key: string]: number }, post) => {
           acc[post.userEmail] = (acc[post.userEmail] || 0) + 1;
           return acc;
         }, {});
-        
         this.popularAuthors = Object.entries(this.authorStats)
           .sort(([,a], [,b]) => b - a)
           .slice(0, 5)
           .map(([author]) => author);
-
-        // Son yazıları al
         this.recentPosts = [...posts]
           .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
           .slice(0, 5);
-
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Post yükleme hatası:', err);
-        this.error = 'Blog yazıları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+      error: (error) => {
+        console.error('Postlar yüklenirken hata:', error);
+        if (error.status === 401) {
+          this.error = 'Oturum süreniz dolmuş olabilir. Lütfen tekrar giriş yapın.';
+          this.router.navigate(['/login']);
+        } else {
+          this.error = 'Blog yazıları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+        }
         this.loading = false;
       }
     });
@@ -722,5 +813,9 @@ export class HomeComponent implements OnInit {
     this.authService.logout();
     this.isLoggedIn = false;
     this.router.navigate(['/home']);
+  }
+
+  navigateToAdmin() {
+    this.router.navigate(['/admin']);
   }
 } 

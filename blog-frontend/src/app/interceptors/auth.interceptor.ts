@@ -27,11 +27,12 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError(error => {
       if (error.status === 401) {
-        // Token geçersiz olduğunda, isteği token olmadan tekrar gönder
-        const newReq = req.clone({
-          headers: req.headers.delete('Authorization')
-        });
-        return next(newReq);
+        // Token geçersiz veya süresi dolmuş
+        authService.logout();
+        if (isPlatformBrowser(platformId)) {
+          window.alert('Oturum süreniz doldu. Lütfen tekrar giriş yapın.');
+        }
+        router.navigate(['/login']);
       }
       return throwError(() => error);
     })

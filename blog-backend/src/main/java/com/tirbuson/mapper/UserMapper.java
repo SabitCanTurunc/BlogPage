@@ -34,6 +34,7 @@ public class UserMapper implements BaseMapper<User, UserResponseDto,UserRequestD
         responseDto.setUsername(entity.getUsername());
         responseDto.setRole(entity.getRole());
         responseDto.setEmail(entity.getEmail());
+        responseDto.setEnabled(entity.isEnabled());
         return responseDto;
     }
 }

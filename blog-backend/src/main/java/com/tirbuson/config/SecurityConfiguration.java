@@ -1,6 +1,5 @@
 package com.tirbuson.config;
 
-import com.tirbuson.service.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -36,9 +35,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/post/**", "/category/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/post").hasRole("USER")
-                        .requestMatchers(HttpMethod.PUT, "/post").hasRole("USER")
-                        .requestMatchers(HttpMethod.DELETE, "/post").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/post").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/post").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/post").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/category/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/category/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/category/**").hasRole("ADMIN")

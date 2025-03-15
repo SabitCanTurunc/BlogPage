@@ -1,15 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AuthService } from './auth.service';
-
-export interface Category {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { CategoryResponseDto } from '../models/category-response.dto';
+import { CategoryRequestDto } from '../models/category-request.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -17,17 +11,21 @@ export interface Category {
 export class CategoryService {
   private apiUrl = `${environment.apiUrl}/category`;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService
-  ) {}
+  constructor(private http: HttpClient) { }
 
-  getAllCategories(): Observable<Category[]> {
-    const token = this.authService.getToken();
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
+  getAllCategories(): Observable<CategoryResponseDto[]> {
+    return this.http.get<CategoryResponseDto[]>(this.apiUrl);
+  }
 
-    return this.http.get<Category[]>(this.apiUrl, { headers });
+  createCategory(categoryRequestDto: CategoryRequestDto): Observable<CategoryResponseDto> {
+    return this.http.post<CategoryResponseDto>(this.apiUrl, categoryRequestDto);
+  }
+
+  updateCategory(id: number, categoryRequestDto: CategoryRequestDto): Observable<CategoryResponseDto> {
+    return this.http.put<CategoryResponseDto>(`${this.apiUrl}/${id}`, categoryRequestDto);
+  }
+
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 } 

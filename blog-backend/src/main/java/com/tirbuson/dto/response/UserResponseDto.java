@@ -14,5 +14,5 @@ public class UserResponseDto extends BaseDto {
     private String username;
     private String email;
     private Role role;
-
+    private boolean enabled;
 }
