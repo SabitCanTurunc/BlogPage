@@ -68,9 +68,11 @@ public class AuthenticationService {
     public User authenticate(UserRequestDto input){
         User user = userRepository.findByEmail(input.getEmail())
                 .orElseThrow(() -> new BaseException("Invalid email or password"));
+        
         if(!user.isEnabled()) {
-            throw new BaseException("Invalid email or password");
+            throw new BaseException("UNVERIFIED_USER");
         }
+        
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
