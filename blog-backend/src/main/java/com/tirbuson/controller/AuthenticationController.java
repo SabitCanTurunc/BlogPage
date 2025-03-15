@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RequestMapping("/auth")
 @RestController
 public class AuthenticationController {
@@ -62,12 +64,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/resend")
-    public ResponseEntity<?> resendVerificationCode(@RequestBody String email) {
+    public ResponseEntity<VerificationResponseDto> resendVerificationCode(@RequestBody Map<String, String> payload) {
         try{
+            String email = payload.get("email");
             authenticationService.resendVerificationCode(email);
-            return ResponseEntity.ok("Verification code resent");
+            return ResponseEntity.ok(new VerificationResponseDto("Verification code resent successfully", true));
         }catch(RuntimeException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new VerificationResponseDto(e.getMessage(), false));
         }
     }
 }

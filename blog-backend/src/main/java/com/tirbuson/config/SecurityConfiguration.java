@@ -33,7 +33,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/verify", "/resend").permitAll()
                         .requestMatchers(HttpMethod.GET, "/post/**", "/category/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/post").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/post").hasAnyRole("USER", "ADMIN")

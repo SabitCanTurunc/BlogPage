@@ -79,11 +79,11 @@ export class AuthService {
   }
 
   verifyEmail(data: { email: string; verificationCode: string }) {
-    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/verify`, data);
+    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/verify`, data);
   }
 
-  resendVerificationCode(email: string): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/resend`, email);
+  resendVerificationCode(email: string): Observable<{message: string, success: boolean}> {
+    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/resend`, { email });
   }
 
   logout(): void {

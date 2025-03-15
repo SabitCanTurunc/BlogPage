@@ -450,13 +450,25 @@ export class VerifyEmailComponent implements OnInit {
     this.authService.resendVerificationCode(email).subscribe({
       next: (response) => {
         console.log('Kod tekrar gönderildi:', response);
-        this.success = 'Doğrulama kodu tekrar gönderildi. Lütfen e-posta kutunuzu kontrol ediniz.';
-        this.error = '';
+        if (response.success) {
+          this.success = response.message || 'Doğrulama kodu tekrar gönderildi. Lütfen e-posta kutunuzu kontrol ediniz.';
+          this.error = '';
+        } else {
+          this.error = response.message || 'Doğrulama kodu gönderilirken bir hata oluştu.';
+          this.success = '';
+        }
         this.isResending = false;
       },
       error: (err) => {
         console.error('Kod gönderme hatası:', err);
-        this.error = err.error?.message || 'Doğrulama kodu gönderilirken bir hata oluştu.';
+        // Hata mesajını daha detaylı kontrol ediyoruz
+        if (err.error && err.error.message) {
+          this.error = err.error.message;
+        } else if (err.error && typeof err.error === 'string') {
+          this.error = err.error;
+        } else {
+          this.error = 'Doğrulama kodu gönderilirken bir hata oluştu.';
+        }
         this.success = '';
         this.isResending = false;
       }
