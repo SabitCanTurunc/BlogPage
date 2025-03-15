@@ -12,7 +12,7 @@ import { AuthService } from '../../services/auth.service';
     <div class="verify-container">
       <div class="verify-box">
         <h2>E-posta Doğrulama</h2>
-        <p>E-posta adresinize gönderilen doğrulama kodunu giriniz.</p>
+        <p class="subtitle">Hesabınızı aktifleştirmek için e-posta adresinize gönderilen doğrulama kodunu giriniz.</p>
         
         <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
           <div class="form-group">
@@ -61,6 +61,12 @@ import { AuthService } from '../../services/auth.service';
             [disabled]="!verifyForm.valid || isLoading">
             {{ isLoading ? 'Doğrulanıyor...' : 'Doğrula' }}
           </button>
+          
+          <div class="resend-code">
+            <button type="button" class="btn-link" (click)="resendCode()" [disabled]="isResending">
+              {{ isResending ? 'Kod gönderiliyor...' : 'Doğrulama kodunu tekrar gönder' }}
+            </button>
+          </div>
         </form>
 
         <div *ngIf="error" class="alert alert-danger mt-3">
@@ -82,106 +88,283 @@ import { AuthService } from '../../services/auth.service';
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      background-color: #f5f5f5;
+      min-height: calc(100vh - 64px);
+      background-color: #FEFAE0;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(212, 163, 115, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(204, 213, 174, 0.1) 0%, transparent 20%);
+      padding: 2rem;
+      position: relative;
     }
 
     .verify-box {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: rgba(233, 237, 201, 0.9);
+      padding: 3rem;
+      border-radius: 24px;
+      box-shadow: 
+        0 10px 40px rgba(212, 163, 115, 0.2),
+        0 0 0 1px rgba(212, 163, 115, 0.1);
       width: 100%;
-      max-width: 400px;
+      max-width: 450px;
+      position: relative;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transform: translateY(0);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .verify-box::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, rgba(212, 163, 115, 0.3), rgba(204, 213, 174, 0.3), rgba(233, 237, 201, 0.3));
+      border-radius: 26px;
+      z-index: -1;
+      opacity: 0.6;
+      filter: blur(8px);
+    }
+
+    .verify-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 
+        0 15px 50px rgba(212, 163, 115, 0.3),
+        0 0 0 1px rgba(212, 163, 115, 0.2);
     }
 
     h2 {
+      color: #2C3E50;
       text-align: center;
-      color: #333;
-      margin-bottom: 1rem;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(45deg, #2C3E50, #D4A373);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+      padding-bottom: 1rem;
     }
 
-    p {
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(45deg, #D4A373, #CCD5AE);
+      border-radius: 3px;
+    }
+
+    .subtitle {
+      color: #2C3E50;
       text-align: center;
-      color: #666;
-      margin-bottom: 2rem;
+      font-size: 1.1rem;
+      margin-bottom: 2.5rem;
+      opacity: 0.8;
+      line-height: 1.6;
     }
 
     .form-group {
-      margin-bottom: 1rem;
+      margin-bottom: 1.8rem;
+      position: relative;
     }
 
     label {
       display: block;
       margin-bottom: 0.5rem;
-      color: #333;
+      color: #2C3E50;
+      font-weight: 500;
+      font-size: 0.95rem;
     }
 
     .form-control {
       width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 0.9rem;
+      border: 2px solid #D4A373;
+      border-radius: 12px;
       font-size: 1rem;
+      background: #FEFAE0;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(212, 163, 115, 0.1);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #CCD5AE;
+      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .is-invalid {
+      border-color: #D4A373;
+      background: #FFF5F5;
+    }
+
+    .invalid-feedback {
+      color: #2C3E50;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      padding-left: 0.5rem;
     }
 
     .btn {
       width: 100%;
-      padding: 0.75rem;
+      padding: 1.1rem;
       border: none;
-      border-radius: 4px;
+      border-radius: 12px;
       font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 1rem;
     }
 
     .btn-primary {
-      background-color: #007bff;
-      color: white;
+      background: linear-gradient(45deg, #D4A373, #CCD5AE);
+      color: #2C3E50;
+      box-shadow: 0 4px 15px rgba(212, 163, 115, 0.3);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(212, 163, 115, 0.4);
     }
 
     .btn-primary:disabled {
-      background-color: #ccc;
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .resend-code {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: #D4A373;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .btn-link:hover:not(:disabled) {
+      color: #CCD5AE;
+      text-decoration: underline;
+    }
+
+    .btn-link:disabled {
+      opacity: 0.7;
       cursor: not-allowed;
     }
 
     .alert {
+      margin-top: 1.5rem;
       padding: 1rem;
-      border-radius: 4px;
-      margin-top: 1rem;
+      border-radius: 12px;
+      text-align: center;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .alert-danger {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
+      background: #FEFAE0;
+      color: #2C3E50;
+      border: 2px solid #D4A373;
+      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1);
     }
 
     .alert-success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
+      background: #E9EDC9;
+      color: #2C3E50;
+      border: 2px solid #CCD5AE;
+      box-shadow: 0 4px 12px rgba(204, 213, 174, 0.2);
+    }
+
+    .mt-3 {
+      margin-top: 2rem;
+      text-align: center;
+      color: #2C3E50;
+      font-size: 0.95rem;
     }
 
     a {
-      color: #007bff;
+      color: #D4A373;
       text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(45deg, #D4A373, #CCD5AE);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
     }
 
     a:hover {
-      text-decoration: underline;
+      color: #CCD5AE;
     }
 
-    .is-invalid {
-      border-color: #dc3545;
+    a:hover::after {
+      transform: scaleX(1);
     }
 
-    .invalid-feedback {
-      display: block;
-      width: 100%;
-      margin-top: 0.25rem;
-      font-size: 0.875em;
-      color: #dc3545;
+    @media (max-width: 768px) {
+      .verify-container {
+        padding: 1rem;
+        min-height: calc(100vh - 56px);
+      }
+
+      .verify-box {
+        padding: 2rem;
+        background: rgba(233, 237, 201, 0.95);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+      }
+
+      .verify-box::before {
+        filter: blur(4px);
+        opacity: 0.4;
+      }
+
+      h2 {
+        font-size: 2rem;
+      }
+
+      .form-control {
+        padding: 0.8rem;
+      }
+
+      .btn {
+        padding: 0.9rem;
+      }
     }
   `]
 })
@@ -190,6 +373,7 @@ export class VerifyEmailComponent implements OnInit {
   error: string = '';
   success: string = '';
   isLoading: boolean = false;
+  isResending: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -220,7 +404,7 @@ export class VerifyEmailComponent implements OnInit {
         next: (response) => {
           console.log('Doğrulama başarılı:', response);
           if (response.success) {
-            this.success = response.message;
+            this.success = response.message || 'Hesabınız başarıyla doğrulandı. Giriş sayfasına yönlendiriliyorsunuz...';
             this.error = '';
             this.isLoading = false;
             
@@ -229,7 +413,7 @@ export class VerifyEmailComponent implements OnInit {
               this.router.navigate(['/login']);
             }, 2000);
           } else {
-            this.error = response.message;
+            this.error = response.message || 'Doğrulama başarısız oldu.';
             this.success = '';
             this.isLoading = false;
           }
@@ -250,5 +434,32 @@ export class VerifyEmailComponent implements OnInit {
         }
       });
     }
+  }
+
+  resendCode() {
+    const email = this.verifyForm.get('email')?.value;
+    if (!email) {
+      this.error = 'Lütfen e-posta adresinizi giriniz.';
+      return;
+    }
+
+    this.isResending = true;
+    this.error = '';
+    this.success = '';
+
+    this.authService.resendVerificationCode(email).subscribe({
+      next: (response) => {
+        console.log('Kod tekrar gönderildi:', response);
+        this.success = 'Doğrulama kodu tekrar gönderildi. Lütfen e-posta kutunuzu kontrol ediniz.';
+        this.error = '';
+        this.isResending = false;
+      },
+      error: (err) => {
+        console.error('Kod gönderme hatası:', err);
+        this.error = err.error?.message || 'Doğrulama kodu gönderilirken bir hata oluştu.';
+        this.success = '';
+        this.isResending = false;
+      }
+    });
   }
 } 
