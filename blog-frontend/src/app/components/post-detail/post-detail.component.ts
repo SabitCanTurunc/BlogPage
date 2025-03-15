@@ -5,17 +5,20 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { Post } from '../../models/post.model';
 import { PostResponseDto } from '../../models/post-response.dto';
+import { CommentComponent } from '../comment/comment.component';
 
 @Component({
   selector: 'app-post-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, CommentComponent],
   template: `
     <div class="container mt-4">
       <div *ngIf="post" class="post-detail">
         <div class="post-header">
           <div class="post-meta">
             <span class="post-date">{{ post.createdAt | date:'mediumDate' }}</span>
+          </div>
+          <div class="post-meta">
             <span class="post-category">{{ post.categoryName }}</span>
           </div>
           <h1>{{ post.title }}</h1>
@@ -37,6 +40,8 @@ import { PostResponseDto } from '../../models/post-response.dto';
             </div>
           </div>
         </div>
+
+        <app-comment [postId]="post.id"></app-comment>
 
         <div class="post-footer">
           <a routerLink="/" class="back-button">

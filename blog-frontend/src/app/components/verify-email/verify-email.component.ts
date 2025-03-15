@@ -10,6 +10,9 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule, RouterModule, ReactiveFormsModule],
   template: `
     <div class="verify-container">
+      <a routerLink="/" class="home-icon">
+        <i class="fas fa-home"></i>
+      </a>
       <div class="verify-box">
         <h2>E-posta Doğrulama</h2>
         <p class="subtitle">Hesabınızı aktifleştirmek için e-posta adresinize gönderilen doğrulama kodunu giriniz.</p>
@@ -336,6 +339,30 @@ import { AuthService } from '../../services/auth.service';
       transform: scaleX(1);
     }
 
+    .home-icon {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      color: #D4A373;
+      background: rgba(233, 237, 201, 0.9);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.2);
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .home-icon:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(212, 163, 115, 0.3);
+      color: #CCD5AE;
+    }
+
     @media (max-width: 768px) {
       .verify-container {
         padding: 1rem;
@@ -364,6 +391,14 @@ import { AuthService } from '../../services/auth.service';
 
       .btn {
         padding: 0.9rem;
+      }
+
+      .home-icon {
+        top: 15px;
+        left: 15px;
+        width: 45px;
+        height: 45px;
+        font-size: 22px;
       }
     }
   `]
@@ -450,25 +485,13 @@ export class VerifyEmailComponent implements OnInit {
     this.authService.resendVerificationCode(email).subscribe({
       next: (response) => {
         console.log('Kod tekrar gönderildi:', response);
-        if (response.success) {
-          this.success = response.message || 'Doğrulama kodu tekrar gönderildi. Lütfen e-posta kutunuzu kontrol ediniz.';
-          this.error = '';
-        } else {
-          this.error = response.message || 'Doğrulama kodu gönderilirken bir hata oluştu.';
-          this.success = '';
-        }
+        this.success = 'Doğrulama kodu tekrar gönderildi. Lütfen e-posta kutunuzu kontrol ediniz.';
+        this.error = '';
         this.isResending = false;
       },
       error: (err) => {
         console.error('Kod gönderme hatası:', err);
-        // Hata mesajını daha detaylı kontrol ediyoruz
-        if (err.error && err.error.message) {
-          this.error = err.error.message;
-        } else if (err.error && typeof err.error === 'string') {
-          this.error = err.error;
-        } else {
-          this.error = 'Doğrulama kodu gönderilirken bir hata oluştu.';
-        }
+        this.error = err.error?.message || 'Doğrulama kodu gönderilirken bir hata oluştu.';
         this.success = '';
         this.isResending = false;
       }

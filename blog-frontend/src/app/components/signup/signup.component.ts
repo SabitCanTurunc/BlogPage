@@ -10,6 +10,9 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="signup-container">
+      <a routerLink="/" class="home-icon">
+        <i class="fas fa-home"></i>
+      </a>
       <div class="signup-box">
         <h2>Hesap Oluştur</h2>
         <p class="subtitle">Blog platformuna katılın ve düşüncelerinizi paylaşın</p>
@@ -308,6 +311,30 @@ import { CommonModule } from '@angular/common';
       transform: scaleX(1);
     }
 
+    .home-icon {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      color: #D4A373;
+      background: rgba(233, 237, 201, 0.9);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.2);
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .home-icon:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(212, 163, 115, 0.3);
+      color: #CCD5AE;
+    }
+
     @media (max-width: 768px) {
       .signup-container {
         padding: 1rem;
@@ -336,6 +363,14 @@ import { CommonModule } from '@angular/common';
 
       .btn {
         padding: 0.9rem;
+      }
+
+      .home-icon {
+        top: 15px;
+        left: 15px;
+        width: 45px;
+        height: 45px;
+        font-size: 22px;
       }
     }
   `]

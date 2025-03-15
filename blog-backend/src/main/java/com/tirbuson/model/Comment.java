@@ -12,16 +12,21 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment extends BaseEntity {
+public class Comment extends BaseEntity implements Ownable {
 
     @Column(nullable = false)
     private String comment;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade= CascadeType.PERSIST)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-
-
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    
+    @Override
+    public User getOwner() {
+        return user;
+    }
 }

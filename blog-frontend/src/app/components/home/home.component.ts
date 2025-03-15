@@ -101,6 +101,8 @@ import { PostResponseDto } from '../../models/post-response.dto';
                 <div class="card-body">
                   <div class="post-meta">
                     <span class="post-date">{{ post.createdAt | date:'mediumDate' }}</span>
+                  </div>
+                  <div class="post-meta">
                     <span class="post-category">{{ post.categoryName }}</span>
                   </div>
                   <h2 class="post-title">{{ post.title }}</h2>

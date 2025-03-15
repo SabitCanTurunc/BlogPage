@@ -38,6 +38,8 @@ export interface LoginResponse {
   };
   token?: string;
   expiresIn?: number;
+  email?: string;
+  role?: string;
 }
 
 @Injectable({
@@ -123,27 +125,23 @@ export class AuthService {
     }
   }
 
-  getUserEmail(): string {
-    const user = this.currentUserSubject.value;
-    console.log('Current User in getUserEmail:', user);
-    
+  getUserEmail(): string | null {
+    const user = this.getCurrentUser();
     if (!user || !user.token) {
-      console.log('No user or token found');
-      return '';
+      return null;
     }
     
     try {
       const decodedToken = this.parseJwt(user.token);
-      console.log('Decoded Token:', decodedToken);
-      return decodedToken?.sub || '';
+      return decodedToken?.sub || null;
     } catch (e) {
       console.error('Error parsing token:', e);
-      return '';
+      return null;
     }
   }
 
   isAdmin(): boolean {
-    const user = this.currentUserSubject.value;
+    const user = this.getCurrentUser();
     if (!user || !user.token) {
       return false;
     }
