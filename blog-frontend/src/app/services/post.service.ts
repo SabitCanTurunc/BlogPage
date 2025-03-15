@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { PostResponseDto } from '../models/post-response.dto';
 import { AuthService } from './auth.service';
@@ -35,6 +35,15 @@ export class PostService {
   createPost(postData: any): Observable<PostResponseDto> {
     const headers = this.getHeaders();
     return this.http.post<PostResponseDto>(`${this.apiUrl}`, postData, { headers });
+  }
+
+  updatePost(id: number, postData: any): Observable<PostResponseDto> {
+    console.log('Güncelleme isteği gönderiliyor:', id, postData);
+    const headers = this.getHeaders();
+    return this.http.put<PostResponseDto>(`${this.apiUrl}/${id}`, postData, { headers })
+      .pipe(
+        tap(response => console.log('Güncelleme yanıtı:', response))
+      );
   }
 
   deletePost(id: number): Observable<void> {

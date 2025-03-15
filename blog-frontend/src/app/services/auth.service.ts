@@ -40,6 +40,7 @@ export interface LoginResponse {
   expiresIn?: number;
   email?: string;
   role?: string;
+  username?: string;
 }
 
 @Injectable({

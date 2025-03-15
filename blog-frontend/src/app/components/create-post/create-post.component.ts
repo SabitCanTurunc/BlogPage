@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { CategoryService } from '../../services/category.service';
 import { AuthService } from '../../services/auth.service';
@@ -13,7 +13,7 @@ import { AuthService } from '../../services/auth.service';
   template: `
     <div class="container">
       <div class="create-post-form">
-        <h2>Yeni Blog Yazısı</h2>
+        <h2>{{ isEditMode ? 'Blog Yazısını Düzenle' : 'Yeni Blog Yazısı' }}</h2>
         
         <div *ngIf="!isLoggedIn" class="alert alert-warning">
           Lütfen önce giriş yapın.
@@ -72,7 +72,7 @@ import { AuthService } from '../../services/auth.service';
           <div class="form-actions">
             <button type="button" (click)="cancel()" class="btn btn-secondary">İptal</button>
             <button type="submit" [disabled]="!postForm.valid || isSubmitting" class="btn btn-primary">
-              {{ isSubmitting ? 'Gönderiliyor...' : 'Yayınla' }}
+              {{ isSubmitting ? 'Gönderiliyor...' : (isEditMode ? 'Güncelle' : 'Yayınla') }}
             </button>
           </div>
         </form>
@@ -235,13 +235,16 @@ export class CreatePostComponent implements OnInit {
   submitError: string = '';
   isSubmitting: boolean = false;
   isLoggedIn: boolean = false;
+  isEditMode: boolean = false;
+  postId: number | null = null;
 
   constructor(
     private fb: FormBuilder,
     private postService: PostService,
     private categoryService: CategoryService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.postForm = this.fb.group({
       title: ['', Validators.required],
@@ -253,6 +256,41 @@ export class CreatePostComponent implements OnInit {
 
   ngOnInit() {
     this.checkAuth();
+    
+    // URL'den post ID'sini al
+    this.route.params.subscribe(params => {
+      if (params['id']) {
+        this.isEditMode = true;
+        this.postId = +params['id'];
+        this.loadPostData(this.postId);
+      }
+    });
+  }
+
+  loadPostData(id: number) {
+    this.postService.getPostById(id).subscribe({
+      next: (post) => {
+        console.log('Düzenlenecek post yüklendi:', post);
+        
+        // Form'u doldur
+        this.postForm.patchValue({
+          title: post.title,
+          content: post.content,
+          categoryId: post.categoryId.toString(),
+          images: post.images ? post.images.join(', ') : ''
+        });
+      },
+      error: (error) => {
+        console.error('Post yüklenirken hata:', error);
+        this.submitError = 'Post yüklenirken bir hata oluştu.';
+        
+        if (error.status === 401) {
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 2000);
+        }
+      }
+    });
   }
 
   checkAuth() {
@@ -313,28 +351,65 @@ export class CreatePostComponent implements OnInit {
       this.isSubmitting = true;
       this.submitError = '';
 
-      this.postService.createPost(postData).subscribe({
-        next: (response) => {
-          this.router.navigate(['/post', response.id]);
-        },
-        error: (error) => {
-          console.error('Post yükleme hatası:', error);
-          if (error.error?.customException?.message) {
-            this.submitError = error.error.customException.message;
-          } else if (error.error?.message) {
-            this.submitError = error.error.message;
-          } else {
-            this.submitError = 'Post oluşturulurken bir hata oluştu.';
+      console.log('Form gönderiliyor, mod:', this.isEditMode ? 'düzenleme' : 'oluşturma');
+      console.log('Post ID:', this.postId);
+      console.log('Post verisi:', postData);
+
+      if (this.isEditMode && this.postId) {
+        // Düzenleme modu
+        console.log(`${this.postId} ID'li post güncelleniyor...`);
+        this.postService.updatePost(this.postId, postData).subscribe({
+          next: (response) => {
+            console.log('Post başarıyla güncellendi:', response);
+            this.router.navigate(['/post', response.id]);
+          },
+          error: (error) => {
+            console.error('Post güncelleme hatası:', error);
+            if (error.error?.customException?.message) {
+              this.submitError = error.error.customException.message;
+            } else if (error.error?.message) {
+              this.submitError = error.error.message;
+            } else {
+              this.submitError = 'Post güncellenirken bir hata oluştu.';
+            }
+            
+            if (error.status === 401) {
+              setTimeout(() => {
+                this.router.navigate(['/login']);
+              }, 2000);
+            }
+            this.isSubmitting = false;
           }
-          
-          if (error.status === 401) {
-            setTimeout(() => {
-              this.router.navigate(['/login']);
-            }, 2000);
+        });
+      } else {
+        // Yeni post oluşturma modu
+        console.log('Yeni post oluşturuluyor...');
+        this.postService.createPost(postData).subscribe({
+          next: (response) => {
+            console.log('Post başarıyla oluşturuldu:', response);
+            this.router.navigate(['/post', response.id]);
+          },
+          error: (error) => {
+            console.error('Post yükleme hatası:', error);
+            if (error.error?.customException?.message) {
+              this.submitError = error.error.customException.message;
+            } else if (error.error?.message) {
+              this.submitError = error.error.message;
+            } else {
+              this.submitError = 'Post oluşturulurken bir hata oluştu.';
+            }
+            
+            if (error.status === 401) {
+              setTimeout(() => {
+                this.router.navigate(['/login']);
+              }, 2000);
+            }
+            this.isSubmitting = false;
           }
-          this.isSubmitting = false;
-        }
-      });
+        });
+      }
+    } else {
+      console.log('Form geçerli değil:', this.postForm.errors);
     }
   }
 

@@ -191,11 +191,18 @@ import { PostResponseDto } from '../../models/post-response.dto';
                     <td>{{ post.categoryName }}</td>
                     <td>{{ post.createdAt ? (post.createdAt | date:'dd.MM.yyyy HH:mm') : 'Tarih yok' }}</td>
                     <td>
-                      <button 
-                        (click)="deletePost(post.id)"
-                        class="btn btn-danger">
-                        Sil
-                      </button>
+                      <div class="action-buttons">
+                        <button 
+                          (click)="editPost(post.id)"
+                          class="btn btn-primary">
+                          Düzenle
+                        </button>
+                        <button 
+                          (click)="deletePost(post.id)"
+                          class="btn btn-danger">
+                          Sil
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -508,6 +515,11 @@ import { PostResponseDto } from '../../models/post-response.dto';
       background: #FEFAE0;
     }
 
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
     @media (max-width: 768px) {
       .admin-container {
         flex-direction: column;
@@ -724,6 +736,10 @@ export class AdminComponent implements OnInit {
         }
       });
     }
+  }
+
+  editPost(id: number) {
+    this.router.navigate(['/create-post', id]);
   }
 
   selectSection(section: string) {

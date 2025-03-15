@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { PostService } from '../../services/post.service';
+import { UserService } from '../../services/user.service';
 import { PostResponseDto } from '../../models/post-response.dto';
 import { Router } from '@angular/router';
 
@@ -102,20 +103,20 @@ import { Router } from '@angular/router';
                   </div>
                   
                   <div class="form-group">
-                    <label for="currentPassword">Mevcut Şifre</label>
+                    <label for="currentPassword">Mevcut Şifre <small class="text-muted">(Şifre değiştirmek için gerekli)</small></label>
                     <input 
                       type="password" 
                       id="currentPassword" 
                       formControlName="currentPassword" 
                       class="form-control"
-                      [class.is-invalid]="accountForm.get('currentPassword')?.invalid && accountForm.get('currentPassword')?.touched">
-                    <div *ngIf="accountForm.get('currentPassword')?.errors?.['required'] && accountForm.get('currentPassword')?.touched" class="error-message">
-                      Mevcut şifre gereklidir
+                      [class.is-invalid]="shouldValidatePassword && !accountForm.get('currentPassword')?.value">
+                    <div *ngIf="shouldValidatePassword && !accountForm.get('currentPassword')?.value" class="error-message">
+                      Şifre değiştirmek için mevcut şifre gereklidir
                     </div>
                   </div>
                   
                   <div class="form-group">
-                    <label for="newPassword">Yeni Şifre</label>
+                    <label for="newPassword">Yeni Şifre <small class="text-muted">(Boş bırakılabilir)</small></label>
                     <input 
                       type="password" 
                       id="newPassword" 
@@ -544,17 +545,19 @@ export class UserProfileComponent implements OnInit {
   isSubmitting: boolean = false;
   updateError: string = '';
   updateSuccess: string = '';
+  shouldValidatePassword: boolean = false;
   
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private postService: PostService,
+    private userService: UserService,
     private router: Router
   ) {
     this.accountForm = this.fb.group({
       username: ['', [Validators.required]],
       email: [{ value: '', disabled: true }],
-      currentPassword: ['', [Validators.required]],
+      currentPassword: [''],
       newPassword: ['', [Validators.minLength(6)]],
       confirmPassword: ['']
     }, { validators: this.passwordMatchValidator });
@@ -588,10 +591,10 @@ export class UserProfileComponent implements OnInit {
   }
   
   loadUserProfile(): void {
-    // Burada kullanıcı bilgilerini yükleyeceğiz
-    // Şimdilik sadece email'i dolduruyoruz
+    // Kullanıcı bilgilerini yükle
     this.accountForm.patchValue({
-      email: this.userEmail
+      email: this.userEmail,
+      username: this.authService.getCurrentUser()?.username || ''
     });
   }
   
@@ -608,22 +611,68 @@ export class UserProfileComponent implements OnInit {
   }
   
   updateAccount(): void {
+    const formValues = this.accountForm.value;
+    const newPassword = formValues.newPassword;
+    const currentPassword = formValues.currentPassword;
+    
+    // Şifre değişikliği var mı kontrol et
+    if (newPassword && !currentPassword) {
+      this.shouldValidatePassword = true;
+      return;
+    }
+    
     if (this.accountForm.valid) {
       this.isSubmitting = true;
       this.updateError = '';
       this.updateSuccess = '';
+      this.shouldValidatePassword = false;
       
-      // Burada kullanıcı bilgilerini güncelleyeceğiz
-      // Şimdilik sadece başarılı mesajı gösteriyoruz
-      setTimeout(() => {
-        this.updateSuccess = 'Hesap bilgileriniz başarıyla güncellendi.';
-        this.isSubmitting = false;
-        
-        // 3 saniye sonra başarı mesajını kaldır
-        setTimeout(() => {
-          this.updateSuccess = '';
-        }, 3000);
-      }, 1000);
+      const email = this.userEmail;
+      const username = formValues.username;
+      
+      // Önce kullanıcı adını güncelle
+      this.userService.updateProfile(email, username).subscribe({
+        next: (response) => {
+          // Şifre değişikliği var mı kontrol et
+          if (newPassword && currentPassword) {
+            // Şifre değişikliği varsa şifreyi güncelle
+            this.userService.updatePassword(email, currentPassword, newPassword).subscribe({
+              next: (passwordResponse) => {
+                this.isSubmitting = false;
+                this.updateSuccess = 'Hesap bilgileriniz başarıyla güncellendi.';
+                
+                // Formu sıfırla
+                this.accountForm.patchValue({
+                  currentPassword: '',
+                  newPassword: '',
+                  confirmPassword: ''
+                });
+                
+                // 3 saniye sonra başarı mesajını kaldır
+                setTimeout(() => {
+                  this.updateSuccess = '';
+                }, 3000);
+              },
+              error: (err) => {
+                this.isSubmitting = false;
+                this.updateError = err.error?.message || 'Şifre güncellenirken bir hata oluştu.';
+              }
+            });
+          } else {
+            this.isSubmitting = false;
+            this.updateSuccess = 'Profil bilgileriniz başarıyla güncellendi.';
+            
+            // 3 saniye sonra başarı mesajını kaldır
+            setTimeout(() => {
+              this.updateSuccess = '';
+            }, 3000);
+          }
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.updateError = err.error?.message || 'Profil güncellenirken bir hata oluştu.';
+        }
+      });
     }
   }
   
@@ -635,6 +684,7 @@ export class UserProfileComponent implements OnInit {
         },
         error: (err) => {
           console.error('Yazı silinirken hata oluştu:', err);
+          alert('Yazı silinirken bir hata oluştu.');
         }
       });
     }
@@ -642,8 +692,22 @@ export class UserProfileComponent implements OnInit {
   
   confirmDeleteAccount(): void {
     if (confirm('Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
-      // Burada hesap silme işlemini yapacağız
-      alert('Hesap silme işlemi şu anda aktif değil.');
+      const password = prompt('Hesabınızı silmek için şifrenizi girin:');
+      
+      if (!password) {
+        return; // Kullanıcı iptal etti veya boş şifre girdi
+      }
+      
+      this.userService.deleteAccount(this.userEmail, password).subscribe({
+        next: (response) => {
+          alert('Hesabınız başarıyla silindi. Ana sayfaya yönlendiriliyorsunuz.');
+          this.authService.logout();
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          alert(err.error?.message || 'Hesap silinirken bir hata oluştu.');
+        }
+      });
     }
   }
   

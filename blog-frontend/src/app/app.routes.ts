@@ -17,7 +17,7 @@ export const routes: Routes = [
     { path: 'verify-email', component: VerifyEmailComponent },
     { path: 'post/:id', component: PostDetailComponent },
     { path: 'create-post', component: CreatePostComponent, canActivate: [AuthGuard] },
-    { path: 'edit-post/:id', component: CreatePostComponent, canActivate: [AuthGuard] },
+    { path: 'create-post/:id', component: CreatePostComponent, canActivate: [AuthGuard] },
     { path: 'admin', component: AdminComponent, canActivate: [AuthGuard, AdminGuard] },
     { path: 'profile', component: UserProfileComponent, canActivate: [AuthGuard] },
     { path: '**', redirectTo: '' }

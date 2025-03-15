@@ -38,9 +38,9 @@ import { PostResponseDto } from '../../models/post-response.dto';
             <button *ngIf="isLoggedIn" (click)="navigateToCreatePost()" class="btn btn-light">
               Yeni Yazı Oluştur
             </button>
-            <button *ngIf="isLoggedIn" (click)="logout()" class="btn btn-danger">
+            <!-- <button *ngIf="isLoggedIn" (click)="logout()" class="btn btn-danger">
               Çıkış Yap
-            </button>
+            </button> -->
           </div>
         </div>
       </div>

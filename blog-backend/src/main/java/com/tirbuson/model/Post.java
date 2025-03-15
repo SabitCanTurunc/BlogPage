@@ -24,7 +24,7 @@ public class Post extends BaseEntity implements Ownable{
 
 
     @ManyToOne(fetch = FetchType.LAZY, cascade= CascadeType.PERSIST)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_post_user", foreignKeyDefinition = "FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE"))
     private User user;
 
     @ManyToOne
