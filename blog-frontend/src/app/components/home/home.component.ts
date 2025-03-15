@@ -748,12 +748,6 @@ export class HomeComponent implements OnInit {
     this.loading = true;
     this.error = '';
 
-    if (!this.authService.isLoggedIn()) {
-      this.error = 'Blog yazılarını görüntülemek için giriş yapmalısınız.';
-      this.loading = false;
-      return;
-    }
-
     this.postService.getAllPosts().subscribe({
       next: (posts: PostResponseDto[]) => {
         console.log('Postlar yüklendi:', posts);
@@ -775,12 +769,7 @@ export class HomeComponent implements OnInit {
       },
       error: (error) => {
         console.error('Postlar yüklenirken hata:', error);
-        if (error.status === 401) {
-          this.error = 'Oturum süreniz dolmuş olabilir. Lütfen tekrar giriş yapın.';
-          this.router.navigate(['/login']);
-        } else {
-          this.error = 'Blog yazıları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
-        }
+        this.error = 'Blog yazıları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
         this.loading = false;
       }
     });

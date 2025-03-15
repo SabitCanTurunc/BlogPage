@@ -25,13 +25,11 @@ export class PostService {
   }
 
   getAllPosts(): Observable<PostResponseDto[]> {
-    const headers = this.getHeaders();
-    return this.http.get<PostResponseDto[]>(this.apiUrl, { headers });
+    return this.http.get<PostResponseDto[]>(this.apiUrl);
   }
 
   getPostById(id: number): Observable<PostResponseDto> {
-    const headers = this.getHeaders();
-    return this.http.get<PostResponseDto>(`${this.apiUrl}/${id}`, { headers });
+    return this.http.get<PostResponseDto>(`${this.apiUrl}/${id}`);
   }
 
   createPost(postData: any): Observable<PostResponseDto> {
