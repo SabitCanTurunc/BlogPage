@@ -53,5 +53,22 @@ public class UserService extends BaseService<User, Integer, UserRepository> {
         return userRepository.save(user);
     }
 
+    @Transactional
+    public void deleteById(Integer userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+        
+        // İlişkili yorumları ve yazıları manuel olarak temizle
+        if (user.getComments() != null) {
+            user.getComments().clear();
+        }
+        
+        if (user.getPosts() != null) {
+            user.getPosts().clear();
+        }
+        
+        // Kullanıcıyı sil
+        userRepository.delete(user);
+    }
 
 }

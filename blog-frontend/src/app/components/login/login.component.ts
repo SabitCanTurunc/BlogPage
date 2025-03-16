@@ -369,42 +369,15 @@ export class LoginComponent {
       this.error = '';
       
       const { email, password } = this.loginForm.value;
-      console.log('Form verileri:', { email, password });
       
       this.authService.login(email, password).subscribe({
         next: (response) => {
-          console.log('Login başarılı:', response);
           this.isLoading = false;
           this.router.navigate(['/home']);
         },
         error: (err) => {
-          console.error('Login hatası:', err);
-          console.error('Hata detayları:', {
-            status: err.status,
-            statusText: err.statusText,
-            error: err.error,
-            message: err.message,
-            headers: err.headers
-          });
-          
           this.isLoading = false;
-          
-          if (err.error && err.error.customException && err.error.customException.message === 'UNVERIFIED_USER') {
-            this.error = 'Hesabınız henüz doğrulanmamış. Doğrulama sayfasına yönlendiriliyorsunuz...';
-            setTimeout(() => {
-              this.router.navigate(['/verify-email'], { 
-                queryParams: { email: email }
-              });
-            }, 2000);
-          } else if (err.error && err.error.customException && err.error.customException.message) {
-            this.error = err.error.customException.message;
-          } else if (err.status === 401) {
-            this.error = 'E-posta veya şifre hatalı';
-          } else if (err.status === 0) {
-            this.error = 'Sunucuya bağlanılamıyor. Lütfen internet bağlantınızı kontrol edin.';
-          } else {
-            this.error = 'Giriş yapılırken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
-          }
+          this.error = err.message;
         }
       });
     }

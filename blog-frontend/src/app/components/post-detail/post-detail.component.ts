@@ -307,12 +307,10 @@ export class PostDetailComponent implements OnInit {
 
     this.postService.getPostById(id).subscribe({
       next: (post: PostResponseDto) => {
-        console.log('Post detayı yüklendi:', post);
         this.post = post;
         this.loading = false;
       },
       error: (error) => {
-        console.error('Post detayı yüklenirken hata:', error);
         this.error = 'Blog yazısı yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
         this.loading = false;
       }

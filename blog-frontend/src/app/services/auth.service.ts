@@ -1,6 +1,7 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
@@ -40,7 +41,6 @@ export interface LoginResponse {
   expiresIn?: number;
   email?: string;
   role?: string;
-  username?: string;
 }
 
 @Injectable({
@@ -52,9 +52,22 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
+    this.loadStoredUser();
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.status === 0) {
+      return throwError(() => new Error('Sunucuya bağlanılamıyor. Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.'));
+    }
+    
+    const errorMessage = error.error?.message || 'Bir hata oluştu.';
+    return throwError(() => new Error(errorMessage));
+  }
+
+  private loadStoredUser() {
     if (isPlatformBrowser(this.platformId)) {
       const storedUser = localStorage.getItem('currentUser');
       if (storedUser) {
@@ -64,7 +77,10 @@ export class AuthService {
   }
 
   signup(userData: UserRequestDto): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/auth/signup`, userData);
+    return this.http.post(`${environment.apiUrl}/auth/signup`, userData)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
   login(email: string, password: string): Observable<LoginResponse> {
@@ -77,16 +93,23 @@ export class AuthService {
             }
             this.currentUserSubject.next(response);
           }
-        })
+        }),
+        catchError(this.handleError)
       );
   }
 
   verifyEmail(data: { email: string; verificationCode: string }) {
-    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/verify`, data);
+    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/verify`, data)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
   resendVerificationCode(email: string): Observable<{message: string, success: boolean}> {
-    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/resend`, { email });
+    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/resend`, { email })
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
   logout(): void {
@@ -136,7 +159,6 @@ export class AuthService {
       const decodedToken = this.parseJwt(user.token);
       return decodedToken?.sub || null;
     } catch (e) {
-      console.error('Error parsing token:', e);
       return null;
     }
   }
@@ -151,7 +173,6 @@ export class AuthService {
       const decodedToken = this.parseJwt(user.token);
       return decodedToken?.role === 'ADMIN';
     } catch (e) {
-      console.error('Error parsing token:', e);
       return false;
     }
   }
@@ -166,7 +187,6 @@ export class AuthService {
       const decodedToken = this.parseJwt(user.token);
       return decodedToken?.userId || null;
     } catch (e) {
-      console.error('Error parsing token:', e);
       return null;
     }
   }

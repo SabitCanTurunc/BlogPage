@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**", "/verify", "/resend", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/user/update-password", "/user/update-profile", "/user/delete-account").permitAll()
+                        .requestMatchers("/user/update-password", "/user/update-profile").permitAll()
                         .requestMatchers(HttpMethod.GET, "/post/**", "/category/**", "/comment/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/post/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/post/**").hasAnyRole("USER", "ADMIN")

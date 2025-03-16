@@ -34,3 +34,8 @@ security:
   jwt:
     secret-key: "dGhlc2VjcmV0a2V5bXVzdGJldGhpc2xvbmcyNTZiaXRz"
     expiration-time: 3600000
+
+cloudinary:
+  cloud_name: dquzrdxog
+  api_key: 782368751769339
+  api_secret: SjQexhNC77z-Lzx5XqwZUfSbGC4

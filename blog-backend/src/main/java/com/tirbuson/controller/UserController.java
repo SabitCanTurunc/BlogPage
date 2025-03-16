@@ -108,7 +108,7 @@ public class UserController extends BaseController<UserService,User,Integer, Use
             }
             
             try {
-                // Kullanıcıyı sil - CASCADE ayarları sayesinde ilişkili tüm veriler otomatik silinecek
+                // Kullanıcıyı sil (cascade ilişkiler sayesinde ilişkili entity'ler de silinecektir)
                 userService.deleteById(user.getId());
                 
                 return ResponseEntity.ok(Map.of("message", "Hesabınız başarıyla silindi", "success", true));

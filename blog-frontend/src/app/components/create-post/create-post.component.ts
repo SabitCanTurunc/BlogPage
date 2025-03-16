@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { CategoryService } from '../../services/category.service';
 import { AuthService } from '../../services/auth.service';
+import { ImageService } from '../../services/image.service';
 
 @Component({
   selector: 'app-create-post',
@@ -60,13 +61,23 @@ import { AuthService } from '../../services/auth.service';
           </div>
 
           <div class="form-group">
-            <label for="images">Görseller (URL'leri virgülle ayırın)</label>
+            <label for="imageUpload">Resim Yükle</label>
             <input 
-              type="text" 
-              id="images" 
-              formControlName="images" 
+              type="file" 
+              id="imageUpload" 
+              (change)="onFileSelected($event)"
               class="form-control"
-              placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg">
+              accept="image/*"
+              multiple>
+            <div class="image-preview-container" *ngIf="uploadedImages.length > 0">
+              <div *ngFor="let image of uploadedImages" class="image-preview">
+                <img [src]="image.url" alt="Yüklenen resim">
+                <button type="button" class="remove-image" (click)="removeImage(image)">×</button>
+              </div>
+            </div>
+            <div *ngIf="imageUploadError" class="error-message">
+              {{ imageUploadError }}
+            </div>
           </div>
 
           <div class="form-actions">
@@ -214,6 +225,45 @@ import { AuthService } from '../../services/auth.service';
       border: 1px solid #D4A373;
     }
 
+    .image-preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .image-preview {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .remove-image {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.7);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+    }
+
     @media (max-width: 768px) {
       .container {
         padding: 1rem;
@@ -237,20 +287,22 @@ export class CreatePostComponent implements OnInit {
   isLoggedIn: boolean = false;
   isEditMode: boolean = false;
   postId: number | null = null;
+  uploadedImages: any[] = [];
+  imageUploadError: string = '';
 
   constructor(
     private fb: FormBuilder,
     private postService: PostService,
     private categoryService: CategoryService,
     private authService: AuthService,
+    private imageService: ImageService,
     private router: Router,
     private route: ActivatedRoute
   ) {
     this.postForm = this.fb.group({
       title: ['', Validators.required],
       content: ['', Validators.required],
-      categoryId: ['', Validators.required],
-      images: ['']
+      categoryId: ['', Validators.required]
     });
   }
 
@@ -270,18 +322,19 @@ export class CreatePostComponent implements OnInit {
   loadPostData(id: number) {
     this.postService.getPostById(id).subscribe({
       next: (post) => {
-        console.log('Düzenlenecek post yüklendi:', post);
-        
         // Form'u doldur
         this.postForm.patchValue({
           title: post.title,
           content: post.content,
-          categoryId: post.categoryId.toString(),
-          images: post.images ? post.images.join(', ') : ''
+          categoryId: post.categoryId.toString()
         });
+        
+        // Resimleri yükle
+        if (post.images && post.images.length > 0) {
+          this.uploadedImages = post.images.map((url: string) => ({ url }));
+        }
       },
       error: (error) => {
-        console.error('Post yüklenirken hata:', error);
         this.submitError = 'Post yüklenirken bir hata oluştu.';
         
         if (error.status === 401) {
@@ -295,8 +348,6 @@ export class CreatePostComponent implements OnInit {
 
   checkAuth() {
     const token = this.authService.getToken();
-    console.log('Token:', token);
-    console.log('Current User:', this.authService.getCurrentUser());
     
     if (!token) {
       this.isLoggedIn = false;
@@ -325,6 +376,53 @@ export class CreatePostComponent implements OnInit {
     });
   }
 
+  onFileSelected(event: any) {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      this.imageUploadError = '';
+      
+      // Maksimum 5 resim yüklenebilir
+      if (this.uploadedImages.length + files.length > 5) {
+        this.imageUploadError = 'En fazla 5 resim yükleyebilirsiniz.';
+        return;
+      }
+      
+      // Her dosya için yükleme işlemi
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Dosya boyutu kontrolü (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          this.imageUploadError = 'Dosya boyutu 5MB\'dan küçük olmalıdır.';
+          continue;
+        }
+        
+        // Dosya türü kontrolü
+        if (!file.type.startsWith('image/')) {
+          this.imageUploadError = 'Sadece resim dosyaları yükleyebilirsiniz.';
+          continue;
+        }
+        
+        // Resmi yükle
+        this.imageService.uploadImage(file).subscribe({
+          next: (response) => {
+            this.uploadedImages.push(response);
+          },
+          error: (error) => {
+            this.imageUploadError = 'Resim yüklenirken bir hata oluştu.';
+          }
+        });
+      }
+    }
+  }
+
+  removeImage(image: any) {
+    const index = this.uploadedImages.findIndex(img => img.url === image.url);
+    if (index !== -1) {
+      this.uploadedImages.splice(index, 1);
+    }
+  }
+
   onSubmit() {
     if (this.postForm.valid) {
       const userEmail = this.authService.getUserEmail();
@@ -337,34 +435,24 @@ export class CreatePostComponent implements OnInit {
         return;
       }
 
-      const imagesValue = this.postForm.get('images')?.value;
-      const images = imagesValue ? imagesValue.split(',').map((url: string) => url.trim()).filter((url: string) => url) : [];
-
       const postData = {
         title: this.postForm.get('title')?.value.trim(),
         content: this.postForm.get('content')?.value.trim(),
         categoryId: parseInt(this.postForm.get('categoryId')?.value),
-        images: images,
+        images: this.uploadedImages.map(img => img.url),
         userEmail: userEmail
       };
 
       this.isSubmitting = true;
       this.submitError = '';
 
-      console.log('Form gönderiliyor, mod:', this.isEditMode ? 'düzenleme' : 'oluşturma');
-      console.log('Post ID:', this.postId);
-      console.log('Post verisi:', postData);
-
       if (this.isEditMode && this.postId) {
         // Düzenleme modu
-        console.log(`${this.postId} ID'li post güncelleniyor...`);
         this.postService.updatePost(this.postId, postData).subscribe({
           next: (response) => {
-            console.log('Post başarıyla güncellendi:', response);
             this.router.navigate(['/post', response.id]);
           },
           error: (error) => {
-            console.error('Post güncelleme hatası:', error);
             if (error.error?.customException?.message) {
               this.submitError = error.error.customException.message;
             } else if (error.error?.message) {
@@ -383,14 +471,11 @@ export class CreatePostComponent implements OnInit {
         });
       } else {
         // Yeni post oluşturma modu
-        console.log('Yeni post oluşturuluyor...');
         this.postService.createPost(postData).subscribe({
           next: (response) => {
-            console.log('Post başarıyla oluşturuldu:', response);
             this.router.navigate(['/post', response.id]);
           },
           error: (error) => {
-            console.error('Post yükleme hatası:', error);
             if (error.error?.customException?.message) {
               this.submitError = error.error.customException.message;
             } else if (error.error?.message) {
@@ -408,8 +493,6 @@ export class CreatePostComponent implements OnInit {
           }
         });
       }
-    } else {
-      console.log('Form geçerli değil:', this.postForm.errors);
     }
   }
 

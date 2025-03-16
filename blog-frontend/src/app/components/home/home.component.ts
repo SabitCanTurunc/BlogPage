@@ -752,7 +752,6 @@ export class HomeComponent implements OnInit {
 
     this.postService.getAllPosts().subscribe({
       next: (posts: PostResponseDto[]) => {
-        console.log('Postlar yüklendi:', posts);
         this.posts = posts;
         this.filteredPosts = posts;
         this.categories = [...new Set(posts.map(post => post.categoryName))].sort();
@@ -770,7 +769,6 @@ export class HomeComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Postlar yüklenirken hata:', error);
         this.error = 'Blog yazıları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
         this.loading = false;
       }

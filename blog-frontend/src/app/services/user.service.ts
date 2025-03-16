@@ -7,30 +7,32 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = `${environment.apiUrl}/user`;
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
-  updatePassword(email: string, currentPassword: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/update-password`, {
-      email,
-      currentPassword,
-      newPassword
-    });
+  // Kullanıcı bilgilerini getir
+  getUserProfile(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/user/profile`);
   }
 
-  updateProfile(email: string, username: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/update-profile`, {
-      email,
-      username
-    });
+  // Kullanıcı bilgilerini güncelle
+  updateUserProfile(userData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/user/update-profile`, userData);
   }
-  
-  deleteAccount(email: string, password: string): Observable<any> {
-    console.log('Hesap silme isteği gönderiliyor:', { email, passwordLength: password?.length });
-    return this.http.post(`${this.apiUrl}/delete-account`, {
-      email,
-      password
-    });
+
+  // Kullanıcı şifresini güncelle
+  updatePassword(passwordData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/user/update-password`, passwordData);
+  }
+
+  // Kullanıcı hesabını sil
+  deleteAccount(credentials: { email: string, password: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/user/delete-account`, credentials);
+  }
+
+  // Kullanıcının yazılarını getir
+  getUserPosts(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/user/posts`);
   }
 } 
