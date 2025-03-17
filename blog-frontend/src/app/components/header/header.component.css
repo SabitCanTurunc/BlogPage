@@ -246,4 +246,21 @@
   .user-email {
     display: none;
   }
+}
+
+.admin-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #2d00f7;
+  font-weight: 600;
+}
+
+.admin-icon {
+  color: #2d00f7;
+  filter: drop-shadow(0 0 5px rgba(45, 0, 247, 0.5));
+}
+
+.admin-item:hover {
+  background: rgba(45, 0, 247, 0.1);
 }  
