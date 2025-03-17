@@ -3,11 +3,23 @@
 
 .post-detail-container {
   min-height: 100vh;
-  background-color: #0f0f1a;
+  background-color: transparent;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Arka plan gradientleri için ayrı bir katman */
+.post-detail-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image: 
     radial-gradient(circle at 10% 20%, rgba(45, 0, 247, 0.15) 0%, transparent 30%),
     radial-gradient(circle at 90% 80%, rgba(255, 0, 136, 0.15) 0%, transparent 30%);
-  padding: 2rem;
+  z-index: -1;
 }
 
 .post-detail-content {
@@ -483,4 +495,57 @@
   .action-buttons {
     flex-wrap: wrap;
   }
+}
+
+.post-images {
+  margin-top: 2rem;
+}
+
+.post-images h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ff0088;
+  margin-bottom: 1.5rem;
+  font-family: 'Montserrat', sans-serif;
+  text-shadow: 0 0 10px rgba(255, 0, 136, 0.5);
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.post-images h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(45deg, #2d00f7, #ff0088);
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(255, 0, 136, 0.5);
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.image-item {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(45, 0, 247, 0.3);
+  transition: all 0.3s;
+  border: 1px solid rgba(255, 0, 136, 0.3);
+}
+
+.image-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 30px rgba(255, 0, 136, 0.5);
+}
+
+.image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 } 
