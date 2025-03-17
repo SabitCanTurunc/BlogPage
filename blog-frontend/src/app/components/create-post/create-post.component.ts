@@ -25,6 +25,7 @@ export class CreatePostComponent implements OnInit {
   postId: number | null = null;
   uploadedImages: any[] = [];
   imageUploadError: string = '';
+  isImageUploading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -127,9 +128,9 @@ export class CreatePostComponent implements OnInit {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         
-        // Dosya boyutu kontrolü (5MB)
-        if (file.size > 5 * 1024 * 1024) {
-          this.imageUploadError = 'Dosya boyutu 5MB\'dan küçük olmalıdır.';
+        // Dosya boyutu kontrolü (20MB)
+        if (file.size > 20 * 1024 * 1024) {
+          this.imageUploadError = 'Dosya boyutu 20MB\'dan küçük olmalıdır.';
           continue;
         }
         
@@ -139,13 +140,18 @@ export class CreatePostComponent implements OnInit {
           continue;
         }
         
+        // Resim yükleme durumunu güncelle
+        this.isImageUploading = true;
+        
         // Resmi yükle
         this.imageService.uploadImage(file).subscribe({
           next: (response) => {
             this.uploadedImages.push(response);
+            this.isImageUploading = false;
           },
           error: (error) => {
             this.imageUploadError = 'Resim yüklenirken bir hata oluştu.';
+            this.isImageUploading = false;
           }
         });
       }

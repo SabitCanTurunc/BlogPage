@@ -19,4 +19,6 @@ public class CommentRequestDto extends BaseDto {
     private Integer postId;
     
     private String userEmail;
+
+    private Integer userId;
 } 

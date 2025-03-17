@@ -400,6 +400,7 @@ export class CommentComponent implements OnInit {
         comment: this.commentForm.get('comment')?.value.trim(),
         postId: this.postId,
         userEmail: this.currentUserEmail,
+        userId: this.authService.getUserId() || undefined,
         username: '' // Backend tarafında doldurulacak
       };
       
@@ -417,7 +418,11 @@ export class CommentComponent implements OnInit {
         },
         error: (err) => {
           console.error('Yorum eklenirken hata oluştu:', err);
-          this.error = 'Yorum eklenirken bir hata oluştu.';
+          if (err.error?.customException?.message) {
+            this.error = err.error.customException.message;
+          } else {
+            this.error = 'Yorum eklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+          }
           this.isSubmitting = false;
         }
       });

@@ -64,6 +64,12 @@
               <button type="button" class="remove-image" (click)="removeImage(image)">×</button>
             </div>
           </div>
+          <div *ngIf="isImageUploading" class="loading-spinner">
+            <div class="spinner">
+              <div class="spinner-inner"></div>
+            </div>
+            <span>Resim yükleniyor...</span>
+          </div>
           <div class="invalid-feedback" *ngIf="imageUploadError">
             {{ imageUploadError }}
           </div>

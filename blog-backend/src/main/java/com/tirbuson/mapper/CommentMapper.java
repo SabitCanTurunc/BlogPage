@@ -2,6 +2,9 @@ package com.tirbuson.mapper;
 
 import com.tirbuson.dto.request.CommentRequestDto;
 import com.tirbuson.dto.response.CommentResponseDto;
+import com.tirbuson.exception.BaseException;
+import com.tirbuson.exception.ErrorMessage;
+import com.tirbuson.exception.MessageType;
 import com.tirbuson.model.Comment;
 import com.tirbuson.model.Post;
 import com.tirbuson.model.User;
@@ -34,13 +37,29 @@ public class CommentMapper implements BaseMapper<Comment, CommentResponseDto, Co
         // Post'u repository'den al
         if (dto.getPostId() != null) {
             Optional<Post> post = postRepository.findById(dto.getPostId());
-            post.ifPresent(comment::setPost);
+            if (post.isEmpty()) {
+                throw new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, "Post bulunamadı: " + dto.getPostId()));
+            }
+            comment.setPost(post.get());
+        } else {
+            throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, "Post ID boş olamaz"));
         }
 
         // User'ı email'e göre repository'den al
-        if (dto.getUserEmail() != null) {
+        if (dto.getUserId() != null) {
+            Optional<User> user = userRepository.findById(dto.getUserId());
+            if (user.isEmpty()) {
+                throw new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, "Kullanıcı bulunamadı: " + dto.getUserId()));
+            }
+            comment.setUser(user.get());
+        } else if (dto.getUserEmail() != null) {
             Optional<User> user = userRepository.findByEmail(dto.getUserEmail());
-            user.ifPresent(comment::setUser);
+            if (user.isEmpty()) {
+                throw new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, "Kullanıcı bulunamadı: " + dto.getUserEmail()));
+            }
+            comment.setUser(user.get());
+        } else {
+            throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION, "Kullanıcı bilgisi boş olamaz"));
         }
 
         return comment;

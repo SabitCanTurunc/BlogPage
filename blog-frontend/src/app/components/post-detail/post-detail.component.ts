@@ -57,7 +57,7 @@ import { CommentComponent } from '../comment/comment.component';
         </div>
         
         <div class="post-body">
-          <p>{{ post.content }}</p>
+          <pre class="post-content">{{ post.content }}</pre>
           
           <div *ngIf="post.images && post.images.length > 0" class="post-images">
             <h3>Görseller</h3>
