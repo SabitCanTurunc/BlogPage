@@ -6,155 +6,37 @@ import { PostService } from '../../services/post.service';
 import { AuthService } from '../../services/auth.service';
 import { Post } from '../../models/post.model';
 import { PostResponseDto } from '../../models/post-response.dto';
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  template: `
-    <div class="blog-container">
-      <!-- Admin Button -->
-      <div class="admin-button-container">
-        <button *ngIf="isAdmin" (click)="navigateToAdmin()" class="btn-admin-small">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-          </svg>
-          Admin
-        </button>
-      </div>
-
-      <!-- Hero Section -->
-      <div class="hero-section">
-        <div class="hero-content">
-          <h1>Blog Platformu</h1>
-          <p class="hero-subtitle">Düşüncelerinizi paylaşın, bilgi birikimini artırın</p>
-          <div class="hero-buttons">
-            <button *ngIf="!isLoggedIn" (click)="navigateToSignup()" class="btn btn-light">
-              Ücretsiz Hesap Oluştur
-            </button>
-            <button *ngIf="!isLoggedIn" (click)="navigateToLogin()" class="btn btn-outline-light">
-              Giriş Yap
-            </button>
-            <button *ngIf="isLoggedIn" (click)="navigateToCreatePost()" class="btn btn-light">
-              Yeni Yazı Oluştur
-            </button>
-            <!-- <button *ngIf="isLoggedIn" (click)="logout()" class="btn btn-danger">
-              Çıkış Yap
-            </button> -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Content -->
-      <div class="main-content">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-          <div class="sidebar-content">
-            <div class="sidebar-section">
-              <h3>Kategoriler</h3>
-              <div class="category-list">
-                <button 
-                  class="category-item"
-                  [class.active]="selectedCategory === null"
-                  (click)="filterByCategory(null)">
-                  Tümü
-                </button>
-                <button 
-                  *ngFor="let category of categories"
-                  class="category-item"
-                  [class.active]="selectedCategory === category"
-                  (click)="filterByCategory(category)">
-                  {{ category }}
-                </button>
-              </div>
-            </div>
-
-            <div class="sidebar-section">
-              <h3>Popüler Yazarlar</h3>
-              <div class="popular-authors">
-                <div *ngFor="let author of popularAuthors" class="author-item">
-                  <img [src]="'https://ui-avatars.com/api/?name=' + author" alt="Yazar" class="author-avatar">
-                  <span class="author-name">{{ author }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="sidebar-section">
-              <h3>Son Yazılar</h3>
-              <div class="recent-posts">
-                <div *ngFor="let post of recentPosts" class="recent-post-item">
-                  <a [routerLink]="['/post', post.id]" class="recent-post-link">
-                    {{ post.title }}
-                  </a>
-                  <span class="recent-post-date">{{ post.createdAt | date:'shortDate' }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        <!-- Posts Grid -->
-        <div class="posts-section">
-          <div class="posts-grid">
-            <article *ngFor="let post of filteredPosts" class="post-card">
-              <div class="card">
-                <div class="card-body">
-                  <div class="post-meta">
-                    <span class="post-date">{{ post.createdAt | date:'mediumDate' }}</span>
-                  </div>
-                  <div class="post-meta">
-                    <span class="post-category">{{ post.categoryName }}</span>
-                  </div>
-                  <h2 class="post-title">{{ post.title }}</h2>
-                  <p class="post-excerpt">{{ post.content | slice:0:200 }}{{ post.content.length > 200 ? '...' : '' }}</p>
-                  <div class="post-footer">
-                    <div class="post-author">
-                      <img [src]="'https://ui-avatars.com/api/?name=' + post.userEmail" alt="Yazar" class="author-avatar">
-                      <span class="author-name">{{ post.userEmail }}</span>
-                    </div>
-                    <a [routerLink]="['/post', post.id]" class="read-more">
-                      Devamını Oku
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </article>
-          </div>
-
-          <div *ngIf="error" class="alert alert-danger">
-            {{ error }}
-          </div>
-
-          <div *ngIf="loading" class="loading-spinner">
-            <div class="spinner-border" role="status">
-              <span class="visually-hidden">Yükleniyor...</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
+  templateUrl: './home.component.html',
   styles: [`
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Poppins:wght@300;400;500;600&display=swap');
+
     .blog-container {
       min-height: 100vh;
-      background-color: #FEFAE0;
+      background-color: #0f0f1a;
       background-image: 
-        radial-gradient(circle at 10% 20%, rgba(212, 163, 115, 0.1) 0%, transparent 20%),
-        radial-gradient(circle at 90% 80%, rgba(204, 213, 174, 0.1) 0%, transparent 20%);
+        radial-gradient(circle at 10% 20%, rgba(45, 0, 247, 0.15) 0%, transparent 30%),
+        radial-gradient(circle at 90% 80%, rgba(255, 0, 136, 0.15) 0%, transparent 30%),
+        url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%232d00f7' stroke-width='1.5' stroke-opacity='0.2'%3E%3C!-- Kalem simgesi 1 --%3E%3Cpath d='M50 120 l-5 15 l1 1 l15 -5 l-11 -11 Z M46 135 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 1 --%3E%3Cpath d='M240 50 h16 v20 h-16 v-20 M240 50 c-3 2 -3 18 0 20 M256 50 v20 M242 55 h12 M242 60 h12 M242 65 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 1 --%3E%3Cpath d='M370 150 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 2 --%3E%3Cpath d='M130 200 l-5 15 l1 1 l15 -5 l-11 -11 Z M126 215 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 2 --%3E%3Cpath d='M320 260 h16 v20 h-16 v-20 M320 260 c-3 2 -3 18 0 20 M336 260 v20 M322 265 h12 M322 270 h12 M322 275 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 2 --%3E%3Cpath d='M180 300 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 3 --%3E%3Cpath d='M80 280 l-5 15 l1 1 l15 -5 l-11 -11 Z M76 295 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 3 --%3E%3Cpath d='M150 70 h16 v20 h-16 v-20 M150 70 c-3 2 -3 18 0 20 M166 70 v20 M152 75 h12 M152 80 h12 M152 85 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 3 --%3E%3Cpath d='M300 110 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 4 --%3E%3Cpath d='M250 340 l-5 15 l1 1 l15 -5 l-11 -11 Z M246 355 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 4 --%3E%3Cpath d='M90 300 h16 v20 h-16 v-20 M90 300 c-3 2 -3 18 0 20 M106 300 v20 M92 305 h12 M92 310 h12 M92 315 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 4 --%3E%3Cpath d='M330 30 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 5 --%3E%3Cpath d='M80 20 l-5 15 l1 1 l15 -5 l-11 -11 Z M76 35 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 5 --%3E%3Cpath d='M210 140 h16 v20 h-16 v-20 M210 140 c-3 2 -3 18 0 20 M226 140 v20 M212 145 h12 M212 150 h12 M212 155 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 5 --%3E%3Cpath d='M370 290 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 6 --%3E%3Cpath d='M30 200 l-5 15 l1 1 l15 -5 l-11 -11 Z M26 215 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C/g%3E%3C/svg%3E");
     }
 
     /* Hero Section */
     .hero-section {
-      background: linear-gradient(135deg, #CCD5AE 0%, #E9EDC9 100%);
-      color: #2C3E50;
+      background: linear-gradient(135deg, rgba(15, 15, 30, 0.7) 0%, rgba(26, 26, 46, 0.7) 100%);
+      color: #fff;
       padding: 6rem 2rem;
       text-align: center;
       margin-bottom: 3rem;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 0 30px rgba(255, 0, 136, 0.3);
+      border-bottom: 1px solid rgba(255, 0, 136, 0.3);
+      backdrop-filter: blur(5px);
     }
 
     .hero-section::before {
@@ -165,9 +47,35 @@ import { PostResponseDto } from '../../models/post-response.dto';
       right: 0;
       bottom: 0;
       background: 
-        radial-gradient(circle at 20% 30%, rgba(212, 163, 115, 0.2) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(204, 213, 174, 0.2) 0%, transparent 50%);
+        radial-gradient(circle at 20% 30%, rgba(45, 0, 247, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 0, 136, 0.2) 0%, transparent 50%);
       z-index: 1;
+    }
+
+    .hero-section::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke-opacity='0.8'%3E%3C!-- Kalem simgesi 1 --%3E%3Cpath d='M50 120 l-5 15 l1 1 l15 -5 l-11 -11 Z M46 135 l0 3 l3 0 Z' stroke='%23ff0088' stroke-width='2.5' fill='%23ff0088' fill-opacity='0.3'/%3E%3C!-- Kitap simgesi 1 --%3E%3Cpath d='M240 50 h16 v20 h-16 v-20 M240 50 c-3 2 -3 18 0 20 M256 50 v20 M242 55 h12 M242 60 h12 M242 65 h12' stroke='%232d00f7' stroke-width='2.5' fill='none'/%3E%3C!-- Tüy simgesi 1 --%3E%3Cpath d='M370 150 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke='%23ffffff' stroke-width='2.5' fill='none'/%3E%3C!-- Kalem simgesi 2 --%3E%3Cpath d='M130 200 l-5 15 l1 1 l15 -5 l-11 -11 Z M126 215 l0 3 l3 0 Z' stroke='%23ff0088' stroke-width='2.5' fill='%23ff0088' fill-opacity='0.3'/%3E%3C!-- Kitap simgesi 2 --%3E%3Cpath d='M320 260 h16 v20 h-16 v-20 M320 260 c-3 2 -3 18 0 20 M336 260 v20 M322 265 h12 M322 270 h12 M322 275 h12' stroke='%232d00f7' stroke-width='2.5' fill='none'/%3E%3C!-- Tüy simgesi 2 --%3E%3Cpath d='M180 300 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke='%23ffffff' stroke-width='2.5' fill='none'/%3E%3C!-- Kalem simgesi 3 --%3E%3Cpath d='M80 280 l-5 15 l1 1 l15 -5 l-11 -11 Z M76 295 l0 3 l3 0 Z' stroke='%23ff0088' stroke-width='2.5' fill='%23ff0088' fill-opacity='0.3'/%3E%3C!-- Kitap simgesi 3 --%3E%3Cpath d='M150 70 h16 v20 h-16 v-20 M150 70 c-3 2 -3 18 0 20 M166 70 v20 M152 75 h12 M152 80 h12 M152 85 h12' stroke='%232d00f7' stroke-width='2.5' fill='none'/%3E%3C!-- Tüy simgesi 3 --%3E%3Cpath d='M300 110 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke='%23ffffff' stroke-width='2.5' fill='none'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 800px 800px;
+      background-repeat: repeat;
+      opacity: 0.9;
+      z-index: 1;
+      pointer-events: none;
+      animation: float 20s infinite linear;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+    }
+
+    @keyframes float {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 800px 800px;
+      }
     }
 
     .hero-content {
@@ -177,102 +85,90 @@ import { PostResponseDto } from '../../models/post-response.dto';
       margin: 0 auto;
     }
 
+    .hero-logo {
+      margin-bottom: 1.5rem;
+    }
+
+    .blog-logo {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 15px rgba(255, 0, 136, 0.7));
+      transition: all 0.3s ease;
+    }
+
+    .blog-logo:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 20px rgba(45, 0, 247, 0.8));
+    }
+
     .hero-content h1 {
-      font-size: 4rem;
+      font-size: 5rem;
       font-weight: 800;
       margin-bottom: 1.5rem;
-      background: linear-gradient(45deg, #2C3E50, #D4A373);
+      background: linear-gradient(45deg, #ff0088, #2d00f7);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      text-shadow: 0 0 15px rgba(255, 0, 136, 0.5);
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: -1px;
     }
 
     .hero-subtitle {
-      color: #2C3E50;
+      color: #fff;
       font-size: 1.5rem;
       opacity: 0.9;
       margin-bottom: 2.5rem;
       line-height: 1.6;
+      font-family: 'Poppins', sans-serif;
+      text-shadow: 0 0 10px rgba(45, 0, 247, 0.5);
     }
 
     .hero-buttons {
       display: flex;
-      gap: 1rem;
+      gap: 1.5rem;
       justify-content: center;
     }
 
     .btn-light {
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
-      color: #2C3E50;
-      border: none;
-      padding: 1rem 2.5rem;
-      font-weight: 600;
-      border-radius: 50px;
-      box-shadow: 0 4px 15px rgba(212, 163, 115, 0.3);
-      transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .btn-light:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(212, 163, 115, 0.4);
-    }
-
-    .btn-outline-light {
-      background: transparent;
-      color: #2C3E50;
-      border: 2px solid #D4A373;
-      padding: 1rem 2.5rem;
-      font-weight: 600;
-      border-radius: 50px;
-      transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .btn-outline-light:hover {
-      background: rgba(212, 163, 115, 0.1);
-      border-color: #D4A373;
-      transform: translateY(-3px);
-    }
-
-    .btn-danger {
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
-      color: #2C3E50;
-      border: none;
-      padding: 1rem 2.5rem;
-      font-weight: 600;
-      border-radius: 50px;
-      box-shadow: 0 4px 15px rgba(212, 163, 115, 0.3);
-      transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .btn-danger:hover {
-      background: linear-gradient(45deg, #CCD5AE, #D4A373);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(212, 163, 115, 0.4);
-    }
-
-    .btn-admin {
-      background: linear-gradient(45deg, #2C3E50, #34495E);
+      background: linear-gradient(45deg, #ff0088, #ff5e5e);
       color: #fff;
       border: none;
       padding: 1rem 2.5rem;
       font-weight: 600;
       border-radius: 50px;
-      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+      box-shadow: 0 0 20px rgba(255, 0, 136, 0.5);
       transition: all 0.3s;
       text-transform: uppercase;
       letter-spacing: 1px;
+      font-family: 'Poppins', sans-serif;
     }
 
-    .btn-admin:hover {
+    .btn-light:hover {
       transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4);
-      background: linear-gradient(45deg, #34495E, #2C3E50);
+      box-shadow: 0 0 30px rgba(255, 0, 136, 0.8);
+      background: linear-gradient(45deg, #ff0088, #ff0055);
+    }
+
+    .btn-outline-light {
+      background: transparent;
+      color: #fff;
+      border: 2px solid #2d00f7;
+      padding: 1rem 2.5rem;
+      font-weight: 600;
+      border-radius: 50px;
+      box-shadow: 0 0 15px rgba(45, 0, 247, 0.5);
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-outline-light:hover {
+      background: rgba(45, 0, 247, 0.2);
+      border-color: #2d00f7;
+      transform: translateY(-3px);
+      box-shadow: 0 0 25px rgba(45, 0, 247, 0.7);
     }
 
     /* Main Content Layout */
@@ -293,11 +189,13 @@ import { PostResponseDto } from '../../models/post-response.dto';
     }
 
     .sidebar-content {
-      background: #E9EDC9;
+      background: rgba(10, 10, 26, 0.6);
       border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(212, 163, 115, 0.2);
+      box-shadow: 0 0 20px rgba(80, 0, 255, 0.3);
       padding: 2rem;
-      border: 1px solid rgba(212, 163, 115, 0.3);
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .sidebar-section {
@@ -309,12 +207,14 @@ import { PostResponseDto } from '../../models/post-response.dto';
     }
 
     .sidebar-section h3 {
-      color: #D4A373;
+      color: #ff00e6;
       font-size: 1.5rem;
       margin-bottom: 1.5rem;
       font-weight: 700;
       position: relative;
       padding-bottom: 0.5rem;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
     }
 
     .sidebar-section h3::after {
@@ -324,8 +224,9 @@ import { PostResponseDto } from '../../models/post-response.dto';
       left: 0;
       width: 50px;
       height: 3px;
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
+      background: linear-gradient(45deg, #5000ff, #ff00e6);
       border-radius: 3px;
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
 
     .category-list {
@@ -337,25 +238,32 @@ import { PostResponseDto } from '../../models/post-response.dto';
     .category-item {
       padding: 1rem 1.5rem;
       border: none;
-      background: #FEFAE0;
+      background: rgba(80, 0, 255, 0.1);
       text-align: left;
       border-radius: 12px;
       transition: all 0.3s;
-      color: #2C3E50;
+      color: #ffffff;
       font-size: 1rem;
       font-weight: 500;
-      border: 1px solid rgba(212, 163, 115, 0.2);
+      border: 1px solid rgba(255, 0, 230, 0.2);
+    }
+
+    .category-text {
+      position: relative;
+      z-index: 2;
     }
 
     .category-item:hover {
-      background: #FAEDCD;
+      background: rgba(255, 0, 230, 0.2);
       transform: translateX(5px);
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.3);
     }
 
     .category-item.active {
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
-      color: #2C3E50;
-      box-shadow: 0 4px 15px rgba(212, 163, 115, 0.3);
+      background: linear-gradient(45deg, rgba(80, 0, 255, 0.3), rgba(255, 0, 230, 0.3));
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
+      border: 1px solid rgba(255, 0, 230, 0.5);
     }
 
     /* Popular Authors */
@@ -369,26 +277,29 @@ import { PostResponseDto } from '../../models/post-response.dto';
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      padding: 0.5rem;
-      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
       transition: all 0.3s;
-      background: #FEFAE0;
-      border: 1px solid rgba(212, 163, 115, 0.2);
+      background: rgba(80, 0, 255, 0.1);
+      border: 1px solid rgba(255, 0, 230, 0.2);
     }
 
     .author-item:hover {
-      background: #FAEDCD;
+      background: rgba(255, 0, 230, 0.2);
       transform: translateX(5px);
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.3);
     }
 
     .author-avatar {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
+      border: 2px solid #ff00e6;
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
 
     .author-name {
-      color: #2C3E50;
+      color: #ffffff;
       font-size: 0.9rem;
     }
 
@@ -403,10 +314,21 @@ import { PostResponseDto } from '../../models/post-response.dto';
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      background: rgba(80, 0, 255, 0.1);
+      border: 1px solid rgba(255, 0, 230, 0.2);
+      transition: all 0.3s;
+    }
+
+    .recent-post-item:hover {
+      background: rgba(255, 0, 230, 0.2);
+      transform: translateX(5px);
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.3);
     }
 
     .recent-post-link {
-      color: #2C3E50;
+      color: #ffffff;
       text-decoration: none;
       font-size: 0.9rem;
       line-height: 1.4;
@@ -414,11 +336,12 @@ import { PostResponseDto } from '../../models/post-response.dto';
     }
 
     .recent-post-link:hover {
-      color: #D4A373;
+      color: #ff00e6;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
     }
 
     .recent-post-date {
-      color: rgba(44, 62, 80, 0.6);
+      color: rgba(255, 255, 255, 0.6);
       font-size: 0.8rem;
     }
 
@@ -433,26 +356,28 @@ import { PostResponseDto } from '../../models/post-response.dto';
     }
 
     .post-card {
-      background: #FEFAE0;
+      background: rgba(10, 10, 26, 0.6);
       border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(212, 163, 115, 0.2);
+      box-shadow: 0 0 20px rgba(80, 0, 255, 0.3);
       transition: all 0.3s;
-      border: 1px solid rgba(212, 163, 115, 0.3);
+      border: 1px solid rgba(255, 0, 230, 0.3);
       overflow: hidden;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .post-card:hover {
       transform: translateY(-10px);
-      box-shadow: 0 12px 40px rgba(212, 163, 115, 0.3);
+      box-shadow: 0 0 30px rgba(255, 0, 230, 0.5);
     }
 
     .card-body {
       padding: 2rem;
-      background: #FEFAE0;
+      background: transparent;
     }
 
     .card {
-      background-color: #FEFAE0;
+      background-color: transparent;
       border: none;
     }
 
@@ -461,41 +386,46 @@ import { PostResponseDto } from '../../models/post-response.dto';
       gap: 1rem;
       margin-bottom: 1.5rem;
       font-size: 0.9rem;
-      color: #2C3E50;
+      color: #ffffff;
     }
 
     .post-date {
-      color: #D4A373;
+      color: #ff00e6;
       font-weight: 500;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
     }
 
     .post-category {
-      background: #E9EDC9;
+      background: rgba(80, 0, 255, 0.2);
       padding: 0.5rem 1rem;
       border-radius: 50px;
-      color: #2C3E50;
+      color: #ffffff;
       font-weight: 500;
-      border: 1px solid rgba(212, 163, 115, 0.3);
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
     }
 
     .post-title {
       font-size: 1.8rem;
       font-weight: 700;
-      color: #2C3E50;
+      color: #ffffff;
       margin-bottom: 1.5rem;
       line-height: 1.4;
-      border-bottom: 2px solid #D4A373;
+      border-bottom: 2px solid #ff00e6;
       padding-bottom: 0.5rem;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px rgba(255, 0, 230, 0.5);
     }
 
     .post-excerpt {
-      color: #2C3E50;
+      color: rgba(255, 255, 255, 0.8);
       line-height: 1.8;
       margin-bottom: 2rem;
       font-size: 1.1rem;
-      background: #E9EDC9;
+      background: rgba(80, 0, 255, 0.1);
       padding: 1.5rem;
       border-radius: 12px;
+      border: 1px solid rgba(255, 0, 230, 0.2);
     }
 
     .post-footer {
@@ -503,7 +433,7 @@ import { PostResponseDto } from '../../models/post-response.dto';
       justify-content: space-between;
       align-items: center;
       padding-top: 1.5rem;
-      border-top: 2px solid #D4A373;
+      border-top: 2px solid #ff00e6;
     }
 
     .post-author {
@@ -511,41 +441,39 @@ import { PostResponseDto } from '../../models/post-response.dto';
       align-items: center;
       gap: 1rem;
       padding: 0.5rem 1rem;
-      background: #E9EDC9;
+      background: rgba(80, 0, 255, 0.2);
       border-radius: 50px;
       transition: all 0.3s;
-      border: 1px solid rgba(212, 163, 115, 0.3);
+      border: 1px solid rgba(255, 0, 230, 0.3);
     }
 
     .post-author:hover {
-      background: #CCD5AE;
+      background: rgba(255, 0, 230, 0.2);
       transform: translateY(-2px);
-    }
-
-    .author-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 2px solid #D4A373;
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
     }
 
     .read-more {
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      color: #2C3E50;
+      color: #ffffff;
       text-decoration: none;
       font-weight: 600;
       transition: all 0.3s;
       padding: 0.75rem 1.5rem;
-      background: #D4A373;
+      background: rgba(255, 0, 230, 0.2);
       border-radius: 50px;
-      border: none;
+      border: 1px solid rgba(255, 0, 230, 0.5);
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
     }
 
     .read-more:hover {
-      background: #CCD5AE;
+      background: rgba(80, 0, 255, 0.3);
       transform: translateX(5px);
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
     }
 
     .read-more svg {
@@ -558,8 +486,135 @@ import { PostResponseDto } from '../../models/post-response.dto';
 
     .loading-spinner {
       display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
       padding: 3rem;
+      gap: 1rem;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .spinner-inner {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 4px solid transparent;
+      border-top-color: #ff00e6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      box-shadow: 0 0 20px rgba(255, 0, 230, 0.8);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-spinner span {
+      color: #ff00e6;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
+    }
+
+    /* No Posts */
+    .no-posts {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 300px;
+    }
+
+    .no-posts-content {
+      text-align: center;
+      background: rgba(10, 10, 26, 0.6);
+      border-radius: 16px;
+      padding: 3rem;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 20px rgba(80, 0, 255, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      max-width: 500px;
+    }
+
+    .no-posts-content svg {
+      color: #ff00e6;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 0 10px rgba(255, 0, 230, 0.8));
+    }
+
+    .no-posts-content h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #ff00e6;
+      text-shadow: 0 0 10px rgba(255, 0, 230, 0.5);
+    }
+
+    .no-posts-content p {
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 0;
+    }
+
+    /* Alert */
+    .alert-danger {
+      background: rgba(255, 0, 0, 0.1);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    /* Admin Button Styles */
+    .admin-button-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+    }
+
+    .btn-admin-small {
+      background: rgba(80, 0, 255, 0.2);
+      color: #ffffff;
+      border: 1px solid rgba(255, 0, 230, 0.5);
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .btn-admin-small:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(255, 0, 230, 0.8);
+      background: rgba(255, 0, 230, 0.3);
+    }
+
+    .btn-admin-small svg {
+      transition: transform 0.3s;
+      filter: drop-shadow(0 0 5px rgba(255, 0, 230, 0.8));
+    }
+
+    .btn-admin-small:hover svg {
+      transform: rotate(360deg);
     }
 
     /* Responsive Design */
@@ -576,10 +631,6 @@ import { PostResponseDto } from '../../models/post-response.dto';
       .hero-buttons {
         flex-direction: column;
       }
-
-      .prompt-buttons {
-        flex-direction: column;
-      }
     }
 
     @media (max-width: 768px) {
@@ -594,120 +645,7 @@ import { PostResponseDto } from '../../models/post-response.dto';
       .main-content {
         padding: 0 1rem;
       }
-    }
 
-    .alert-info {
-      background: #E9EDC9;
-      border: 1px solid rgba(212, 163, 115, 0.3);
-      color: #2C3E50;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 8px 32px rgba(212, 163, 115, 0.2);
-    }
-
-    .login-prompt {
-      background: #E9EDC9;
-      border-radius: 16px;
-      padding: 3rem;
-      text-align: center;
-      box-shadow: 0 8px 32px rgba(212, 163, 115, 0.2);
-      border: 1px solid rgba(212, 163, 115, 0.3);
-    }
-
-    .login-prompt h4 {
-      color: #D4A373;
-      margin-bottom: 1.5rem;
-      font-size: 2rem;
-      font-weight: 700;
-    }
-
-    .login-prompt p {
-      color: #2C3E50;
-      margin-bottom: 2rem;
-      font-size: 1.2rem;
-      line-height: 1.6;
-    }
-
-    .prompt-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-    }
-
-    .btn-primary {
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
-      border: none;
-      color: #2C3E50;
-      padding: 1rem 2.5rem;
-      font-weight: 600;
-      border-radius: 50px;
-      box-shadow: 0 4px 15px rgba(212, 163, 115, 0.3);
-      transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(212, 163, 115, 0.4);
-    }
-
-    .btn-outline-primary {
-      color: #D4A373;
-      border: 2px solid #D4A373;
-      padding: 1rem 2.5rem;
-      font-weight: 600;
-      border-radius: 50px;
-      transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .btn-outline-primary:hover {
-      background: rgba(212, 163, 115, 0.1);
-      transform: translateY(-3px);
-    }
-
-    /* Admin Button Styles */
-    .admin-button-container {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      z-index: 1000;
-    }
-
-    .btn-admin-small {
-      background: linear-gradient(45deg, #2C3E50, #34495E);
-      color: #fff;
-      border: none;
-      padding: 0.5rem 1rem;
-      font-weight: 600;
-      border-radius: 50px;
-      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
-      transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 0.8rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .btn-admin-small:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4);
-      background: linear-gradient(45deg, #34495E, #2C3E50);
-    }
-
-    .btn-admin-small svg {
-      transition: transform 0.3s;
-    }
-
-    .btn-admin-small:hover svg {
-      transform: rotate(360deg);
-    }
-
-    @media (max-width: 768px) {
       .admin-button-container {
         top: 0.5rem;
         right: 0.5rem;
@@ -807,4 +745,4 @@ export class HomeComponent implements OnInit {
   navigateToAdmin() {
     this.router.navigate(['/admin']);
   }
-} 
+}

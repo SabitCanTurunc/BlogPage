@@ -70,19 +70,25 @@ import { Comment } from '../../models/comment.model';
     </div>
   `,
   styles: [`
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap');
+    
     .comments-section {
       margin-top: 3rem;
       padding-top: 2rem;
-      border-top: 2px solid #D4A373;
+      border-top: 2px solid #ff00e6;
+      font-family: 'Poppins', sans-serif;
     }
     
     h3 {
-      color: #2C3E50;
+      color: #ff00e6;
       font-size: 1.8rem;
       margin-bottom: 1.5rem;
       font-weight: 700;
       position: relative;
       padding-bottom: 0.5rem;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
+      letter-spacing: 1px;
     }
     
     h3::after {
@@ -92,8 +98,9 @@ import { Comment } from '../../models/comment.model';
       left: 0;
       width: 50px;
       height: 3px;
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
+      background: linear-gradient(45deg, #5000ff, #ff00e6);
       border-radius: 3px;
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
     
     .comment-form {
@@ -103,44 +110,75 @@ import { Comment } from '../../models/comment.model';
     .form-control {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid #D4A373;
+      border: 1px solid rgba(255, 0, 230, 0.3);
       border-radius: 8px;
       font-size: 1rem;
-      background: #E9EDC9;
+      background: rgba(20, 20, 40, 0.6);
+
+      color: #ffffff;
       transition: all 0.3s ease;
       resize: vertical;
+      box-shadow: 0 0 10px rgba(80, 0, 255, 0.2);
     }
     
     .form-control:focus {
       outline: none;
-      border-color: #CCD5AE;
-      box-shadow: 0 0 0 2px rgba(212, 163, 115, 0.2);
+      border-color: #ff00e6;
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
+    }
+    
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.6);
     }
     
     .error-message {
-      color: #2C3E50;
+      color: #ff00e6;
       font-size: 0.875rem;
       margin-top: 0.25rem;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
     }
     
     .btn {
       padding: 0.75rem 1.5rem;
       border: none;
-      border-radius: 8px;
+      border-radius: 50px;
       font-size: 1rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.3s ease;
       margin-top: 1rem;
+      font-family: 'Poppins', sans-serif;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #5000ff, #ff00e6);
+      opacity: 0;
+      z-index: -1;
+      transition: opacity 0.3s;
+    }
+    
+    .btn:hover:not(:disabled)::before {
+      opacity: 1;
     }
     
     .btn-primary {
-      background: #D4A373;
-      color: #2C3E50;
+      background: rgba(80, 0, 255, 0.2);
+      color: #ffffff;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
     }
     
     .btn-primary:hover:not(:disabled) {
-      background: #CCD5AE;
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
       transform: translateY(-2px);
     }
     
@@ -150,21 +188,27 @@ import { Comment } from '../../models/comment.model';
     }
     
     .login-prompt {
-      background: #E9EDC9;
+      background: rgba(20, 20, 40, 0.6);
       padding: 1rem;
       border-radius: 8px;
       margin-bottom: 2rem;
       text-align: center;
+      color: #ffffff;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(80, 0, 255, 0.2);
     }
     
     .login-prompt a {
-      color: #D4A373;
+      color: #ff00e6;
       text-decoration: none;
       font-weight: 600;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
+      transition: all 0.3s ease;
     }
     
     .login-prompt a:hover {
       text-decoration: underline;
+      text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
     
     .alert {
@@ -174,15 +218,17 @@ import { Comment } from '../../models/comment.model';
     }
     
     .alert-danger {
-      background: #FEFAE0;
-      color: #2C3E50;
-      border: 1px solid #D4A373;
+      background: rgba(20, 20, 40, 0.6);
+      color: #ff00e6;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
     }
     
     .alert-success {
-      background: #E9EDC9;
-      color: #2C3E50;
-      border: 1px solid #CCD5AE;
+      background: rgba(20, 20, 40, 0.6);
+      color: #00ffaa;
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      box-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
     }
     
     .comments-list {
@@ -192,24 +238,27 @@ import { Comment } from '../../models/comment.model';
     .no-comments {
       text-align: center;
       padding: 2rem;
-      background: #E9EDC9;
+      background: rgba(40, 40, 80, 0.5);
       border-radius: 8px;
-      color: #2C3E50;
+      color: #ffffff;
       font-style: italic;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(80, 0, 255, 0.2);
     }
     
     .comment-item {
-      background: #E9EDC9;
+      background: rgba(40, 40, 80, 0.5);
       padding: 1.5rem;
       border-radius: 12px;
       margin-bottom: 1.5rem;
-      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1);
+      box-shadow: 0 0 15px rgba(80, 0, 255, 0.2);
       transition: all 0.3s ease;
+      border: 1px solid rgba(255, 0, 230, 0.3);
     }
     
     .comment-item:hover {
       transform: translateY(-3px);
-      box-shadow: 0 6px 16px rgba(212, 163, 115, 0.2);
+      box-shadow: 0 0 20px rgba(255, 0, 230, 0.3);
     }
     
     .comment-header {
@@ -218,7 +267,7 @@ import { Comment } from '../../models/comment.model';
       align-items: center;
       margin-bottom: 1rem;
       padding-bottom: 0.5rem;
-      border-bottom: 1px solid rgba(212, 163, 115, 0.3);
+      border-bottom: 1px solid rgba(255, 0, 230, 0.3);
     }
     
     .comment-author {
@@ -231,24 +280,24 @@ import { Comment } from '../../models/comment.model';
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      border: 2px solid #D4A373;
+      border: 2px solid #ff00e6;
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
     
     .author-name {
       font-weight: 600;
-      color: #2C3E50;
+      color: #ffffff;
     }
     
     .comment-date {
       font-size: 0.875rem;
-      color: #2C3E50;
-      opacity: 0.7;
+      color: rgba(255, 255, 255, 0.7);
     }
     
     .comment-content {
       font-size: 1.1rem;
       line-height: 1.6;
-      color: #2C3E50;
+      color: #ffffff;
       white-space: pre-wrap;
     }
     
@@ -261,15 +310,17 @@ import { Comment } from '../../models/comment.model';
     .btn-delete {
       background: none;
       border: none;
-      color: #D4A373;
+      color: #ff00e6;
       font-size: 0.875rem;
       cursor: pointer;
       transition: all 0.3s ease;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.5);
     }
     
     .btn-delete:hover {
-      color: #2C3E50;
+      color: #ffffff;
       text-decoration: underline;
+      text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
     
     @media (max-width: 768px) {
@@ -398,4 +449,4 @@ export class CommentComponent implements OnInit {
       });
     }
   }
-} 
+}

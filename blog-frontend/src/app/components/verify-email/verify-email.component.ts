@@ -86,27 +86,31 @@ import { AuthService } from '../../services/auth.service';
       </div>
     </div>
   `,
+  // ... existing code ...
   styles: [`
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap');
+    
     .verify-container {
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: calc(100vh - 64px);
-      background-color: #FEFAE0;
+      background: linear-gradient(135deg, rgba(10, 10, 26, 0.95), rgba(20, 20, 40, 0.9));
       background-image: 
-        radial-gradient(circle at 10% 20%, rgba(212, 163, 115, 0.1) 0%, transparent 20%),
-        radial-gradient(circle at 90% 80%, rgba(204, 213, 174, 0.1) 0%, transparent 20%);
+        radial-gradient(circle at 10% 20%, rgba(80, 0, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(255, 0, 230, 0.1) 0%, transparent 20%);
       padding: 2rem;
       position: relative;
+      font-family: 'Poppins', sans-serif;
     }
 
     .verify-box {
-      background: rgba(233, 237, 201, 0.9);
+      background: rgba(15, 15, 30, 0.8);
       padding: 3rem;
       border-radius: 24px;
       box-shadow: 
-        0 10px 40px rgba(212, 163, 115, 0.2),
-        0 0 0 1px rgba(212, 163, 115, 0.1);
+        0 0 30px rgba(80, 0, 255, 0.3),
+        0 0 0 1px rgba(255, 0, 230, 0.3);
       width: 100%;
       max-width: 450px;
       position: relative;
@@ -114,7 +118,7 @@ import { AuthService } from '../../services/auth.service';
       -webkit-backdrop-filter: blur(10px);
       transform: translateY(0);
       transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 0, 230, 0.3);
     }
 
     .verify-box::before {
@@ -124,7 +128,7 @@ import { AuthService } from '../../services/auth.service';
       left: -2px;
       right: -2px;
       bottom: -2px;
-      background: linear-gradient(45deg, rgba(212, 163, 115, 0.3), rgba(204, 213, 174, 0.3), rgba(233, 237, 201, 0.3));
+      background: linear-gradient(45deg, rgba(80, 0, 255, 0.3), rgba(255, 0, 230, 0.3));
       border-radius: 26px;
       z-index: -1;
       opacity: 0.6;
@@ -134,21 +138,23 @@ import { AuthService } from '../../services/auth.service';
     .verify-box:hover {
       transform: translateY(-5px);
       box-shadow: 
-        0 15px 50px rgba(212, 163, 115, 0.3),
-        0 0 0 1px rgba(212, 163, 115, 0.2);
+        0 0 40px rgba(80, 0, 255, 0.4),
+        0 0 0 1px rgba(255, 0, 230, 0.4);
     }
 
     h2 {
-      color: #2C3E50;
+      color: #ffffff;
       text-align: center;
       font-size: 2.5rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
-      background: linear-gradient(45deg, #2C3E50, #D4A373);
+      background: linear-gradient(45deg, #5000ff, #ff00e6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       position: relative;
       padding-bottom: 1rem;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
 
     h2::after {
@@ -159,12 +165,13 @@ import { AuthService } from '../../services/auth.service';
       transform: translateX(-50%);
       width: 100px;
       height: 3px;
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
+      background: linear-gradient(45deg, #5000ff, #ff00e6);
       border-radius: 3px;
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
 
     .subtitle {
-      color: #2C3E50;
+      color: #ffffff;
       text-align: center;
       font-size: 1.1rem;
       margin-bottom: 2.5rem;
@@ -180,7 +187,7 @@ import { AuthService } from '../../services/auth.service';
     label {
       display: block;
       margin-bottom: 0.5rem;
-      color: #2C3E50;
+      color: #ffffff;
       font-weight: 500;
       font-size: 0.95rem;
     }
@@ -188,31 +195,34 @@ import { AuthService } from '../../services/auth.service';
     .form-control {
       width: 100%;
       padding: 0.9rem;
-      border: 2px solid #D4A373;
+      border: 1px solid rgba(255, 0, 230, 0.3);
       border-radius: 12px;
       font-size: 1rem;
-      background: #FEFAE0;
+      background: rgba(40, 40, 80, 0.5);
+      color: #ffffff;
       transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(212, 163, 115, 0.1);
+      box-shadow: 0 0 10px rgba(80, 0, 255, 0.2);
     }
 
     .form-control:focus {
       outline: none;
-      border-color: #CCD5AE;
-      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.2);
+      border-color: #ff00e6;
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
       transform: translateY(-1px);
     }
 
     .is-invalid {
-      border-color: #D4A373;
-      background: #FFF5F5;
+      border-color: #ff00e6;
+      background: rgba(255, 0, 100, 0.1);
+      box-shadow: 0 0 15px rgba(255, 0, 100, 0.3);
     }
 
     .invalid-feedback {
-      color: #2C3E50;
+      color: #ff00e6;
       font-size: 0.875rem;
       margin-top: 0.5rem;
       padding-left: 0.5rem;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
     }
 
     .btn {
@@ -227,17 +237,38 @@ import { AuthService } from '../../services/auth.service';
       text-transform: uppercase;
       letter-spacing: 1px;
       margin-top: 1rem;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #5000ff, #ff00e6);
+      opacity: 0;
+      z-index: -1;
+      transition: opacity 0.3s;
+    }
+    
+    .btn:hover:not(:disabled)::before {
+      opacity: 1;
     }
 
     .btn-primary {
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
-      color: #2C3E50;
-      box-shadow: 0 4px 15px rgba(212, 163, 115, 0.3);
+      background: rgba(80, 0, 255, 0.2);
+      color: #ffffff;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
     }
 
     .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
       transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(212, 163, 115, 0.4);
     }
 
     .btn-primary:disabled {
@@ -245,30 +276,33 @@ import { AuthService } from '../../services/auth.service';
       cursor: not-allowed;
     }
 
-    .resend-code {
-      text-align: center;
-      margin-top: 1rem;
-    }
-
     .btn-link {
-      background: none;
+      background: transparent;
       border: none;
-      color: #D4A373;
+      color: #ff00e6;
       text-decoration: none;
       font-weight: 600;
+      font-size: 0.9rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      font-size: 0.9rem;
+      padding: 0;
+      margin-top: 1rem;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.5);
     }
 
     .btn-link:hover:not(:disabled) {
-      color: #CCD5AE;
-      text-decoration: underline;
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(255, 0, 230, 0.8);
     }
 
     .btn-link:disabled {
       opacity: 0.7;
       cursor: not-allowed;
+    }
+
+    .resend-code {
+      text-align: center;
+      margin-top: 0.5rem;
     }
 
     .alert {
@@ -290,33 +324,34 @@ import { AuthService } from '../../services/auth.service';
       }
     }
 
-    .alert-danger {
-      background: #FEFAE0;
-      color: #2C3E50;
-      border: 2px solid #D4A373;
-      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1);
+    .alert-success {
+      background: rgba(40, 40, 80, 0.5);
+      color: #00ffaa;
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      box-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
     }
 
-    .alert-success {
-      background: #E9EDC9;
-      color: #2C3E50;
-      border: 2px solid #CCD5AE;
-      box-shadow: 0 4px 12px rgba(204, 213, 174, 0.2);
+    .alert-danger {
+      background: rgba(40, 40, 80, 0.5);
+      color: #ff00e6;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
     }
 
     .mt-3 {
       margin-top: 2rem;
       text-align: center;
-      color: #2C3E50;
+      color: #ffffff;
       font-size: 0.95rem;
     }
 
     a {
-      color: #D4A373;
+      color: #ff00e6;
       text-decoration: none;
       font-weight: 600;
       transition: all 0.3s ease;
       position: relative;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
     }
 
     a::after {
@@ -326,13 +361,14 @@ import { AuthService } from '../../services/auth.service';
       left: 0;
       width: 100%;
       height: 2px;
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
+      background: linear-gradient(45deg, #5000ff, #ff00e6);
       transform: scaleX(0);
       transition: transform 0.3s ease;
+      box-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
     }
 
     a:hover {
-      color: #CCD5AE;
+      color: #ffffff;
     }
 
     a:hover::after {
@@ -344,23 +380,24 @@ import { AuthService } from '../../services/auth.service';
       top: 20px;
       left: 20px;
       font-size: 24px;
-      color: #D4A373;
-      background: rgba(233, 237, 201, 0.9);
+      color: #ffffff;
+      background: rgba(15, 15, 30, 0.8);
       width: 50px;
       height: 50px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.2);
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.3);
+      border: 1px solid rgba(255, 0, 230, 0.3);
       transition: all 0.3s ease;
       z-index: 100;
     }
     
     .home-icon:hover {
       transform: translateY(-3px);
-      box-shadow: 0 6px 16px rgba(212, 163, 115, 0.3);
-      color: #CCD5AE;
+      box-shadow: 0 0 20px rgba(255, 0, 230, 0.5);
+      color: #ff00e6;
     }
 
     @media (max-width: 768px) {
@@ -371,7 +408,7 @@ import { AuthService } from '../../services/auth.service';
 
       .verify-box {
         padding: 2rem;
-        background: rgba(233, 237, 201, 0.95);
+        background: rgba(15, 15, 30, 0.9);
         backdrop-filter: blur(5px);
         -webkit-backdrop-filter: blur(5px);
       }
@@ -402,6 +439,7 @@ import { AuthService } from '../../services/auth.service';
       }
     }
   `]
+// ... existing code ...
 })
 export class VerifyEmailComponent implements OnInit {
   verifyForm: FormGroup;

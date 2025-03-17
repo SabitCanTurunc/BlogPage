@@ -58,18 +58,22 @@ import { CommentComponent } from '../comment/comment.component';
       </div>
 
       <div *ngIf="loading" class="loading-spinner">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">Yükleniyor...</span>
+        <div class="spinner">
+          <div class="spinner-inner"></div>
         </div>
+        <span>Yükleniyor...</span>
       </div>
     </div>
   `,
   styles: [`
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap');
+    
     :host {
       display: block;
       min-height: 100vh;
-      background: #FEFAE0;
+      background: linear-gradient(135deg, rgba(10, 10, 26, 0.95), rgba(20, 20, 40, 0.9));
       padding: 2rem 0;
+      font-family: 'Poppins', sans-serif;
     }
 
     .container {
@@ -79,11 +83,13 @@ import { CommentComponent } from '../comment/comment.component';
     }
 
     .post-detail {
-      background: #fff;
+      background: rgba(15, 15, 30, 0.8);
       padding: 2rem;
       border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(212, 163, 115, 0.2);
-      border: 1px solid rgba(212, 163, 115, 0.3);
+      box-shadow: 0 0 30px rgba(80, 0, 255, 0.3);
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .post-header {
@@ -100,27 +106,32 @@ import { CommentComponent } from '../comment/comment.component';
     }
 
     .post-date {
-      color: #D4A373;
+      color: #ff00e6;
       font-weight: 500;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
     }
 
     .post-category {
-      background: #E9EDC9;
+      background: rgba(80, 0, 255, 0.2);
       padding: 0.5rem 1rem;
       border-radius: 50px;
-      color: #2C3E50;
+      color: #ffffff;
       font-weight: 500;
-      border: 1px solid rgba(212, 163, 115, 0.3);
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
     }
 
     h1 {
-      color: #2C3E50;
+      color: #ffffff;
       font-size: 2.5rem;
       font-weight: 700;
       margin-bottom: 1.5rem;
       line-height: 1.4;
-      border-bottom: 2px solid #D4A373;
+      border-bottom: 2px solid #ff00e6;
       padding-bottom: 0.5rem;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
+      letter-spacing: 1px;
     }
 
     .post-author {
@@ -129,40 +140,45 @@ import { CommentComponent } from '../comment/comment.component';
       gap: 1rem;
       justify-content: center;
       padding: 0.5rem 1rem;
-      background: #E9EDC9;
+      background: rgba(80, 0, 255, 0.2);
       border-radius: 50px;
       transition: all 0.3s;
-      border: 1px solid rgba(212, 163, 115, 0.3);
+      border: 1px solid rgba(255, 0, 230, 0.3);
       width: fit-content;
       margin: 0 auto;
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
     }
 
     .post-author:hover {
-      background: #CCD5AE;
+      background: rgba(255, 0, 230, 0.2);
       transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
     }
 
     .author-avatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      border: 2px solid #D4A373;
+      border: 2px solid #ff00e6;
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
 
     .author-name {
-      color: #2C3E50;
+      color: #ffffff;
       font-weight: 500;
     }
 
     .post-content {
       font-size: 1.2rem;
       line-height: 1.8;
-      color: #2C3E50;
+      color: #ffffff;
       white-space: pre-wrap;
-      background: #E9EDC9;
+      background: rgba(20, 20, 80, 0.5);
       padding: 2rem;
       border-radius: 12px;
       margin-bottom: 2rem;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 20px rgba(80, 0, 255, 0.2);
     }
 
     .post-images {
@@ -170,12 +186,14 @@ import { CommentComponent } from '../comment/comment.component';
     }
 
     .post-images h3 {
-      color: #D4A373;
+      color: #ff00e6;
       font-size: 1.5rem;
       margin-bottom: 1.5rem;
       font-weight: 700;
       position: relative;
       padding-bottom: 0.5rem;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
     }
 
     .post-images h3::after {
@@ -185,8 +203,9 @@ import { CommentComponent } from '../comment/comment.component';
       left: 0;
       width: 50px;
       height: 3px;
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
+      background: linear-gradient(45deg, #5000ff, #ff00e6);
       border-radius: 3px;
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
 
     .image-grid {
@@ -198,13 +217,14 @@ import { CommentComponent } from '../comment/comment.component';
     .image-item {
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(212, 163, 115, 0.2);
+      box-shadow: 0 0 20px rgba(80, 0, 255, 0.3);
       transition: all 0.3s;
+      border: 1px solid rgba(255, 0, 230, 0.3);
     }
 
     .image-item:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(212, 163, 115, 0.3);
+      box-shadow: 0 0 30px rgba(255, 0, 230, 0.5);
     }
 
     .image-item img {
@@ -217,7 +237,7 @@ import { CommentComponent } from '../comment/comment.component';
     .post-footer {
       margin-top: 3rem;
       padding-top: 2rem;
-      border-top: 2px solid #D4A373;
+      border-top: 2px solid #ff00e6;
       text-align: center;
     }
 
@@ -225,18 +245,39 @@ import { CommentComponent } from '../comment/comment.component';
       display: inline-flex;
       align-items: center;
       gap: 0.75rem;
-      color: #2C3E50;
+      color: #ffffff;
       text-decoration: none;
       font-weight: 600;
       transition: all 0.3s;
       padding: 0.75rem 1.5rem;
-      background: #D4A373;
+      background: rgba(80, 0, 255, 0.2);
       border-radius: 50px;
-      border: none;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .back-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #5000ff, #ff00e6);
+      opacity: 0;
+      z-index: -1;
+      transition: opacity 0.3s;
+    }
+
+    .back-button:hover::before {
+      opacity: 1;
     }
 
     .back-button:hover {
-      background: #CCD5AE;
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
       transform: translateX(-5px);
     }
 
@@ -250,17 +291,56 @@ import { CommentComponent } from '../comment/comment.component';
 
     .loading-spinner {
       display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
       padding: 3rem;
+      color: #ff00e6;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .spinner::before, .spinner::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+    }
+
+    .spinner::before {
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(90deg, #5000ff 0%, #ff00e6 100%);
+      animation: spin 0.5s infinite linear;
+    }
+
+    .spinner::after {
+      width: 85%;
+      height: 85%;
+      background-color: rgba(15, 15, 30, 0.8);
+      top: 7.5%;
+      left: 7.5%;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .alert-danger {
-      background: #FEFAE0;
-      border: 1px solid #D4A373;
-      color: #2C3E50;
+      background: rgba(20, 20, 40, 0.6);
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      color: #ff00e6;
       border-radius: 12px;
       padding: 1rem;
       margin-top: 1rem;
+      box-shadow: 0 0 20px rgba(255, 0, 230, 0.3);
     }
 
     @media (max-width: 768px) {
@@ -316,4 +396,4 @@ export class PostDetailComponent implements OnInit {
       }
     });
   }
-} 
+}

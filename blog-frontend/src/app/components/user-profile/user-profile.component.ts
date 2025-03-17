@@ -161,9 +161,18 @@ import { Router } from '@angular/router';
     </div>
   `,
   styles: [`
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    :host {
+      display: block;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(10, 10, 26, 0.95), rgba(20, 20, 40, 0.9));
+      padding: 2rem 0;
+      font-family: 'Poppins', sans-serif;
+    }
+    
     .profile-container {
       padding: 3rem 0;
-      background-color: #FEFAE0;
       min-height: 100vh;
     }
     
@@ -192,10 +201,13 @@ import { Router } from '@angular/router';
     }
     
     .profile-sidebar {
-      background: #fff;
+      background: rgba(15, 15, 30, 0.8);
       border-radius: 16px;
       padding: 2rem;
-      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1);
+      box-shadow: 0 0 30px rgba(80, 0, 255, 0.3);
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       margin-bottom: 2rem;
     }
     
@@ -214,21 +226,25 @@ import { Router } from '@angular/router';
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 4px solid #D4A373;
+      border: 4px solid #ff00e6;
       object-fit: cover;
+      box-shadow: 0 0 20px rgba(255, 0, 230, 0.8);
     }
     
     .profile-name {
-      color: #2C3E50;
+      color: #ffffff;
       font-size: 1.5rem;
       margin-bottom: 0.5rem;
       font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
     
     .profile-role {
-      color: #D4A373;
+      color: #ff00e6;
       font-size: 1rem;
       margin-bottom: 0;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
     }
     
     .profile-stats {
@@ -236,8 +252,8 @@ import { Router } from '@angular/router';
       justify-content: center;
       margin-bottom: 2rem;
       padding: 1rem 0;
-      border-top: 1px solid rgba(212, 163, 115, 0.2);
-      border-bottom: 1px solid rgba(212, 163, 115, 0.2);
+      border-top: 1px solid rgba(255, 0, 230, 0.3);
+      border-bottom: 1px solid rgba(255, 0, 230, 0.3);
     }
     
     .stat-item {
@@ -249,12 +265,13 @@ import { Router } from '@angular/router';
       display: block;
       font-size: 1.5rem;
       font-weight: 700;
-      color: #2C3E50;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
     
     .stat-label {
       font-size: 0.875rem;
-      color: #D4A373;
+      color: #ff00e6;
     }
     
     .profile-actions {
@@ -274,47 +291,74 @@ import { Router } from '@angular/router';
       text-align: center;
       display: inline-block;
       text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #5000ff, #ff00e6);
+      opacity: 0;
+      z-index: -1;
+      transition: opacity 0.3s;
+    }
+    
+    .btn:hover:not(:disabled)::before {
+      opacity: 1;
     }
     
     .btn-primary {
-      background: #D4A373;
-      color: #2C3E50;
+      background: rgba(80, 0, 255, 0.2);
+      color: #ffffff;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
     }
     
     .btn-primary:hover:not(:disabled) {
-      background: #CCD5AE;
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
       transform: translateY(-2px);
     }
     
     .btn-secondary {
-      background: #CCD5AE;
-      color: #2C3E50;
+      background: rgba(255, 0, 230, 0.2);
+      color: #ffffff;
+      border: 1px solid rgba(80, 0, 255, 0.3);
+      box-shadow: 0 0 10px rgba(80, 0, 255, 0.3);
     }
     
     .btn-secondary:hover:not(:disabled) {
-      background: #E9EDC9;
+      box-shadow: 0 0 15px rgba(80, 0, 255, 0.5);
       transform: translateY(-2px);
     }
     
     .btn-danger {
-      background: #E76F51;
+      background: rgba(255, 0, 100, 0.3);
       color: white;
+      border: 1px solid rgba(255, 0, 100, 0.5);
+      box-shadow: 0 0 10px rgba(255, 0, 100, 0.3);
     }
     
     .btn-danger:hover:not(:disabled) {
-      background: #F4A261;
+      box-shadow: 0 0 15px rgba(255, 0, 100, 0.5);
       transform: translateY(-2px);
     }
     
     .btn-outline {
       background: transparent;
-      border: 1px solid #D4A373;
-      color: #D4A373;
+      border: 1px solid rgba(255, 0, 230, 0.5);
+      color: #ff00e6;
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
     }
     
     .btn-outline:hover {
-      background: #D4A373;
-      color: #2C3E50;
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
       transform: translateY(-2px);
     }
     
@@ -324,19 +368,24 @@ import { Router } from '@angular/router';
     }
     
     .profile-content {
-      background: #fff;
+      background: rgba(15, 15, 30, 0.8);
       border-radius: 16px;
       padding: 2rem;
-      box-shadow: 0 4px 12px rgba(212, 163, 115, 0.1);
+      box-shadow: 0 0 30px rgba(80, 0, 255, 0.3);
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
     
     h3 {
-      color: #2C3E50;
+      color: #ffffff;
       font-size: 1.8rem;
       margin-bottom: 1.5rem;
       font-weight: 700;
       position: relative;
       padding-bottom: 0.5rem;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
     
     h3::after {
@@ -346,21 +395,24 @@ import { Router } from '@angular/router';
       left: 0;
       width: 50px;
       height: 3px;
-      background: linear-gradient(45deg, #D4A373, #CCD5AE);
+      background: linear-gradient(45deg, #5000ff, #ff00e6);
       border-radius: 3px;
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
     }
     
     .no-posts {
       text-align: center;
       padding: 2rem;
-      background: #E9EDC9;
+      background: rgba(40, 40, 80, 0.5);
       border-radius: 8px;
       margin-bottom: 1.5rem;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(80, 0, 255, 0.2);
     }
     
     .no-posts p {
       margin-bottom: 1rem;
-      color: #2C3E50;
+      color: #ffffff;
       font-size: 1.1rem;
     }
     
@@ -369,7 +421,7 @@ import { Router } from '@angular/router';
     }
     
     .post-item {
-      background: #E9EDC9;
+      background: rgba(40, 40, 80, 0.5);
       padding: 1.5rem;
       border-radius: 12px;
       margin-bottom: 1.5rem;
@@ -377,11 +429,13 @@ import { Router } from '@angular/router';
       justify-content: space-between;
       align-items: center;
       transition: all 0.3s ease;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 15px rgba(80, 0, 255, 0.2);
     }
     
     .post-item:hover {
       transform: translateY(-3px);
-      box-shadow: 0 6px 16px rgba(212, 163, 115, 0.2);
+      box-shadow: 0 0 20px rgba(255, 0, 230, 0.3);
     }
     
     .post-header {
@@ -389,10 +443,11 @@ import { Router } from '@angular/router';
     }
     
     .post-title {
-      color: #2C3E50;
+      color: #ffffff;
       font-size: 1.2rem;
       margin-bottom: 0.5rem;
       font-weight: 600;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.5);
     }
     
     .post-meta {
@@ -402,16 +457,18 @@ import { Router } from '@angular/router';
     }
     
     .post-date {
-      color: #2C3E50;
+      color: #ffffff;
       opacity: 0.7;
     }
     
     .post-category {
-      background: #D4A373;
+      background: rgba(80, 0, 255, 0.2);
       padding: 0.25rem 0.75rem;
       border-radius: 50px;
-      color: #2C3E50;
+      color: #ffffff;
       font-weight: 500;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
     }
     
     .post-actions {
@@ -429,15 +486,18 @@ import { Router } from '@angular/router';
     }
     
     .btn-view {
-      color: #2C3E50;
+      color: #ffffff;
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
     }
     
     .btn-edit {
-      color: #D4A373;
+      color: #5000ff;
+      text-shadow: 0 0 5px rgba(80, 0, 255, 0.8);
     }
     
     .btn-delete {
-      color: #E76F51;
+      color: #ff00e6;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
     }
     
     .btn-view:hover, .btn-edit:hover, .btn-delete:hover {
@@ -455,39 +515,44 @@ import { Router } from '@angular/router';
     label {
       display: block;
       margin-bottom: 0.5rem;
-      color: #2C3E50;
+      color: #ffffff;
       font-weight: 500;
     }
     
     .form-control {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid #D4A373;
+      border: 1px solid rgba(255, 0, 230, 0.3);
       border-radius: 8px;
       font-size: 1rem;
-      background: #E9EDC9;
+      background: rgba(40, 40, 80, 0.5);
+      color: #ffffff;
       transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(80, 0, 255, 0.2);
     }
     
     .form-control:focus {
       outline: none;
-      border-color: #CCD5AE;
-      box-shadow: 0 0 0 2px rgba(212, 163, 115, 0.2);
+      border-color: #ff00e6;
+      box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
     }
     
     .form-control.is-invalid {
-      border-color: #E76F51;
+      border-color: #ff00e6;
+      box-shadow: 0 0 15px rgba(255, 0, 100, 0.5);
     }
     
     .error-message {
-      color: #E76F51;
+      color: #ff00e6;
       font-size: 0.875rem;
       margin-top: 0.25rem;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
     }
     
     .form-text {
       font-size: 0.875rem;
       margin-top: 0.25rem;
+      color: rgba(255, 255, 255, 0.7);
     }
     
     .alert {
@@ -497,15 +562,17 @@ import { Router } from '@angular/router';
     }
     
     .alert-danger {
-      background: #FEFAE0;
-      color: #E76F51;
-      border: 1px solid #E76F51;
+      background: rgba(40, 40, 80, 0.5);
+      color: #ff00e6;
+      border: 1px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
     }
     
     .alert-success {
-      background: #E9EDC9;
-      color: #2C3E50;
-      border: 1px solid #CCD5AE;
+      background: rgba(40, 40, 80, 0.5);
+      color: #00ffaa;
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      box-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
     }
     
     .mb-4 {

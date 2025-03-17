@@ -1,7 +1,7 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 * {
   margin: 0;
@@ -9,9 +9,68 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #FEFAE0;
-  color: #2C3E50;
   line-height: 1.6;
+  min-height: 100vh;
+  background: #0f0f1a !important;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%232d00f7' stroke-width='1.5' stroke-opacity='0.2'%3E%3C!-- Kalem simgesi 1 --%3E%3Cpath d='M50 120 l-5 15 l1 1 l15 -5 l-11 -11 Z M46 135 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 1 --%3E%3Cpath d='M240 50 h16 v20 h-16 v-20 M240 50 c-3 2 -3 18 0 20 M256 50 v20 M242 55 h12 M242 60 h12 M242 65 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 1 --%3E%3Cpath d='M370 150 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 2 --%3E%3Cpath d='M130 200 l-5 15 l1 1 l15 -5 l-11 -11 Z M126 215 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 2 --%3E%3Cpath d='M320 260 h16 v20 h-16 v-20 M320 260 c-3 2 -3 18 0 20 M336 260 v20 M322 265 h12 M322 270 h12 M322 275 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 2 --%3E%3Cpath d='M180 300 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 3 --%3E%3Cpath d='M80 280 l-5 15 l1 1 l15 -5 l-11 -11 Z M76 295 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 3 --%3E%3Cpath d='M150 70 h16 v20 h-16 v-20 M150 70 c-3 2 -3 18 0 20 M166 70 v20 M152 75 h12 M152 80 h12 M152 85 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 3 --%3E%3Cpath d='M300 110 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 4 --%3E%3Cpath d='M250 340 l-5 15 l1 1 l15 -5 l-11 -11 Z M246 355 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 4 --%3E%3Cpath d='M90 300 h16 v20 h-16 v-20 M90 300 c-3 2 -3 18 0 20 M106 300 v20 M92 305 h12 M92 310 h12 M92 315 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 4 --%3E%3Cpath d='M330 30 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 5 --%3E%3Cpath d='M80 20 l-5 15 l1 1 l15 -5 l-11 -11 Z M76 35 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 5 --%3E%3Cpath d='M210 140 h16 v20 h-16 v-20 M210 140 c-3 2 -3 18 0 20 M226 140 v20 M212 145 h12 M212 150 h12 M212 155 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 5 --%3E%3Cpath d='M370 290 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 6 --%3E%3Cpath d='M30 200 l-5 15 l1 1 l15 -5 l-11 -11 Z M26 215 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C/g%3E%3C/svg%3E") !important;
+  background-attachment: fixed !important;
+  background-size: 800px 800px !important;
+  background-repeat: repeat !important;
+  color: #ffffff !important;
+}
+
+app-root {
+  display: block;
+  min-height: 100vh;
+  background: transparent;
+}
+
+/* Bootstrap override styles */
+.form-control {
+  background-color: rgba(15, 15, 30, 0.6) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 0, 230, 0.3) !important;
+}
+
+.form-control:focus {
+  background-color: rgba(15, 15, 30, 0.8) !important;
+  color: #ffffff !important;
+  border-color: #ff00e6 !important;
+  box-shadow: 0 0 0 0.25rem rgba(255, 0, 230, 0.25) !important;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.invalid-feedback {
+  color: #ff3b30 !important;
+}
+
+.btn-primary {
+  background: linear-gradient(45deg, rgba(80, 0, 255, 0.7), rgba(255, 0, 230, 0.7)) !important;
+  border-color: rgba(255, 0, 230, 0.5) !important;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background: linear-gradient(45deg, rgba(80, 0, 255, 0.9), rgba(255, 0, 230, 0.9)) !important;
+  border-color: rgba(255, 0, 230, 0.8) !important;
+  box-shadow: 0 0 15px rgba(255, 0, 230, 0.5) !important;
+}
+
+.alert-danger {
+  background-color: rgba(255, 59, 48, 0.2) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 59, 48, 0.5) !important;
 }

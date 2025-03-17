@@ -1,0 +1,137 @@
+<div class="blog-container">
+  <!-- Header Component -->
+
+  <!-- Admin Button -->
+  <div class="admin-button-container">
+    <button *ngIf="isAdmin" (click)="navigateToAdmin()" class="btn-admin-small">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+      </svg>
+      Admin
+    </button>
+  </div>
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="hero-logo">
+        <img src="assets/blogLogo.png" alt="Blog Logo" class="blog-logo">
+      </div>
+      <h1>NeoWrite</h1> 
+      <p class="hero-subtitle">Düşüncelerinizi paylaşın, bilgi birikimini artırın</p>
+      <div class="hero-buttons">
+        <button *ngIf="!isLoggedIn" (click)="navigateToSignup()" class="btn-light">
+          <span class="btn-text">Ücretsiz Hesap Oluştur</span>
+        </button>
+        <button *ngIf="!isLoggedIn" (click)="navigateToLogin()" class="btn-outline-light">
+          <span class="btn-text">Giriş Yap</span>
+        </button>
+        <button *ngIf="isLoggedIn" (click)="navigateToCreatePost()" class="btn-light">
+          <span class="btn-text">Yeni Yazı Oluştur</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-content">
+        <div class="sidebar-section">
+          <h3>Kategoriler</h3>
+          <div class="category-list">
+            <button 
+              class="category-item"
+              [class.active]="selectedCategory === null"
+              (click)="filterByCategory(null)">
+              <span class="category-text">Tümü</span>
+            </button>
+            <button 
+              *ngFor="let category of categories"
+              class="category-item"
+              [class.active]="selectedCategory === category"
+              (click)="filterByCategory(category)">
+              <span class="category-text">{{ category }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Popüler Yazarlar</h3>
+          <div class="popular-authors">
+            <div *ngFor="let author of popularAuthors" class="author-item">
+              <img [src]="'https://ui-avatars.com/api/?name=' + author" alt="Yazar" class="author-avatar">
+              <span class="author-name">{{ author }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Son Yazılar</h3>
+          <div class="recent-posts">
+            <div *ngFor="let post of recentPosts" class="recent-post-item">
+              <a [routerLink]="['/post', post.id]" class="recent-post-link">
+                {{ post.title }}
+              </a>
+              <span class="recent-post-date">{{ post.createdAt | date:'shortDate' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Posts Grid -->
+    <div class="posts-section">
+      <div class="posts-grid">
+        <article *ngFor="let post of filteredPosts" class="post-card">
+          <div class="card">
+            <div class="card-body">
+              <div class="post-meta">
+                <span class="post-date">{{ post.createdAt | date:'mediumDate' }}</span>
+                <span class="post-category">{{ post.categoryName }}</span>
+              </div>
+              <h2 class="post-title">{{ post.title }}</h2>
+              <p class="post-excerpt">{{ post.content | slice:0:200 }}{{ post.content.length > 200 ? '...' : '' }}</p>
+              <div class="post-footer">
+                <div class="post-author">
+                  <img [src]="'https://ui-avatars.com/api/?name=' + post.userEmail" alt="Yazar" class="author-avatar">
+                  <span class="author-name">{{ post.userEmail }}</span>
+                </div>
+                <a [routerLink]="['/post', post.id]" class="read-more">
+                  Devamını Oku
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- No Posts Message -->
+      <div *ngIf="!loading && filteredPosts.length === 0 && !error" class="no-posts">
+        <div class="no-posts-content">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+            <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+          </svg>
+          <h3>Henüz Yazı Bulunamadı</h3>
+          <p>Bu kategoride henüz yazı bulunmuyor. Daha sonra tekrar kontrol edin veya başka bir kategori seçin.</p>
+        </div>
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+
+      <div *ngIf="loading" class="loading-spinner">
+        <div class="spinner">
+          <div class="spinner-inner"></div>
+        </div>
+        <span>Yükleniyor...</span>
+      </div>
+    </div>
+  </div>
+</div>
