@@ -14,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Comment extends BaseEntity implements Ownable {
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar('8192')")
     private String comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
