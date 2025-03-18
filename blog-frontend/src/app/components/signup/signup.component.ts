@@ -69,6 +69,23 @@ import { CommonModule } from '@angular/common';
             </div>
           </div>
 
+          <div class="form-group">
+            <label for="confirmPassword">Şifre Tekrarı</label>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              formControlName="confirmPassword" 
+              class="form-control"
+              [class.is-invalid]="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched"
+              placeholder="Şifrenizi tekrar giriniz">
+            <div class="invalid-feedback" *ngIf="signupForm.get('confirmPassword')?.errors?.['required'] && signupForm.get('confirmPassword')?.touched">
+              Şifre tekrarı zorunludur
+            </div>
+            <div class="invalid-feedback" *ngIf="signupForm.get('confirmPassword')?.errors?.['passwordMismatch'] && signupForm.get('confirmPassword')?.touched">
+              Şifreler eşleşmiyor
+            </div>
+          </div>
+
           <button type="submit" class="btn btn-primary" [disabled]="signupForm.invalid || isLoading">
             <span *ngIf="!isLoading">Hesap Oluştur</span>
             <span *ngIf="isLoading">Oluşturuluyor...</span>
@@ -414,6 +431,8 @@ export class SignupComponent implements OnInit {
   error: string = '';
   success: string = '';
   isLoading: boolean = false;
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -421,14 +440,24 @@ export class SignupComponent implements OnInit {
     private router: Router
   ) {
     this.signupForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
+      username: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
+      email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
+      password: ['', [Validators.required, Validators.minLength(6), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validator: this.passwordMatchValidator });
   }
 
   ngOnInit(): void {
-    // Form başlatıldığında yapılacak işlemler
+    // Form değişikliklerini dinle
+    this.signupForm.get('password')?.valueChanges.subscribe(() => {
+      this.signupForm.get('confirmPassword')?.updateValueAndValidity();
+    });
+  }
+
+  passwordMatchValidator(g: FormGroup) {
+    return g.get('password')?.value === g.get('confirmPassword')?.value
+      ? null
+      : { 'passwordMismatch': true };
   }
 
   onSubmit(): void {
@@ -437,33 +466,66 @@ export class SignupComponent implements OnInit {
       this.error = '';
       this.success = '';
       
-      this.authService.signup(this.signupForm.value).subscribe({
+      const { username, email, password } = this.signupForm.value;
+      
+      this.authService.signup({ username, email, password }).subscribe({
         next: (response) => {
-          console.log('Kayıt başarılı:', response);
-          this.success = 'Kayıt başarılı! Lütfen e-posta adresinizi doğrulayın.';
-          this.error = '';
           this.isLoading = false;
-          
-          // 2 saniye sonra yönlendirme yap
+          this.success = 'Hesabınız başarıyla oluşturuldu! Lütfen e-posta adresinizi doğrulayın.';
           setTimeout(() => {
-            this.router.navigate(['/verify-email']);
-          }, 2000);
+            this.router.navigate(['/login']);
+          }, 3000);
         },
         error: (err) => {
-          console.error('Kayıt hatası:', err);
-          this.error = err.error?.customException?.message || 'Kayıt sırasında bir hata oluştu.';
-          this.success = '';
           this.isLoading = false;
+          this.error = err.message;
         }
       });
     } else {
-      // Form geçerli değilse tüm alanları işaretle
-      Object.keys(this.signupForm.controls).forEach(key => {
-        const control = this.signupForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
-        }
-      });
+      this.markFormGroupTouched(this.signupForm);
     }
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  togglePasswordVisibility(field: 'password' | 'confirmPassword') {
+    if (field === 'password') {
+      this.showPassword = !this.showPassword;
+    } else {
+      this.showConfirmPassword = !this.showConfirmPassword;
+    }
+  }
+
+  getErrorMessage(controlName: string): string {
+    const control = this.signupForm.get(controlName);
+    if (control?.hasError('required')) {
+      return 'Bu alan zorunludur';
+    }
+    if (control?.hasError('email') || control?.hasError('pattern')) {
+      return 'Geçerli bir e-posta adresi giriniz';
+    }
+    if (control?.hasError('minlength')) {
+      if (controlName === 'username') {
+        return 'Kullanıcı adı en az 3 karakter olmalıdır';
+      }
+      return 'Şifre en az 6 karakter olmalıdır';
+    }
+    if (control?.hasError('pattern')) {
+      if (controlName === 'username') {
+        return 'Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir';
+      }
+      return 'Şifre en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir';
+    }
+    if (control?.hasError('passwordMismatch')) {
+      return 'Şifreler eşleşmiyor';
+    }
+    return '';
   }
 } 

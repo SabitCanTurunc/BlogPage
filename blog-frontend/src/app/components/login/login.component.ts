@@ -37,13 +37,18 @@ import { CommonModule } from '@angular/common';
 
           <div class="form-group">
             <label for="password">Şifre</label>
-            <input 
-              type="password" 
-              id="password" 
-              formControlName="password" 
-              class="form-control"
-              [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-              placeholder="Şifrenizi giriniz">
+            <div class="password-input">
+              <input 
+                [type]="showPassword ? 'text' : 'password'" 
+                id="password" 
+                formControlName="password" 
+                class="form-control"
+                [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                placeholder="Şifrenizi giriniz">
+              <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+                <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
             <div class="invalid-feedback" *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched">
               Şifre zorunludur
             </div>
@@ -51,7 +56,9 @@ import { CommonModule } from '@angular/common';
 
           <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid || isLoading">
             <span *ngIf="!isLoading">Giriş Yap</span>
-            <span *ngIf="isLoading">Giriş Yapılıyor...</span>
+            <span *ngIf="isLoading">
+              <i class="fas fa-spinner fa-spin"></i> Giriş Yapılıyor...
+            </span>
           </button>
         </form>
 
@@ -63,7 +70,6 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-  // ... existing code ...
   styles: [`
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap');
     
@@ -379,13 +385,44 @@ import { CommonModule } from '@angular/common';
         font-size: 22px;
       }
     }
+
+    .password-input {
+      position: relative;
+      width: 100%;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      padding: 5px;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .toggle-password:hover {
+      opacity: 1;
+    }
+
+    .toggle-password i {
+      font-size: 1.1rem;
+    }
+
+    .form-control {
+      padding-right: 40px;
+    }
   `]
-// ... existing code ...
 })
 export class LoginComponent {
   loginForm: FormGroup;
   error: string = '';
   isLoading: boolean = false;
+  showPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -408,13 +445,31 @@ export class LoginComponent {
       this.authService.login(email, password).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.router.navigate(['/home']);
+          if (response.token) {
+            this.router.navigate(['/home']);
+          }
         },
         error: (err) => {
           this.isLoading = false;
           this.error = err.message;
+          this.loginForm.get('password')?.reset();
         }
       });
+    } else {
+      this.markFormGroupTouched(this.loginForm);
     }
   }
-} 
+
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+}

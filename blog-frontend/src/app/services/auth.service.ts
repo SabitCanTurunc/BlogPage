@@ -59,19 +59,31 @@ export class AuthService {
   }
 
   private handleError(error: HttpErrorResponse) {
-    if (error.status === 0) {
-      return throwError(() => new Error('Sunucuya bağlanılamıyor. Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.'));
+    if (error.error?.customException?.message) {
+      return throwError(() => new Error(error.error.customException.message));
+    } else if (error.status === 0) {
+      return throwError(() => new Error('Sunucuya bağlanılamıyor'));
+    } else if (error.error?.message) {
+      return throwError(() => new Error(error.error.message));
+    } else {
+      return throwError(() => new Error('Bir hata oluştu'));
     }
-    
-    const errorMessage = error.error?.message || 'Bir hata oluştu.';
-    return throwError(() => new Error(errorMessage));
   }
 
   private loadStoredUser() {
     if (isPlatformBrowser(this.platformId)) {
       const storedUser = localStorage.getItem('currentUser');
       if (storedUser) {
-        this.currentUserSubject.next(JSON.parse(storedUser));
+        try {
+          const user = JSON.parse(storedUser);
+          if (user.token && !this.isTokenExpired(user.token)) {
+            this.currentUserSubject.next(user);
+          } else {
+            this.logout();
+          }
+        } catch (e) {
+          this.logout();
+        }
       }
     }
   }
@@ -121,19 +133,24 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.currentUserSubject.value;
+    const user = this.currentUserSubject.value;
+    return !!user && !!user.token && !this.isTokenExpired(user.token);
   }
 
   getToken(): string | null {
     const user = this.currentUserSubject.value;
-    if (!user || !user.token) {
+    if (!user || !user.token || this.isTokenExpired(user.token)) {
       return null;
     }
     return user.token;
   }
 
   getCurrentUser(): LoginResponse | null {
-    return this.currentUserSubject.value;
+    const user = this.currentUserSubject.value;
+    if (!user || !user.token || this.isTokenExpired(user.token)) {
+      return null;
+    }
+    return user;
   }
 
   private parseJwt(token: string): any {
@@ -146,6 +163,20 @@ export class AuthService {
       return JSON.parse(jsonPayload);
     } catch (e) {
       return null;
+    }
+  }
+
+  private isTokenExpired(token: string): boolean {
+    try {
+      const decodedToken = this.parseJwt(token);
+      if (!decodedToken || !decodedToken.exp) {
+        return true;
+      }
+      const expirationDate = new Date(0);
+      expirationDate.setUTCSeconds(decodedToken.exp);
+      return expirationDate < new Date();
+    } catch (e) {
+      return true;
     }
   }
 
@@ -179,7 +210,7 @@ export class AuthService {
 
   getUserId(): number | null {
     const user = this.currentUserSubject.value;
-    if (!user || !user.token) {
+    if (!user || !user.token || this.isTokenExpired(user.token)) {
       return null;
     }
     
