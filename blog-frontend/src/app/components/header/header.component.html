@@ -3,37 +3,60 @@
     <div class="logo">
       <a routerLink="/">NeoWrite</a>
     </div>
-    <nav class="main-nav">
+    <button class="hamburger-menu" (click)="toggleMenu()" [class.active]="isMenuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <nav class="main-nav" [class.show]="isMenuOpen">
       <ul class="nav-links">
-        <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Ana Sayfa</a></li>
-        <li *ngIf="isLoggedIn"><a routerLink="/create-post" routerLinkActive="active">Yazı Oluştur</a></li>
-        <li *ngIf="isAdmin"><a routerLink="/admin" routerLinkActive="active">Admin</a></li>
+        <li *ngIf="isLoggedIn" class="mobile-only">
+          <a routerLink="/create-post" class="mobile-profile-link" (click)="closeMenu()">Yazı Oluştur</a>
+        </li>
+        <li *ngIf="!isLoggedIn" class="mobile-auth">
+          <a routerLink="/login" class="mobile-btn-login" (click)="closeMenu()">Giriş Yap</a>
+        </li>
+        <li *ngIf="!isLoggedIn" class="mobile-auth">
+          <a routerLink="/signup" class="mobile-btn-signup" (click)="closeMenu()">Kayıt Ol</a>
+        </li>
+        <li *ngIf="isLoggedIn" class="mobile-only">
+          <a routerLink="/profile" class="mobile-profile-link" (click)="closeMenu()">Profil</a>
+        </li>
+        <li *ngIf="isLoggedIn && isAdmin" class="mobile-only">
+          <a routerLink="/admin" class="mobile-admin-link" (click)="closeMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="admin-icon">
+              <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+            </svg>
+            Admin Paneli
+          </a>
+        </li>
+        <li *ngIf="isLoggedIn" class="mobile-only">
+          <button class="mobile-logout-btn" (click)="logoutAndCloseAll()">Çıkış Yap</button>
+        </li>
       </ul>
     </nav>
-    <div class="user-actions">
+    <div class="user-actions desktop-only">
       <div *ngIf="!isLoggedIn" class="auth-buttons">
-        <a routerLink="/login" class="btn-login">Giriş Yap</a>
-        <a routerLink="/signup" class="btn-signup">Kayıt Ol</a>
+        <a routerLink="/login" class="btn-login" (click)="closeMenu()">Giriş Yap</a>
+        <a routerLink="/signup" class="btn-signup" (click)="closeMenu()">Kayıt Ol</a>
       </div>
       <div *ngIf="isLoggedIn" class="user-dropdown">
         <button class="dropdown-toggle" (click)="toggleDropdown()">
           <img [src]="'https://ui-avatars.com/api/?name=' + userEmail" alt="Kullanıcı" class="user-avatar">
           <span class="user-email">{{ userEmail }}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-          </svg>
         </button>
         <div class="dropdown-menu" [class.show]="isDropdownOpen">
-          <a routerLink="/profile" class="dropdown-item" (click)="closeDropdown()">Profil</a>
-          
-          <a *ngIf="isAdmin" routerLink="/admin" class="dropdown-item admin-item" (click)="closeDropdown()">
+          <a routerLink="/create-post" class="dropdown-item" (click)="closeDropdownAndMenu()">Yazı Oluştur</a>
+          <a routerLink="/profile" class="dropdown-item" (click)="closeDropdownAndMenu()">Profil</a>
+          <a *ngIf="isAdmin" routerLink="/admin" class="dropdown-item admin-item" (click)="closeDropdownAndMenu()">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="admin-icon">
               <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
             </svg>
             Admin Paneli
           </a>
           <div class="dropdown-divider"></div>
-          <button class="dropdown-item logout" (click)="logoutAndCloseDropdown()">Çıkış Yap</button>
+          <button class="dropdown-item logout" (click)="logoutAndCloseAll()">Çıkış Yap</button>
         </div>
       </div>
     </div>

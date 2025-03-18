@@ -16,6 +16,7 @@ export class HeaderComponent implements OnInit {
   userEmail: string = '';
   isAdmin: boolean = false;
   isDropdownOpen: boolean = false;
+  isMenuOpen: boolean = false;
   
   constructor(
     private authService: AuthService,
@@ -39,10 +40,26 @@ export class HeaderComponent implements OnInit {
   closeDropdown(): void {
     this.isDropdownOpen = false;
   }
-  
-  logoutAndCloseDropdown(): void {
+
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu(): void {
+    this.isMenuOpen = false;
+  }
+
+  closeDropdownAndMenu(): void {
     this.closeDropdown();
+    this.closeMenu();
+  }
+  
+  logoutAndCloseAll(): void {
+    localStorage.clear();
+    this.closeDropdown();
+    this.closeMenu();
     this.authService.logout();
     this.router.navigate(['/']);
+    window.location.reload();
   }
 }
