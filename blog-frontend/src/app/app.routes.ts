@@ -20,5 +20,6 @@ export const routes: Routes = [
     { path: 'edit-post/:id', component: CreatePostComponent, canActivate: [AuthGuard] },
     { path: 'admin', component: AdminComponent, canActivate: [AuthGuard, AdminGuard] },
     { path: 'profile', component: UserProfileComponent, canActivate: [AuthGuard] },
+    { path: 'user/:email', component: UserProfileComponent },
     { path: '**', redirectTo: '' }
 ];

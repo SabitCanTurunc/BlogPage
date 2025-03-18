@@ -311,12 +311,13 @@
   background: rgba(80, 0, 255, 0.1);
   border: 1px solid rgba(255, 0, 230, 0.2);
   width: 100%;
+  cursor: pointer;
 }
 
 .author-item:hover {
   background: rgba(255, 0, 230, 0.2);
-  transform: translateX(5px);
-  box-shadow: 0 0 15px rgba(255, 0, 230, 0.3);
+  transform: translateX(5px) scale(1.02);
+  box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
 }
 
 .author-avatar {
@@ -325,6 +326,13 @@
   border-radius: 50%;
   border: 2px solid #ff00e6;
   box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
+  transition: all 0.3s;
+}
+
+.author-item:hover .author-avatar {
+  border-color: rgba(80, 0, 255, 0.8);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(80, 0, 255, 0.8);
 }
 
 .author-name {
@@ -345,19 +353,29 @@
 
 .recent-post-item {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   padding: 0.75rem 1rem;
   border-radius: 12px;
   background: rgba(80, 0, 255, 0.1);
+  margin-bottom: 0.75rem;
   border: 1px solid rgba(255, 0, 230, 0.2);
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  width: 100%;
 }
 
 .recent-post-item:hover {
   background: rgba(255, 0, 230, 0.2);
   transform: translateX(5px);
   box-shadow: 0 0 15px rgba(255, 0, 230, 0.3);
+}
+
+.recent-post-text {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .recent-post-link {
@@ -372,14 +390,15 @@
   display: block;
 }
 
-.recent-post-link:hover {
-  color: #ff00e6;
-  text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
+.recent-post-item:hover .recent-post-link {
+  color: #ffffff;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
 .recent-post-date {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.8rem;
+  margin-top: 0.25rem;
 }
 
 /* Posts Section */

@@ -6,13 +6,13 @@
           <div class="profile-header">
             <div class="profile-avatar">
               <img
-                [src]="'https://ui-avatars.com/api/?name=' + userEmail"
+                [src]="'https://ui-avatars.com/api/?name=' + getDisplayedEmail()"
                 alt="Profil"
                 class="avatar"
               />
             </div>
-            <h2 class="profile-name">{{ userEmail }}</h2>
-            <p class="profile-role">{{ isAdmin ? "Yönetici" : "Kullanıcı" }}</p>
+            <h2 class="profile-name">{{ getDisplayedEmail() }}</h2>
+            <p class="profile-role" *ngIf="isOwnProfile">{{ isAdmin ? "Yönetici" : "Kullanıcı" }}</p>
           </div>
 
           <div class="profile-stats">
@@ -22,7 +22,7 @@
             </div>
           </div>
 
-          <div class="profile-actions">
+          <div class="profile-actions" *ngIf="isOwnProfile">
             <button class="btn btn-primary" (click)="activeTab = 'posts'">
               Yazılarım
             </button>
@@ -36,24 +36,32 @@
               Çıkış Yap
             </button>
           </div>
+
+          <div class="profile-actions" *ngIf="!isOwnProfile">
+            <a routerLink="/home" class="btn btn-outline">
+              Ana Sayfaya Dön
+            </a>
+          </div>
         </div>
       </div>
 
       <div class="col-md-8">
         <div class="profile-content">
           <!-- Yazılar Sekmesi -->
-          <div *ngIf="activeTab === 'posts'" class="posts-tab">
-            <h3>Yazılarım</h3>
+          <div *ngIf="(isOwnProfile && activeTab === 'posts') || !isOwnProfile" class="posts-tab">
+            <h3 *ngIf="isOwnProfile">Yazılarım</h3>
+            <h3 *ngIf="!isOwnProfile">{{ getDisplayedEmail() }} Kullanıcısının Yazıları</h3>
 
             <div *ngIf="userPosts.length === 0" class="no-posts">
-              <p>Henüz hiç yazı yazmadınız.</p>
-              <a routerLink="/create-post" class="btn btn-primary"
+              <p *ngIf="isOwnProfile">Henüz hiç yazı yazmadınız.</p>
+              <p *ngIf="!isOwnProfile">Bu kullanıcı henüz hiç yazı yazmamış.</p>
+              <a *ngIf="isOwnProfile" routerLink="/create-post" class="btn btn-primary"
                 >Yeni Yazı Oluştur</a
               >
             </div>
 
             <div *ngIf="userPosts.length > 0" class="posts-list">
-              <a routerLink="/create-post" class="btn btn-primary mb-4"
+              <a *ngIf="isOwnProfile" routerLink="/create-post" class="btn btn-primary mb-4"
                 >Yeni Yazı Oluştur</a
               >
 
@@ -73,10 +81,10 @@
                   <a [routerLink]="['/post', post.id]" class="btn-view"
                     >Görüntüle</a
                   >
-                  <a [routerLink]="['/edit-post', post.id]" class="btn-edit"
+                  <a *ngIf="isOwnProfile" [routerLink]="['/edit-post', post.id]" class="btn-edit"
                     >Düzenle</a
                   >
-                  <button (click)="confirmDeletePost(post)" class="btn-delete">
+                  <button *ngIf="isOwnProfile" (click)="confirmDeletePost(post)" class="btn-delete">
                     Sil
                   </button>
                 </div>
@@ -85,7 +93,7 @@
           </div>
 
           <!-- Hesap Ayarları Sekmesi -->
-          <div *ngIf="activeTab === 'account'" class="account-tab">
+          <div *ngIf="isOwnProfile && activeTab === 'account'" class="account-tab">
             <h3>Hesap Ayarları</h3>
 
             <form

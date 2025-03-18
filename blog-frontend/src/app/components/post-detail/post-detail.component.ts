@@ -50,7 +50,7 @@ import { CommentComponent } from '../comment/comment.component';
           
           <h1 class="post-title">{{ post.title }}</h1>
           
-          <div class="post-author">
+          <div class="post-author" [routerLink]="['/user', post.userEmail]" style="cursor: pointer;">
             <img [src]="'https://ui-avatars.com/api/?name=' + post.userEmail" alt="Yazar" class="author-avatar">
             <span class="author-name">{{ post.userEmail }}</span>
           </div>
@@ -84,7 +84,8 @@ export class PostDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private postService: PostService
+    private postService: PostService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -109,5 +110,9 @@ export class PostDetailComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+  
+  navigateToAuthorProfile(email: string): void {
+    this.router.navigate(['/user', email]);
   }
 }

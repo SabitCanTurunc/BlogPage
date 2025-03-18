@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { PostService } from '../../services/post.service';
@@ -20,6 +20,8 @@ export class UserProfileComponent implements OnInit {
   userEmail: string = '';
   isAdmin: boolean = false;
   userPosts: PostResponseDto[] = [];
+  isOwnProfile: boolean = true;
+  viewedUserEmail: string = '';
   
   accountForm: FormGroup;
   isSubmitting: boolean = false;
@@ -32,7 +34,8 @@ export class UserProfileComponent implements OnInit {
     private authService: AuthService,
     private postService: PostService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.accountForm = this.fb.group({
       username: ['', [Validators.required]],
@@ -44,13 +47,28 @@ export class UserProfileComponent implements OnInit {
   }
   
   ngOnInit(): void {
-    this.checkAuth();
-    this.loadUserPosts();
-    this.loadUserProfile();
+    this.route.params.subscribe(params => {
+      if (params['email']) {
+        // URL'den email parametresi alındı, başka bir kullanıcının profili görüntüleniyor
+        this.viewedUserEmail = params['email'];
+        this.isOwnProfile = this.viewedUserEmail === this.authService.getUserEmail();
+        this.checkAuth();
+        this.loadUserPosts(this.viewedUserEmail);
+      } else {
+        // Parametre yok, kendi profili görüntüleniyor
+        this.isOwnProfile = true;
+        this.checkAuth();
+        this.loadUserPosts(this.userEmail);
+      }
+      
+      if (this.isOwnProfile) {
+        this.loadUserProfile();
+      }
+    });
   }
   
   checkAuth(): void {
-    if (!this.authService.isLoggedIn()) {
+    if (this.isOwnProfile && !this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;
     }
@@ -59,10 +77,10 @@ export class UserProfileComponent implements OnInit {
     this.isAdmin = this.authService.isAdmin();
   }
   
-  loadUserPosts(): void {
+  loadUserPosts(email: string): void {
     this.postService.getAllPosts().subscribe({
       next: (posts) => {
-        this.userPosts = posts.filter(post => post.userEmail === this.userEmail);
+        this.userPosts = posts.filter(post => post.userEmail === email);
       },
       error: (err) => {
         console.error('Kullanıcı yazıları yüklenirken hata oluştu:', err);
@@ -147,5 +165,9 @@ export class UserProfileComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/']);
+  }
+
+  getDisplayedEmail(): string {
+    return this.isOwnProfile ? this.userEmail : this.viewedUserEmail;
   }
 } 
