@@ -224,15 +224,31 @@ tr:hover {
 }
 
 .btn-danger {
-  background: rgba(255, 59, 48, 0.2);
-  color: #ffffff;
-  border: 1px solid rgba(255, 59, 48, 0.5);
+  background: rgba(255, 20, 147, 0.2);
+  color: #ff1493;
+  border: 1px solid rgba(255, 20, 147, 0.3);
 }
 
-.btn-danger:hover:not(:disabled) {
-  background: rgba(255, 59, 48, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(255, 59, 48, 0.3);
+.btn-danger:hover {
+  background: rgba(255, 20, 147, 0.3);
+  box-shadow: 0 0 15px rgba(255, 20, 147, 0.5);
+}
+
+.btn-edit {
+  background: rgba(80, 0, 255, 0.2);
+  color: #5000ff;
+  border: 1px solid rgba(80, 0, 255, 0.3);
+  margin-right: 0.5rem;
+}
+
+.btn-edit:hover {
+  background: rgba(80, 0, 255, 0.3);
+  box-shadow: 0 0 15px rgba(80, 0, 255, 0.5);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .btn:disabled {

@@ -172,11 +172,18 @@
                 <td>{{ post.categoryName }}</td>
                 <td>{{ post.createdAt ? (post.createdAt | date:'dd.MM.yyyy HH:mm') : 'Tarih yok' }}</td>
                 <td>
-                  <button 
-                    (click)="deletePost(post.id)"
-                    class="btn btn-danger">
-                    Sil
-                  </button>
+                  <div class="action-buttons">
+                    <button 
+                      (click)="editPost(post.id)"
+                      class="btn btn-edit">
+                      Düzenle
+                    </button>
+                    <button 
+                      (click)="deletePost(post.id)"
+                      class="btn btn-danger">
+                      Sil
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>

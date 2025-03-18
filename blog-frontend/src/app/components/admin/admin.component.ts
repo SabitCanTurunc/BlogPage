@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { AuthService } from '../../services/auth.service';
 import { UserResponseDto } from '../../models/user-response.dto';
@@ -194,6 +194,10 @@ export class AdminComponent implements OnInit {
         console.error('Postlar yüklenirken hata:', error);
       }
     });
+  }
+
+  editPost(id: number) {
+    this.router.navigate(['/edit-post', id]);
   }
 
   deletePost(id: number) {
