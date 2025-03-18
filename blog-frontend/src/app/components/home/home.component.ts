@@ -27,6 +27,7 @@ export class HomeComponent implements OnInit {
   popularAuthors: string[] = [];
   recentPosts: PostResponseDto[] = [];
   authorStats: { [key: string]: number } = {};
+  searchQuery: string = '';
 
   constructor(
     private postService: PostService,
@@ -72,9 +73,33 @@ export class HomeComponent implements OnInit {
 
   filterByCategory(category: string | null) {
     this.selectedCategory = category;
-    this.filteredPosts = category 
-      ? this.posts.filter(post => post.categoryName === category)
-      : this.posts;
+    this.applyFilters();
+  }
+
+  searchPosts() {
+    this.applyFilters();
+  }
+
+  private applyFilters() {
+    let filtered = [...this.posts];
+
+    // Kategori filtresi
+    if (this.selectedCategory) {
+      filtered = filtered.filter(post => post.categoryName === this.selectedCategory);
+    }
+
+    // Arama filtresi
+    if (this.searchQuery.trim()) {
+      const query = this.searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(post => 
+        post.title.toLowerCase().includes(query) ||
+        post.content.toLowerCase().includes(query) ||
+        post.userEmail.toLowerCase().includes(query) ||
+        post.categoryName.toLowerCase().includes(query)
+      );
+    }
+
+    this.filteredPosts = filtered;
   }
 
   navigateToLogin() {
@@ -98,6 +123,4 @@ export class HomeComponent implements OnInit {
     this.isLoggedIn = false;
     this.router.navigate(['/home']);
   }
-
-  
 }
