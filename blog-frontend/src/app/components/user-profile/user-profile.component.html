@@ -11,7 +11,7 @@
                 class="avatar"
               />
             </div>
-            <h2 class="profile-name">{{ getDisplayedEmail() }}</h2>
+            <h2 class="profile-name" [title]="viewedUserEmail || userEmail">{{ getDisplayedEmail() }}</h2>
             <p class="profile-role" *ngIf="isOwnProfile">{{ isAdmin ? "Yönetici" : "Kullanıcı" }}</p>
           </div>
 
@@ -28,6 +28,9 @@
             </button>
             <button class="btn btn-secondary" (click)="activeTab = 'account'">
               Hesap Ayarları
+            </button>
+            <button class="btn btn-secondary" (click)="activeTab = 'changePassword'">
+              Şifre Değiştir
             </button>
             <button class="btn btn-danger" (click)="confirmDeleteAccount()">
               Hesabı Sil
@@ -130,69 +133,9 @@
                   class="form-control"
                   [disabled]="true"
                 />
-                <small class="form-text text-muted"
+                <small class="form-text text"
                   >E-posta adresi değiştirilemez</small
                 >
-              </div>
-
-              <div class="form-group">
-                <label for="currentPassword">Mevcut Şifre</label>
-                <input
-                  type="password"
-                  id="currentPassword"
-                  formControlName="currentPassword"
-                  class="form-control"
-                  [class.is-invalid]="
-                    accountForm.get('currentPassword')?.invalid &&
-                    accountForm.get('currentPassword')?.touched
-                  "
-                />
-                <div
-                  *ngIf="accountForm.get('currentPassword')?.errors?.['required'] && accountForm.get('currentPassword')?.touched"
-                  class="error-message"
-                >
-                  Mevcut şifre gereklidir
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="newPassword">Yeni Şifre</label>
-                <input
-                  type="password"
-                  id="newPassword"
-                  formControlName="newPassword"
-                  class="form-control"
-                  [class.is-invalid]="
-                    accountForm.get('newPassword')?.invalid &&
-                    accountForm.get('newPassword')?.touched
-                  "
-                />
-                <div
-                  *ngIf="accountForm.get('newPassword')?.errors?.['minlength'] && accountForm.get('newPassword')?.touched"
-                  class="error-message"
-                >
-                  Şifre en az 6 karakter olmalıdır
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="confirmPassword">Şifre Tekrar</label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  formControlName="confirmPassword"
-                  class="form-control"
-                  [class.is-invalid]="
-                    accountForm.get('confirmPassword')?.invalid &&
-                    accountForm.get('confirmPassword')?.touched
-                  "
-                />
-                <div
-                  *ngIf="accountForm.get('confirmPassword')?.errors?.['passwordMismatch'] && accountForm.get('confirmPassword')?.touched"
-                  class="error-message"
-                >
-                  Şifreler eşleşmiyor
-                </div>
               </div>
 
               <div *ngIf="updateError" class="alert alert-danger">
@@ -208,9 +151,154 @@
                 class="btn btn-primary"
                 [disabled]="accountForm.invalid || isSubmitting"
               >
-                {{ isSubmitting ? "Güncelleniyor..." : "Güncelle" }}
+                {{ isSubmitting ? "Güncelleniyor..." : "Hesap Bilgilerini Güncelle" }}
               </button>
             </form>
+          </div>
+
+          <!-- Şifre Değiştirme Sekmesi -->
+          <div *ngIf="isOwnProfile && activeTab === 'changePassword'" class="password-tab">
+            <h3>Şifre Değiştir</h3>
+
+            <!-- Adım 1: Doğrulama Kodu Talep Et -->
+            <div *ngIf="passwordChangeStep === 1">
+              <p class="text">Güvenliğiniz için, şifre değiştirme işlemi sırasında e-posta doğrulaması gereklidir.</p>
+              
+              <form (ngSubmit)="requestPasswordResetCode()" class="password-form">
+                <div *ngIf="passwordResetError" class="alert alert-danger">
+                  {{ passwordResetError }}
+                </div>
+
+                <div *ngIf="passwordResetSuccess" class="alert alert-success">
+                  {{ passwordResetSuccess }}
+                </div>
+
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="isRequestingCode"
+                >
+                  {{ isRequestingCode ? "Kod Gönderiliyor..." : "Doğrulama Kodu İste" }}
+                </button>
+              </form>
+            </div>
+
+            <!-- Adım 2: Kod Doğrulama ve Şifre Değiştirme -->
+            <div *ngIf="passwordChangeStep === 2">
+              <form
+                [formGroup]="passwordForm"
+                (ngSubmit)="updatePassword()"
+                class="password-form"
+              >
+                <div class="form-group">
+                  <label for="verificationCode">Doğrulama Kodu</label>
+                  <input
+                    type="text"
+                    id="verificationCode"
+                    formControlName="verificationCode"
+                    class="form-control"
+                    [class.is-invalid]="
+                      passwordForm.get('verificationCode')?.invalid &&
+                      passwordForm.get('verificationCode')?.touched
+                    "
+                    placeholder="Doğrulama kodunu giriniz"
+                  />
+                  <div
+                    *ngIf="passwordForm.get('verificationCode')?.errors?.['required'] && passwordForm.get('verificationCode')?.touched"
+                    class="error-message"
+                  >
+                    Doğrulama kodu gereklidir
+                  </div>
+                  <div
+                    *ngIf="passwordForm.get('verificationCode')?.errors?.['minlength'] && passwordForm.get('verificationCode')?.touched"
+                    class="error-message"
+                  >
+                    Doğrulama kodu en az 6 karakter olmalıdır
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="newPassword">Yeni Şifre</label>
+                  <input
+                    type="password"
+                    id="newPassword"
+                    formControlName="newPassword"
+                    class="form-control"
+                    [class.is-invalid]="
+                      passwordForm.get('newPassword')?.invalid &&
+                      passwordForm.get('newPassword')?.touched
+                    "
+                    placeholder="Yeni şifrenizi giriniz"
+                  />
+                  <div
+                    *ngIf="passwordForm.get('newPassword')?.errors?.['required'] && passwordForm.get('newPassword')?.touched"
+                    class="error-message"
+                  >
+                    Yeni şifre gereklidir
+                  </div>
+                  <div
+                    *ngIf="passwordForm.get('newPassword')?.errors?.['minlength'] && passwordForm.get('newPassword')?.touched"
+                    class="error-message"
+                  >
+                    Şifre en az 6 karakter olmalıdır
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="confirmPassword">Şifre Tekrar</label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    formControlName="confirmPassword"
+                    class="form-control"
+                    [class.is-invalid]="
+                      passwordForm.get('confirmPassword')?.invalid &&
+                      passwordForm.get('confirmPassword')?.touched || passwordForm.errors?.['passwordMismatch']
+                    "
+                    placeholder="Yeni şifrenizi tekrar giriniz"
+                  />
+                  <div
+                    *ngIf="passwordForm.get('confirmPassword')?.errors?.['required'] && passwordForm.get('confirmPassword')?.touched"
+                    class="error-message"
+                  >
+                    Şifre tekrarı gereklidir
+                  </div>
+                  <div
+                    *ngIf="passwordForm.errors?.['passwordMismatch']"
+                    class="error-message"
+                  >
+                    Şifreler eşleşmiyor
+                  </div>
+                </div>
+
+                <div *ngIf="passwordResetError" class="alert alert-danger">
+                  {{ passwordResetError }}
+                </div>
+
+                <div *ngIf="passwordResetSuccess" class="alert alert-success">
+                  {{ passwordResetSuccess }}
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="passwordForm.invalid || isSubmittingPassword"
+                  >
+                    {{ isSubmittingPassword ? "Güncelleniyor..." : "Şifremi Değiştir" }}
+                  </button>
+                  
+                  <button
+                    type="button"
+                    class="btn btn-link"
+                    (click)="resendPasswordResetCode()"
+                    [disabled]="isResendingCode"
+                  >
+                    {{ isResendingCode ? "Kod Gönderiliyor..." : "Yeni Kod İste" }}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>

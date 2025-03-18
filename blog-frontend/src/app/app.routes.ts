@@ -9,12 +9,14 @@ import { AdminComponent } from './components/admin/admin.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
     { path: 'verify-email', component: VerifyEmailComponent },
+    { path: 'forgot-password', component: ForgotPasswordComponent },
     { path: 'post/:id', component: PostDetailComponent },
     { path: 'create-post', component: CreatePostComponent, canActivate: [AuthGuard] },
     { path: 'edit-post/:id', component: CreatePostComponent, canActivate: [AuthGuard] },

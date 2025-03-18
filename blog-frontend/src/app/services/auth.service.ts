@@ -111,9 +111,25 @@ export class AuthService {
   }
 
   verifyEmail(data: { email: string; verificationCode: string }) {
+    console.log('API isteği gönderiliyor:', `${environment.apiUrl}/auth/verify`, data);
     return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/verify`, data)
       .pipe(
-        catchError(this.handleError)
+        tap(response => console.log('API yanıtı alındı:', response)),
+        catchError(error => {
+          console.error('API hatası:', error);
+          // Özel hata yönetimi
+          if (error.error && error.error.message && error.error.message.includes('Yanlış doğrulama kodu')) {
+            console.log('Doğrulama kodu hatası algılandı');
+            return throwError(() => ({
+              status: error.status,
+              error: {
+                message: 'Yanlış doğrulama kodu. Lütfen tekrar deneyin.'
+              }
+            }));
+          }
+          // Diğer hatalar için standart hata yönetimi kullan
+          return this.handleError(error);
+        })
       );
   }
 
@@ -122,6 +138,25 @@ export class AuthService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  // Şifre sıfırlama için doğrulama kodu isteme
+  forgotPassword(email: string): Observable<{message: string, success: boolean}> {
+    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/forgot-password`, { email })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  // Doğrulama kodu ve yeni şifre ile şifre sıfırlama
+  resetPassword(email: string, verificationCode: string, newPassword: string): Observable<{message: string, success: boolean}> {
+    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/reset-password`, {
+      email,
+      verificationCode,
+      newPassword
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   logout(): void {

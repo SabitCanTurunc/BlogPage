@@ -16,18 +16,27 @@ import { Router } from '@angular/router';
   styleUrl: './user-profile.component.css'
 })
 export class UserProfileComponent implements OnInit {
-  activeTab: 'posts' | 'account' = 'posts';
+  activeTab: 'posts' | 'account' | 'changePassword' = 'posts';
   userEmail: string = '';
   isAdmin: boolean = false;
   userPosts: PostResponseDto[] = [];
   isOwnProfile: boolean = true;
   viewedUserEmail: string = '';
   
+  // Hesap güncelleme formu
   accountForm: FormGroup;
   isSubmitting: boolean = false;
   updateError: string = '';
   updateSuccess: string = '';
-  shouldValidatePassword: boolean = false;
+  
+  // Şifre değiştirme
+  passwordChangeStep: number = 1;
+  passwordForm: FormGroup;
+  isSubmittingPassword: boolean = false;
+  isRequestingCode: boolean = false;
+  isResendingCode: boolean = false;
+  passwordResetError: string = '';
+  passwordResetSuccess: string = '';
   
   constructor(
     private fb: FormBuilder,
@@ -37,12 +46,17 @@ export class UserProfileComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
+    // Hesap formu
     this.accountForm = this.fb.group({
       username: ['', [Validators.required]],
-      email: [{ value: '', disabled: true }],
-      currentPassword: [''],
-      newPassword: ['', [Validators.minLength(6)]],
-      confirmPassword: ['']
+      email: [{ value: '', disabled: true }]
+    });
+    
+    // Şifre değiştirme formu
+    this.passwordForm = this.fb.group({
+      verificationCode: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]],
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
   }
   
@@ -128,6 +142,86 @@ export class UserProfileComponent implements OnInit {
     }
   }
   
+  // Şifre değiştirme için doğrulama kodu iste
+  requestPasswordResetCode(): void {
+    this.isRequestingCode = true;
+    this.passwordResetError = '';
+    this.passwordResetSuccess = '';
+    
+    this.authService.forgotPassword(this.userEmail).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.passwordResetSuccess = 'Doğrulama kodu e-posta adresinize gönderildi.';
+          this.passwordChangeStep = 2;
+        } else {
+          this.passwordResetError = response.message || 'Doğrulama kodu gönderilirken bir hata oluştu.';
+        }
+        this.isRequestingCode = false;
+      },
+      error: (err) => {
+        this.passwordResetError = err.message || 'Doğrulama kodu gönderilirken bir hata oluştu.';
+        this.isRequestingCode = false;
+      }
+    });
+  }
+  
+  // Doğrulama kodunu yeniden gönder
+  resendPasswordResetCode(): void {
+    this.isResendingCode = true;
+    this.passwordResetError = '';
+    this.passwordResetSuccess = '';
+    
+    this.authService.forgotPassword(this.userEmail).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.passwordResetSuccess = 'Doğrulama kodu tekrar gönderildi. Lütfen e-posta kutunuzu kontrol ediniz.';
+        } else {
+          this.passwordResetError = response.message || 'Doğrulama kodu gönderilemedi.';
+        }
+        this.isResendingCode = false;
+      },
+      error: (err) => {
+        this.passwordResetError = err.message || 'Doğrulama kodu gönderilirken bir hata oluştu.';
+        this.isResendingCode = false;
+      }
+    });
+  }
+  
+  // Şifre değiştirme işlemi
+  updatePassword(): void {
+    if (this.passwordForm.valid) {
+      this.isSubmittingPassword = true;
+      this.passwordResetError = '';
+      this.passwordResetSuccess = '';
+      
+      const verificationCode = this.passwordForm.get('verificationCode')?.value;
+      const newPassword = this.passwordForm.get('newPassword')?.value;
+      
+      this.authService.resetPassword(this.userEmail, verificationCode, newPassword).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.passwordResetSuccess = 'Şifreniz başarıyla değiştirildi.';
+            this.passwordForm.reset();
+            
+            // 3 saniye sonra adım 1'e dön
+            setTimeout(() => {
+              this.passwordChangeStep = 1;
+              this.passwordResetSuccess = '';
+              this.activeTab = 'posts';
+            }, 3000);
+          } else {
+            this.passwordResetError = response.message || 'Şifre değiştirme başarısız oldu.';
+          }
+          this.isSubmittingPassword = false;
+        },
+        error: (err) => {
+          this.passwordResetError = err.message || 'Şifre değiştirme sırasında bir hata oluştu.';
+          this.isSubmittingPassword = false;
+        }
+      });
+    }
+  }
+  
   confirmDeletePost(post: PostResponseDto): void {
     if (confirm(`"${post.title}" başlıklı yazıyı silmek istediğinizden emin misiniz?`)) {
       this.postService.deletePost(post.id).subscribe({
@@ -168,6 +262,21 @@ export class UserProfileComponent implements OnInit {
   }
 
   getDisplayedEmail(): string {
-    return this.isOwnProfile ? this.userEmail : this.viewedUserEmail;
+    // İzlenen profil başkasına aitse o profili göster, yoksa kendi profilini
+    const emailToDisplay = this.viewedUserEmail || this.userEmail;
+    
+    if (!emailToDisplay) {
+      return 'Kullanıcı';
+    }
+    
+    // E-posta adresini @ karakterine kadar kısalt (çok uzunsa)
+    const atIndex = emailToDisplay.indexOf('@');
+    if (atIndex > 15) {
+      return emailToDisplay.substring(0, 12) + '...' + 
+             emailToDisplay.substring(atIndex - 3, atIndex) + 
+             emailToDisplay.substring(atIndex);
+    }
+    
+    return emailToDisplay;
   }
 } 

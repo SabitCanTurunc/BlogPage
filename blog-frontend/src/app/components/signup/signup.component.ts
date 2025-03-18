@@ -442,9 +442,9 @@ export class SignupComponent implements OnInit {
     this.signupForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
       email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
-      password: ['', [Validators.required, Validators.minLength(6), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
-    }, { validator: this.passwordMatchValidator });
+    }, { validators: SignupComponent.passwordMatchValidator });
   }
 
   ngOnInit(): void {
@@ -454,10 +454,16 @@ export class SignupComponent implements OnInit {
     });
   }
 
-  passwordMatchValidator(g: FormGroup) {
-    return g.get('password')?.value === g.get('confirmPassword')?.value
-      ? null
-      : { 'passwordMismatch': true };
+  static passwordMatchValidator(g: FormGroup) {
+    const password = g.get('password')?.value;
+    const confirmPassword = g.get('confirmPassword')?.value;
+    
+    if (password && confirmPassword && password !== confirmPassword) {
+      g.get('confirmPassword')?.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    }
+    
+    return null;
   }
 
   onSubmit(): void {
@@ -471,9 +477,9 @@ export class SignupComponent implements OnInit {
       this.authService.signup({ username, email, password }).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.success = 'Hesabınız başarıyla oluşturuldu! Lütfen e-posta adresinizi doğrulayın.';
+          this.success = 'Hesabınız başarıyla oluşturuldu! Doğrulama sayfasına yönlendiriliyorsunuz...';
           setTimeout(() => {
-            this.router.navigate(['/login']);
+            this.router.navigate(['/verify-email'], { queryParams: { email } });
           }, 3000);
         },
         error: (err) => {
