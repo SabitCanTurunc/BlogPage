@@ -55,8 +55,15 @@ public class PostMapper implements BaseMapper<Post, PostResponseDto, PostRequest
         postResponseDto.setTitle(entity.getTitle());
         postResponseDto.setContent(entity.getContent());
         postResponseDto.setUserEmail(entity.getUser().getEmail());
-        postResponseDto.setCategoryId(entity.getCategory().getId());
-        postResponseDto.setCategoryName(entity.getCategory().getName());
+        
+        if (entity.getCategory() != null) {
+            postResponseDto.setCategoryId(entity.getCategory().getId());
+            postResponseDto.setCategoryName(entity.getCategory().getName());
+        } else {
+            postResponseDto.setCategoryId(0);
+            postResponseDto.setCategoryName("Kategorisiz");
+        }
+        
         postResponseDto.setCreatedAt(entity.getCreatedAt());
         postResponseDto.setUpdatedAt(entity.getUpdatedAt());
         

@@ -73,6 +73,14 @@ public class AuthenticationController {
         } catch (BaseException e) {
             System.out.println("BaseException yakalandı: " + e.getMessage());
             
+            // Eğer hata "zaten doğrulanmış" ile ilgili ise, başarılı yanıt döndür
+            if (e.getMessage() != null && e.getMessage().contains("zaten doğrulanmış")) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", true);
+                response.put("message", "Bu hesap zaten doğrulanmış");
+                return ResponseEntity.ok(response);
+            }
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", e.getMessage());

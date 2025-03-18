@@ -1,0 +1,101 @@
+<div class="verify-container">
+  <a routerLink="/" class="home-icon">
+    <i class="bi bi-house-fill"></i>
+  </a>
+  <div class="verify-box">
+    <h2>E-posta Doğrulama</h2>
+    <p class="subtitle">
+      Hesabınızı aktifleştirmek için e-posta adresinize gönderilen doğrulama
+      kodunu giriniz.
+    </p>
+
+    <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">E-posta</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="verifyForm.get('email')?.invalid && verifyForm.get('email')?.touched"
+          placeholder="E-posta adresinizi giriniz"
+        />
+        <div
+          class="invalid-feedback"
+          *ngIf="verifyForm.get('email')?.errors?.['required'] && verifyForm.get('email')?.touched"
+        >
+          E-posta adresi zorunludur.
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="verifyForm.get('email')?.errors?.['email'] && verifyForm.get('email')?.touched"
+        >
+          Geçerli bir e-posta adresi giriniz.
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="verifyForm.get('email')?.errors?.['pattern'] && verifyForm.get('email')?.touched"
+        >
+          Geçerli bir e-posta adresi giriniz.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="verificationCode">Doğrulama Kodu</label>
+        <input
+          type="text"
+          id="verificationCode"
+          formControlName="verificationCode"
+          class="form-control"
+          [class.is-invalid]="verifyForm.get('verificationCode')?.invalid && verifyForm.get('verificationCode')?.touched"
+          placeholder="Doğrulama kodunu giriniz"
+        />
+        <div
+          class="invalid-feedback"
+          *ngIf="verifyForm.get('verificationCode')?.errors?.['required'] && verifyForm.get('verificationCode')?.touched"
+        >
+          Doğrulama kodu zorunludur.
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="verifyForm.get('verificationCode')?.errors?.['minlength'] && verifyForm.get('verificationCode')?.touched"
+        >
+          Doğrulama kodu en az 6 karakter olmalıdır.
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="verifyForm.get('verificationCode')?.errors?.['maxlength'] && verifyForm.get('verificationCode')?.touched"
+        >
+          Doğrulama kodu en fazla 6 karakter olmalıdır.
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!verifyForm.valid || isLoading"
+      >
+        {{ isLoading ? 'Doğrulanıyor...' : 'Doğrula' }}
+      </button>
+
+      <div class="resend-code">
+        <button
+          type="button"
+          class="btn-link"
+          (click)="resendCode()"
+          [disabled]="isResending"
+        >
+          {{ isResending ? 'Kod gönderiliyor...' : 'Doğrulama kodunu tekrar gönder' }}
+        </button>
+      </div>
+    </form>
+
+    <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
+
+    <div *ngIf="success" class="alert alert-success mt-3">{{ success }}</div>
+
+    <div class="mt-3">
+      <a routerLink="/login">Giriş sayfasına dön</a>
+    </div>
+  </div>
+</div>
