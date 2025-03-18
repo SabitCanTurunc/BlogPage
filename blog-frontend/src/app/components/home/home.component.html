@@ -2,20 +2,13 @@
   <!-- Header Component -->
 
   <!-- Admin Button -->
-  <div class="admin-button-container">
-    <button *ngIf="isAdmin" (click)="navigateToAdmin()" class="btn-admin-small">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-      </svg>
-      Admin
-    </button>
-  </div>
+  
 
   <!-- Hero Section -->
   <div class="hero-section">
     <div class="hero-content">
       <div class="hero-logo">
-        <img src="assets/blogLogo.png" alt="NeoWrite" class="blog-logo">
+        <img  (click)="navigateToCreatePost()" src="assets/blogLogo.png" alt="NeoWrite" class="blog-logo">
       </div>
       <h1>NeoWrite</h1> 
       <p class="hero-subtitle">Düşüncelerinizi paylaşın, bilgi birikimini artırın</p>
@@ -26,9 +19,7 @@
         <button *ngIf="!isLoggedIn" (click)="navigateToLogin()" class="btn-outline-light">
           <span class="btn-text">Giriş Yap</span>
         </button>
-        <button *ngIf="isLoggedIn" (click)="navigateToCreatePost()" class="btn-light">
-          <span class="btn-text">Yeni Yazı Oluştur</span>
-        </button>
+        
       </div>
     </div>
   </div>
@@ -89,9 +80,12 @@
             <div class="card-body">
               <div class="post-meta">
                 <span class="post-date">{{ post.createdAt | date:'mediumDate' }}</span>
-                <span class="post-category">{{ post.categoryName }}</span>
               </div>
-              <h2 class="post-title">{{ post.title }}</h2>
+              <div class="post-meta">
+                <span class="post-category">{{ post.categoryName }}</span>
+
+              </div>
+              <h2 class="post-title" [routerLink]="['/post', post.id]">{{ post.title }}</h2>
               <p class="post-excerpt">{{ post.content | slice:0:200 }}{{ post.content.length > 200 ? '...' : '' }}</p>
               <div class="post-footer">
                 <div class="post-author">
