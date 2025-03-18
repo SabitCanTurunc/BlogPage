@@ -1,44 +1,84 @@
 <div class="login-container">
-  
-  <h2>Giriş Yap</h2>
-  
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="email">E-posta</label>
-      <input 
-        type="email" 
-        id="email" 
-        formControlName="email" 
-        class="form-control"
-        [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-      <div class="invalid-feedback" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-        <div *ngIf="loginForm.get('email')?.errors?.['required']">E-posta gereklidir</div>
-        <div *ngIf="loginForm.get('email')?.errors?.['email']">Geçerli bir e-posta adresi giriniz</div>
+  <a routerLink="/" class="home-icon">
+    <i class="fas fa-home"></i>
+  </a>
+  <div class="login-box">
+    <h2>Giriş Yap</h2>
+    <p class="subtitle">Blog platformuna hoş geldiniz</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">E-posta</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="
+            loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+          "
+          placeholder="E-posta adresinizi giriniz"
+        />
+        <div
+          class="invalid-feedback"
+          *ngIf="loginForm.get('email')?.errors?.['required'] && loginForm.get('email')?.touched"
+        >
+          E-posta adresi zorunludur
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="loginForm.get('email')?.errors?.['email'] && loginForm.get('email')?.touched"
+        >
+          Geçerli bir e-posta adresi giriniz
+        </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label for="password">Şifre</label>
-      <input 
-        type="password" 
-        id="password" 
-        formControlName="password" 
-        class="form-control"
-        [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-      <div class="invalid-feedback" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-        <div *ngIf="loginForm.get('password')?.errors?.['required']">Şifre gereklidir</div>
+      <div class="form-group">
+        <label for="password">Şifre</label>
+        <div class="password-input">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-control"
+            [class.is-invalid]="
+              loginForm.get('password')?.invalid &&
+              loginForm.get('password')?.touched
+            "
+            placeholder="Şifrenizi giriniz"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+          >
+            <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+          </button>
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched"
+        >
+          Şifre zorunludur
+        </div>
       </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="loginForm.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">Giriş Yap</span>
+        <span *ngIf="isLoading">
+          <i class="fas fa-spinner fa-spin"></i> Giriş Yapılıyor...
+        </span>
+      </button>
+    </form>
+
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+    <div class="mt-3">
+      Hesabınız yok mu? <a routerLink="/signup">Kayıt Ol</a>
     </div>
-
-    <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid || isLoading">
-      <span *ngIf="!isLoading">Giriş Yap</span>
-      <span *ngIf="isLoading">Giriş Yapılıyor...</span>
-    </button>
-  </form>
-
-  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
-
-  <div class="mt-3">
-    Hesabınız yok mu? <a routerLink="/signup">Kayıt Ol</a>
   </div>
-</div> 
+</div>
