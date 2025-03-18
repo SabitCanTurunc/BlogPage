@@ -51,13 +51,25 @@
 
         <div class="form-group">
           <label for="imageUpload" class="form-label">Resim Yükle</label>
-          <input 
-            type="file" 
-            id="imageUpload" 
-            (change)="onFileSelected($event)"
-            class="form-control"
-            accept="image/*"
-            multiple>
+          <div class="file-upload-container">
+            <input 
+              type="file" 
+              id="imageUpload" 
+              (change)="onFileSelected($event)"
+              class="file-input"
+              accept="image/*"
+              multiple
+              #fileInput>
+            <div class="file-upload-button" (click)="fileInput.click()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+              </svg>
+              <span>Resim Seç</span>
+            </div>
+            <div class="file-upload-info">
+              <small>En fazla 5 resim, her biri 20MB'dan küçük olmalıdır.</small>
+            </div>
+          </div>
           <div class="image-preview-container" *ngIf="uploadedImages.length > 0">
             <div *ngFor="let image of uploadedImages" class="image-preview">
               <img [src]="image.url" alt="Yüklenen resim">

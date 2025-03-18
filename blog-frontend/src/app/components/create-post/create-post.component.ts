@@ -7,6 +7,11 @@ import { CategoryService } from '../../services/category.service';
 import { AuthService } from '../../services/auth.service';
 import { ImageService } from '../../services/image.service';
 import { RouterModule } from '@angular/router';
+import { CategoryResponseDto } from '../../models/category-response.dto';
+
+interface UploadedImage {
+  url: string;
+}
 
 @Component({
   selector: 'app-create-post',
@@ -17,13 +22,13 @@ import { RouterModule } from '@angular/router';
 })
 export class CreatePostComponent implements OnInit {
   postForm: FormGroup;
-  categories: any[] = [];
+  categories: CategoryResponseDto[] = [];
   submitError: string = '';
   isSubmitting: boolean = false;
   isLoggedIn: boolean = false;
   isEditMode: boolean = false;
   postId: number | null = null;
-  uploadedImages: any[] = [];
+  uploadedImages: UploadedImage[] = [];
   imageUploadError: string = '';
   isImageUploading: boolean = false;
 
@@ -46,7 +51,6 @@ export class CreatePostComponent implements OnInit {
   ngOnInit() {
     this.checkAuth();
     
-    // URL'den post ID'sini al
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
@@ -59,16 +63,14 @@ export class CreatePostComponent implements OnInit {
   loadPostData(id: number) {
     this.postService.getPostById(id).subscribe({
       next: (post) => {
-        // Form'u doldur
         this.postForm.patchValue({
           title: post.title,
           content: post.content,
           categoryId: post.categoryId.toString()
         });
         
-        // Resimleri yükle
         if (post.images && post.images.length > 0) {
-          this.uploadedImages = post.images.map((url: string) => ({ url }));
+          this.uploadedImages = post.images.map(url => ({ url }));
         }
       },
       error: (error) => {
@@ -118,32 +120,26 @@ export class CreatePostComponent implements OnInit {
     if (files && files.length > 0) {
       this.imageUploadError = '';
       
-      // Maksimum 5 resim yüklenebilir
       if (this.uploadedImages.length + files.length > 5) {
         this.imageUploadError = 'En fazla 5 resim yükleyebilirsiniz.';
         return;
       }
       
-      // Her dosya için yükleme işlemi
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         
-        // Dosya boyutu kontrolü (20MB)
         if (file.size > 20 * 1024 * 1024) {
           this.imageUploadError = 'Dosya boyutu 20MB\'dan küçük olmalıdır.';
           continue;
         }
         
-        // Dosya türü kontrolü
         if (!file.type.startsWith('image/')) {
           this.imageUploadError = 'Sadece resim dosyaları yükleyebilirsiniz.';
           continue;
         }
         
-        // Resim yükleme durumunu güncelle
         this.isImageUploading = true;
         
-        // Resmi yükle
         this.imageService.uploadImage(file).subscribe({
           next: (response) => {
             this.uploadedImages.push(response);
@@ -158,7 +154,7 @@ export class CreatePostComponent implements OnInit {
     }
   }
 
-  removeImage(image: any) {
+  removeImage(image: UploadedImage) {
     const index = this.uploadedImages.findIndex(img => img.url === image.url);
     if (index !== -1) {
       this.uploadedImages.splice(index, 1);
@@ -189,52 +185,42 @@ export class CreatePostComponent implements OnInit {
       this.submitError = '';
 
       if (this.isEditMode && this.postId) {
-        // Düzenleme modu
         this.postService.updatePost(this.postId, postData).subscribe({
           next: (response) => {
             this.router.navigate(['/post', response.id]);
           },
           error: (error) => {
-            if (error.error?.customException?.message) {
-              this.submitError = error.error.customException.message;
-            } else if (error.error?.message) {
-              this.submitError = error.error.message;
-            } else {
-              this.submitError = 'Post güncellenirken bir hata oluştu.';
-            }
-            
-            if (error.status === 401) {
-              setTimeout(() => {
-                this.router.navigate(['/login']);
-              }, 2000);
-            }
+            this.handleSubmitError(error);
             this.isSubmitting = false;
           }
         });
       } else {
-        // Yeni post oluşturma modu
         this.postService.createPost(postData).subscribe({
           next: (response) => {
             this.router.navigate(['/post', response.id]);
           },
           error: (error) => {
-            if (error.error?.customException?.message) {
-              this.submitError = error.error.customException.message;
-            } else if (error.error?.message) {
-              this.submitError = error.error.message;
-            } else {
-              this.submitError = 'Post oluşturulurken bir hata oluştu.';
-            }
-            
-            if (error.status === 401) {
-              setTimeout(() => {
-                this.router.navigate(['/login']);
-              }, 2000);
-            }
+            this.handleSubmitError(error);
             this.isSubmitting = false;
           }
         });
       }
+    }
+  }
+
+  private handleSubmitError(error: any) {
+    if (error.error?.customException?.message) {
+      this.submitError = error.error.customException.message;
+    } else if (error.error?.message) {
+      this.submitError = error.error.message;
+    } else {
+      this.submitError = this.isEditMode ? 'Post güncellenirken bir hata oluştu.' : 'Post oluşturulurken bir hata oluştu.';
+    }
+    
+    if (error.status === 401) {
+      setTimeout(() => {
+        this.router.navigate(['/login']);
+      }, 2000);
     }
   }
 

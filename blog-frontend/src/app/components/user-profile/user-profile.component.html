@@ -1,0 +1,211 @@
+<div class="profile-container">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="profile-sidebar">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <img
+                [src]="'https://ui-avatars.com/api/?name=' + userEmail"
+                alt="Profil"
+                class="avatar"
+              />
+            </div>
+            <h2 class="profile-name">{{ userEmail }}</h2>
+            <p class="profile-role">{{ isAdmin ? "Yönetici" : "Kullanıcı" }}</p>
+          </div>
+
+          <div class="profile-stats">
+            <div class="stat-item">
+              <span class="stat-value">{{ userPosts.length }}</span>
+              <span class="stat-label">Yazı</span>
+            </div>
+          </div>
+
+          <div class="profile-actions">
+            <button class="btn btn-primary" (click)="activeTab = 'posts'">
+              Yazılarım
+            </button>
+            <button class="btn btn-secondary" (click)="activeTab = 'account'">
+              Hesap Ayarları
+            </button>
+            <button class="btn btn-danger" (click)="confirmDeleteAccount()">
+              Hesabı Sil
+            </button>
+            <button class="btn btn-outline" (click)="logout()">
+              Çıkış Yap
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="profile-content">
+          <!-- Yazılar Sekmesi -->
+          <div *ngIf="activeTab === 'posts'" class="posts-tab">
+            <h3>Yazılarım</h3>
+
+            <div *ngIf="userPosts.length === 0" class="no-posts">
+              <p>Henüz hiç yazı yazmadınız.</p>
+              <a routerLink="/create-post" class="btn btn-primary"
+                >Yeni Yazı Oluştur</a
+              >
+            </div>
+
+            <div *ngIf="userPosts.length > 0" class="posts-list">
+              <a routerLink="/create-post" class="btn btn-primary mb-4"
+                >Yeni Yazı Oluştur</a
+              >
+
+              <div *ngFor="let post of userPosts" class="post-item">
+                <div class="post-header">
+                  <div class="post-meta">
+                    <span class="post-date">{{
+                      post.createdAt | date : "dd.MM.yyyy"
+                    }}</span>
+                  </div>
+                  <h4 class="post-title">{{ post.title }}</h4>
+                  <div class="post-meta">
+                    <span class="post-category">{{ post.categoryName }}</span>
+                  </div>
+                </div>
+                <div class="post-actions">
+                  <a [routerLink]="['/post', post.id]" class="btn-view"
+                    >Görüntüle</a
+                  >
+                  <a [routerLink]="['/edit-post', post.id]" class="btn-edit"
+                    >Düzenle</a
+                  >
+                  <button (click)="confirmDeletePost(post)" class="btn-delete">
+                    Sil
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hesap Ayarları Sekmesi -->
+          <div *ngIf="activeTab === 'account'" class="account-tab">
+            <h3>Hesap Ayarları</h3>
+
+            <form
+              [formGroup]="accountForm"
+              (ngSubmit)="updateAccount()"
+              class="account-form"
+            >
+              <div class="form-group">
+                <label for="username">Kullanıcı Adı</label>
+                <input
+                  type="text"
+                  id="username"
+                  formControlName="username"
+                  class="form-control"
+                  [class.is-invalid]="
+                    accountForm.get('username')?.invalid &&
+                    accountForm.get('username')?.touched
+                  "
+                />
+                <div
+                  *ngIf="accountForm.get('username')?.errors?.['required'] && accountForm.get('username')?.touched"
+                  class="error-message"
+                >
+                  Kullanıcı adı gereklidir
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email">E-posta</label>
+                <input
+                  type="email"
+                  id="email"
+                  formControlName="email"
+                  class="form-control"
+                  [disabled]="true"
+                />
+                <small class="form-text text-muted"
+                  >E-posta adresi değiştirilemez</small
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="currentPassword">Mevcut Şifre</label>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  formControlName="currentPassword"
+                  class="form-control"
+                  [class.is-invalid]="
+                    accountForm.get('currentPassword')?.invalid &&
+                    accountForm.get('currentPassword')?.touched
+                  "
+                />
+                <div
+                  *ngIf="accountForm.get('currentPassword')?.errors?.['required'] && accountForm.get('currentPassword')?.touched"
+                  class="error-message"
+                >
+                  Mevcut şifre gereklidir
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="newPassword">Yeni Şifre</label>
+                <input
+                  type="password"
+                  id="newPassword"
+                  formControlName="newPassword"
+                  class="form-control"
+                  [class.is-invalid]="
+                    accountForm.get('newPassword')?.invalid &&
+                    accountForm.get('newPassword')?.touched
+                  "
+                />
+                <div
+                  *ngIf="accountForm.get('newPassword')?.errors?.['minlength'] && accountForm.get('newPassword')?.touched"
+                  class="error-message"
+                >
+                  Şifre en az 6 karakter olmalıdır
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="confirmPassword">Şifre Tekrar</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  formControlName="confirmPassword"
+                  class="form-control"
+                  [class.is-invalid]="
+                    accountForm.get('confirmPassword')?.invalid &&
+                    accountForm.get('confirmPassword')?.touched
+                  "
+                />
+                <div
+                  *ngIf="accountForm.get('confirmPassword')?.errors?.['passwordMismatch'] && accountForm.get('confirmPassword')?.touched"
+                  class="error-message"
+                >
+                  Şifreler eşleşmiyor
+                </div>
+              </div>
+
+              <div *ngIf="updateError" class="alert alert-danger">
+                {{ updateError }}
+              </div>
+
+              <div *ngIf="updateSuccess" class="alert alert-success">
+                {{ updateSuccess }}
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="accountForm.invalid || isSubmitting"
+              >
+                {{ isSubmitting ? "Güncelleniyor..." : "Güncelle" }}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
