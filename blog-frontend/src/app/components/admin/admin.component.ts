@@ -13,6 +13,7 @@ import { PostService } from '../../services/post.service';
 import { PostResponseDto } from '../../models/post-response.dto';
 import { ToastrService } from 'ngx-toastr';
 import { firstValueFrom } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-admin',
@@ -109,18 +110,46 @@ export class AdminComponent implements OnInit {
   }
 
   deleteUser(userId: number) {
-    if (confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) {
-      this.adminService.deleteUser(userId).subscribe({
-        next: () => {
-          this.loadUsers();
-          this.toastr.success('Kullanıcı başarıyla silindi');
-        },
-        error: (err) => {
-          console.error('Error deleting user', err);
-          this.toastr.error('Kullanıcı silinirken bir hata oluştu');
-        }
-      });
-    }
+    Swal.fire({
+      title: 'Kullanıcıyı Sil',
+      text: 'Bu kullanıcıyı silmek istediğinize emin misiniz?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Evet, Sil',
+      cancelButtonText: 'İptal',
+      background: '#1a1a2e',
+      color: '#ffffff',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title',
+        htmlContainer: 'modern-swal-content',
+        confirmButton: 'modern-swal-confirm',
+        cancelButton: 'modern-swal-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.adminService.deleteUser(userId).subscribe({
+          next: () => {
+            this.loadUsers();
+            this.toastr.success('Kullanıcı başarıyla silindi', 'Başarılı', {
+              timeOut: 3000,
+              positionClass: 'toast-top-right',
+              progressBar: true
+            });
+          },
+          error: (err) => {
+            console.error('Error deleting user', err);
+            this.toastr.error('Kullanıcı silinirken bir hata oluştu', 'Hata', {
+              timeOut: 5000,
+              positionClass: 'toast-top-right',
+              progressBar: true
+            });
+          }
+        });
+      }
+    });
   }
 
   isCurrentUser(userId: number): boolean {
@@ -187,18 +216,46 @@ export class AdminComponent implements OnInit {
   }
 
   deleteCategory(categoryId: number) {
-    if (confirm('Bu kategoriyi silmek istediğinize emin misiniz?')) {
-      this.categoryService.deleteCategory(categoryId).subscribe({
-        next: () => {
-          this.loadCategories();
-          this.toastr.success('Kategori başarıyla silindi');
-        },
-        error: (err) => {
-          console.error('Error deleting category', err);
-          this.toastr.error('Kategori silinirken bir hata oluştu');
-        }
-      });
-    }
+    Swal.fire({
+      title: 'Kategoriyi Sil',
+      text: 'Bu kategoriyi silmek istediğinize emin misiniz?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Evet, Sil',
+      cancelButtonText: 'İptal',
+      background: '#1a1a2e',
+      color: '#ffffff',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title',
+        htmlContainer: 'modern-swal-content',
+        confirmButton: 'modern-swal-confirm',
+        cancelButton: 'modern-swal-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.categoryService.deleteCategory(categoryId).subscribe({
+          next: () => {
+            this.loadCategories();
+            this.toastr.success('Kategori başarıyla silindi', 'Başarılı', {
+              timeOut: 3000,
+              positionClass: 'toast-top-right',
+              progressBar: true
+            });
+          },
+          error: (err) => {
+            console.error('Error deleting category', err);
+            this.toastr.error('Kategori silinirken bir hata oluştu', 'Hata', {
+              timeOut: 5000,
+              positionClass: 'toast-top-right',
+              progressBar: true
+            });
+          }
+        });
+      }
+    });
   }
 
   loadPosts() {
@@ -219,18 +276,46 @@ export class AdminComponent implements OnInit {
   }
 
   deletePost(postId: number) {
-    if (confirm('Bu gönderiyi silmek istediğinize emin misiniz?')) {
-      this.postService.deletePost(postId).subscribe({
-        next: () => {
-          this.loadPosts();
-          this.toastr.success('Gönderi başarıyla silindi');
-        },
-        error: (err) => {
-          console.error('Error deleting post', err);
-          this.toastr.error('Gönderi silinirken bir hata oluştu');
-        }
-      });
-    }
+    Swal.fire({
+      title: 'Gönderiyi Sil',
+      text: 'Bu gönderiyi silmek istediğinize emin misiniz?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Evet, Sil',
+      cancelButtonText: 'İptal',
+      background: '#1a1a2e',
+      color: '#ffffff',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title',
+        htmlContainer: 'modern-swal-content',
+        confirmButton: 'modern-swal-confirm',
+        cancelButton: 'modern-swal-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.postService.deletePost(postId).subscribe({
+          next: () => {
+            this.loadPosts();
+            this.toastr.success('Gönderi başarıyla silindi', 'Başarılı', {
+              timeOut: 3000,
+              positionClass: 'toast-top-right',
+              progressBar: true
+            });
+          },
+          error: (err) => {
+            console.error('Error deleting post', err);
+            this.toastr.error('Gönderi silinirken bir hata oluştu', 'Hata', {
+              timeOut: 5000,
+              positionClass: 'toast-top-right',
+              progressBar: true
+            });
+          }
+        });
+      }
+    });
   }
 
   selectSection(section: string) {

@@ -7,6 +7,7 @@ import { PostService } from '../../services/post.service';
 import { UserService } from '../../services/user.service';
 import { PostResponseDto } from '../../models/post-response.dto';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-user-profile',
@@ -239,24 +240,87 @@ export class UserProfileComponent implements OnInit {
   }
   
   confirmDeleteAccount(): void {
-    if (confirm('Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
-      const password = prompt('Hesabınızı silmek için şifrenizi girin:');
-      
-      if (!password) {
-        return; // Kullanıcı iptal etti veya boş şifre girdi
+    Swal.fire({
+      title: 'Hesabı Sil',
+      text: 'Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Evet, Sil',
+      cancelButtonText: 'İptal',
+      background: '#1a1a2e',
+      color: '#ffffff',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title',
+        htmlContainer: 'modern-swal-content',
+        confirmButton: 'modern-swal-confirm',
+        cancelButton: 'modern-swal-cancel'
       }
-      
-      this.userService.deleteAccount({ email: this.userEmail, password }).subscribe({
-        next: (response: any) => {
-          alert('Hesabınız başarıyla silindi. Ana sayfaya yönlendiriliyorsunuz.');
-          this.authService.logout();
-          this.router.navigate(['/']);
-        },
-        error: (err: any) => {
-          alert(err.error?.message || 'Hesap silinirken bir hata oluştu.');
-        }
-      });
-    }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Şifre doğrulama için ikinci bir SweetAlert
+        Swal.fire({
+          title: 'Şifre Doğrulama',
+          text: 'Hesabınızı silmek için şifrenizi girin:',
+          input: 'password',
+          inputPlaceholder: 'Şifrenizi girin',
+          icon: 'info',
+          showCancelButton: true,
+          confirmButtonText: 'Onayla',
+          cancelButtonText: 'İptal',
+          background: '#1a1a2e',
+          color: '#ffffff',
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#6c757d',
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content',
+            confirmButton: 'modern-swal-confirm',
+            cancelButton: 'modern-swal-cancel',
+            input: 'modern-swal-input'
+          }
+        }).then((passwordResult) => {
+          if (passwordResult.isConfirmed && passwordResult.value) {
+            this.userService.deleteAccount({ email: this.userEmail, password: passwordResult.value }).subscribe({
+              next: () => {
+                Swal.fire({
+                  title: 'Başarılı',
+                  text: 'Hesabınız başarıyla silindi. Ana sayfaya yönlendiriliyorsunuz.',
+                  icon: 'success',
+                  background: '#1a1a2e',
+                  color: '#ffffff',
+                  customClass: {
+                    popup: 'modern-swal-popup',
+                    title: 'modern-swal-title',
+                    htmlContainer: 'modern-swal-content'
+                  }
+                }).then(() => {
+                  this.authService.logout();
+                  this.router.navigate(['/']);
+                });
+              },
+              error: (err) => {
+                Swal.fire({
+                  title: 'Hata',
+                  text: err.error?.message || 'Hesap silinirken bir hata oluştu.',
+                  icon: 'error',
+                  background: '#1a1a2e',
+                  color: '#ffffff',
+                  customClass: {
+                    popup: 'modern-swal-popup',
+                    title: 'modern-swal-title',
+                    htmlContainer: 'modern-swal-content'
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
   }
   
   logout(): void {

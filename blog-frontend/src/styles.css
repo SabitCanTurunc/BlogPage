@@ -1,5 +1,6 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import 'ngx-toastr/toastr';
+@import 'sweetalert2/dist/sweetalert2.min.css';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* You can add global styles to this file, and also import other style files */
@@ -152,4 +153,80 @@ html {
 
 .toast-warning {
   background-color: rgba(255, 193, 7, 0.95) !important;
+}
+
+/* SweetAlert2 Özel Stilleri */
+.modern-swal-popup {
+  border: 1px solid rgba(255, 0, 230, 0.3) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  box-shadow: 0 0 30px rgba(80, 0, 255, 0.3) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.modern-swal-title {
+  color: #ffffff !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 1rem !important;
+}
+
+.modern-swal-content {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 1.1rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.modern-swal-confirm {
+  background: linear-gradient(45deg, #dc3545, #ff4d4d) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+}
+
+.modern-swal-confirm:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4) !important;
+}
+
+.modern-swal-cancel {
+  background: rgba(108, 117, 125, 0.2) !important;
+  border: 1px solid rgba(108, 117, 125, 0.3) !important;
+  border-radius: 8px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  color: #ffffff !important;
+  transition: all 0.3s ease !important;
+}
+
+.modern-swal-cancel:hover {
+  background: rgba(108, 117, 125, 0.3) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 15px rgba(108, 117, 125, 0.2) !important;
+}
+
+.modern-swal-input {
+  background: rgba(40, 40, 80, 0.5) !important;
+  border: 2px solid rgba(255, 0, 230, 0.3) !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  padding: 12px !important;
+  margin-top: 1rem !important;
+  font-family: 'Inter', sans-serif !important;
+  transition: all 0.3s ease !important;
+}
+
+.modern-swal-input:focus {
+  border-color: #ff00e6 !important;
+  box-shadow: 0 0 15px rgba(255, 0, 230, 0.3) !important;
+  outline: none !important;
+}
+
+.modern-swal-input::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
 }
