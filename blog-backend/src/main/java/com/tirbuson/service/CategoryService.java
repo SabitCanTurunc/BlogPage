@@ -2,7 +2,6 @@ package com.tirbuson.service;
 
 import com.tirbuson.model.Category;
 import com.tirbuson.model.Post;
-import com.tirbuson.repository.BaseRepository;
 import com.tirbuson.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

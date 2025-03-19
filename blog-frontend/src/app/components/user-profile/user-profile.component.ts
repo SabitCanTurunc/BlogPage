@@ -20,8 +20,10 @@ export class UserProfileComponent implements OnInit {
   userEmail: string = '';
   isAdmin: boolean = false;
   userPosts: PostResponseDto[] = [];
+  filteredPosts: PostResponseDto[] = [];
   isOwnProfile: boolean = true;
   viewedUserEmail: string = '';
+  searchQuery: string = '';
   
   // Hesap güncelleme formu
   accountForm: FormGroup;
@@ -95,6 +97,7 @@ export class UserProfileComponent implements OnInit {
     this.postService.getAllPosts().subscribe({
       next: (posts) => {
         this.userPosts = posts.filter(post => post.userEmail === email);
+        this.filteredPosts = [...this.userPosts]; // Filtrelenmiş postları başlangıçta tüm postlar olarak ayarla
       },
       error: (err) => {
         console.error('Kullanıcı yazıları yüklenirken hata oluştu:', err);
@@ -278,5 +281,19 @@ export class UserProfileComponent implements OnInit {
     }
     
     return emailToDisplay;
+  }
+
+  searchPosts(): void {
+    if (!this.searchQuery.trim()) {
+      this.filteredPosts = [...this.userPosts];
+      return;
+    }
+    
+    const query = this.searchQuery.toLowerCase().trim();
+    this.filteredPosts = this.userPosts.filter(post => 
+      post.title.toLowerCase().includes(query) ||
+      post.content.toLowerCase().includes(query) ||
+      post.categoryName.toLowerCase().includes(query)
+    );
   }
 } 

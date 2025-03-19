@@ -10,6 +10,7 @@ import { UserProfileComponent } from './components/user-profile/user-profile.com
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { ContactComponent } from './components/contact/contact.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -22,6 +23,7 @@ export const routes: Routes = [
     { path: 'edit-post/:id', component: CreatePostComponent, canActivate: [AuthGuard] },
     { path: 'admin', component: AdminComponent, canActivate: [AuthGuard, AdminGuard] },
     { path: 'profile', component: UserProfileComponent, canActivate: [AuthGuard] },
-    { path: 'user/:email', component: UserProfileComponent },
+    { path: 'user/:email', component: UserProfileComponent }, 
+    { path: 'contact', component: ContactComponent, title: 'İletişim - NeoWrite' },
     { path: '**', redirectTo: '' }
 ];

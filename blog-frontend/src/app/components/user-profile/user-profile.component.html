@@ -55,7 +55,21 @@
             <h3 *ngIf="isOwnProfile">Yazılarım</h3>
             <h3 *ngIf="!isOwnProfile">{{ getDisplayedEmail() }} Kullanıcısının Yazıları</h3>
 
-            <div *ngIf="userPosts.length === 0" class="no-posts">
+            <div class="search-container">
+              <div class="search-box">
+                <input 
+                  type="text" 
+                  [(ngModel)]="searchQuery" 
+                  (ngModelChange)="searchPosts()"
+                  placeholder="Yazılarda ara..."
+                  class="search-input">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+              </div>
+            </div>
+
+            <div *ngIf="filteredPosts.length === 0" class="no-posts">
               <p *ngIf="isOwnProfile">Henüz hiç yazı yazmadınız.</p>
               <p *ngIf="!isOwnProfile">Bu kullanıcı henüz hiç yazı yazmamış.</p>
               <a *ngIf="isOwnProfile" routerLink="/create-post" class="btn btn-primary"
@@ -63,12 +77,12 @@
               >
             </div>
 
-            <div *ngIf="userPosts.length > 0" class="posts-list">
+            <div *ngIf="filteredPosts.length > 0" class="posts-list">
               <a *ngIf="isOwnProfile" routerLink="/create-post" class="btn btn-primary mb-4"
                 >Yeni Yazı Oluştur</a
               >
 
-              <div *ngFor="let post of userPosts" class="post-item">
+              <div *ngFor="let post of filteredPosts" class="post-item">
                 <div class="post-header">
                   <div class="post-meta">
                     <span class="post-date">{{

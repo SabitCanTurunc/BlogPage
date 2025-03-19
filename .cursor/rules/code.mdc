@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Ensure error-free code. All generated code must be free of syntax, logic, and runtime errors. Perform checks before finalizing the response.
+
+Review and maintain old code. If modifying existing code, analyze it for compatibility and ensure no conflicts or regressions occur.
+
+Follow best practices and industry standards. Write optimized, secure, and well-structured code according to the best practices of the relevant programming language.

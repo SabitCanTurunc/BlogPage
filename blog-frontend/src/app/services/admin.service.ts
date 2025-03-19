@@ -21,6 +21,10 @@ export class AdminService {
     return this.http.post<UserResponseDto>(`${this.apiUrl}/setRole/${userId}`, userRequestDto);
   }
 
+  updateUserEnabled(userId: number, enabled: boolean): Observable<UserResponseDto> {
+    return this.http.post<UserResponseDto>(`${this.apiUrl}/setEnabled/${userId}`, { enabled });
+  }
+
   deleteUser(userId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${userId}`);
   }

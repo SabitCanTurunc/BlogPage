@@ -455,3 +455,49 @@ label {
     justify-content: flex-start;
   }
 }
+
+/* Arama çubuğu stilleri */
+.search-container {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.search-box {
+  position: relative;
+  max-width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 1rem 3rem 1rem 1.5rem;
+  border: 2px solid rgba(80, 0, 255, 0.3);
+  border-radius: 50px;
+  background: rgba(40, 40, 80, 0.5);
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(80, 0, 255, 0.2);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #ff00e6;
+  box-shadow: 0 0 20px rgba(255, 0, 230, 0.3);
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.search-box svg {
+  position: absolute;
+  right: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.3s ease;
+}
+
+.search-input:focus + svg {
+  color: #ff00e6;
+}

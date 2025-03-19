@@ -1,7 +1,6 @@
 package com.tirbuson.dto.request;
 
 import com.tirbuson.dto.BaseDto;
-import com.tirbuson.model.Image;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

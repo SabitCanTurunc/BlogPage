@@ -53,7 +53,25 @@
     <div *ngIf="isAdmin">
       <!-- Kullanıcı Yönetimi -->
       <div *ngIf="selectedSection === 'users'" class="admin-section">
-        <h3>Kullanıcı Yönetimi</h3>
+        <div class="section-header">
+          <h3>Kullanıcı Yönetimi</h3>
+          <button 
+            class="btn btn-save-all" 
+            (click)="saveAllUserChanges()"
+            [disabled]="!hasUserChanges()">
+            Değişiklikleri Kaydet
+          </button>
+        </div>
+        <div class="search-container">
+          <input type="text" 
+                 [(ngModel)]="userSearchQuery" 
+                 (input)="searchUsers()" 
+                 placeholder="Kullanıcı ara..." 
+                 class="search-input">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5 1.5-1.5-5-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+        </div>
         <div class="users-table">
           <table>
             <thead>
@@ -67,15 +85,16 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let user of users">
+              <tr *ngFor="let user of filteredUsers">
                 <td>{{ user.id }}</td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
                 <td>
                   <select 
                     [value]="user.role"
-                    (change)="updateUserRole(user.id, $event)"
-                    class="role-select">
+                    (change)="onUserRoleChange(user.id, $event)"
+                    class="role-select"
+                    [disabled]="isCurrentUser(user.id)">
                     <option value="USER">Kullanıcı</option>
                     <option value="ADMIN">Admin</option>
                   </select>
@@ -84,6 +103,14 @@
                   <span [class]="user.enabled ? 'status-active' : 'status-inactive'">
                     {{ user.enabled ? 'Aktif' : 'Pasif' }}
                   </span>
+                  <label class="switch" [class.disabled]="isCurrentUser(user.id)">
+                    <input 
+                      type="checkbox" 
+                      [checked]="user.enabled" 
+                      (change)="onUserEnabledChange(user.id, $event)"
+                      [disabled]="isCurrentUser(user.id)">
+                    <span class="slider round"></span>
+                  </label>
                 </td>
                 <td>
                   <button 
@@ -101,7 +128,25 @@
 
       <!-- Kategori Yönetimi -->
       <div *ngIf="selectedSection === 'categories'" class="admin-section">
-        <h3>Kategori Yönetimi</h3>
+        <div class="section-header">
+          <h3>Kategori Yönetimi</h3>
+          <button 
+            class="btn btn-save-all" 
+            (click)="saveAllCategoryChanges()"
+            [disabled]="!hasCategoryChanges()">
+            Değişiklikleri Kaydet
+          </button>
+        </div>
+        <div class="search-container">
+          <input type="text" 
+                 [(ngModel)]="categorySearchQuery" 
+                 (input)="searchCategories()" 
+                 placeholder="Kategori ara..." 
+                 class="search-input">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5 1.5-1.5-5-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+        </div>
         <div class="category-form">
           <input 
             type="text" 
@@ -126,13 +171,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let category of categories">
+              <tr *ngFor="let category of filteredCategories">
                 <td>{{ category.id }}</td>
                 <td>
                   <input 
                     type="text" 
                     [(ngModel)]="category.name" 
-                    (blur)="updateCategory(category)"
+                    (input)="onCategoryNameChange(category.id, $event)"
                     class="form-input">
                 </td>
                 <td>{{ category.createdAt | date:'medium' }}</td>
@@ -151,7 +196,19 @@
 
       <!-- Post Yönetimi -->
       <div *ngIf="selectedSection === 'posts'" class="admin-section">
-        <h3>Post Yönetimi</h3>
+        <div class="section-header">
+          <h3>Post Yönetimi</h3>
+        </div>
+        <div class="search-container">
+          <input type="text" 
+                 [(ngModel)]="postSearchQuery" 
+                 (input)="searchPosts()" 
+                 placeholder="Yazı ara..." 
+                 class="search-input">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5 1.5-1.5-5-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+          </svg>
+        </div>
         <div class="posts-table">
           <table>
             <thead>
@@ -165,7 +222,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let post of posts">
+              <tr *ngFor="let post of filteredPosts">
                 <td>{{ post.id }}</td>
                 <td>{{ post.title }}</td>
                 <td>{{ post.userEmail }}</td>

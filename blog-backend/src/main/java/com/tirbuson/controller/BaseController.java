@@ -6,11 +6,9 @@ import com.tirbuson.model.BaseEntity;
 import com.tirbuson.repository.BaseRepository;
 import com.tirbuson.service.BaseService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 public abstract class BaseController<

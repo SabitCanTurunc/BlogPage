@@ -80,13 +80,27 @@ public class GlobalExceptionHandler {
     }
 
     private String extractUserFriendlyMessage(String errorMessage) {
+        if (errorMessage == null) {
+            return "A database error occurred.";
+        }
+        
         if (errorMessage.contains("duplicate key value violates unique constraint \"user_email_key\"")) {
-            String email = errorMessage.split("Key \\(email\\)=\\(")[1].split("\\)")[0];
-            return "The email address '" + email + "' is already registered.";
+            String email;
+            try {
+                email = errorMessage.split("Key \\(email\\)=\\(")[1].split("\\)")[0];
+                return "The email address '" + email + "' is already registered.";
+            } catch (Exception e) {
+                return "This email address is already registered.";
+            }
         }
         if (errorMessage.contains("duplicate key value violates unique constraint \"user_username_key\"")) {
-            String username = errorMessage.split("Key \\(username\\)=\\(")[1].split("\\)")[0];
-            return "The username '" + username + "' is already taken.";
+            String username;
+            try {
+                username = errorMessage.split("Key \\(username\\)=\\(")[1].split("\\)")[0];
+                return "The username '" + username + "' is already taken.";
+            } catch (Exception e) {
+                return "This username is already taken.";
+            }
         }
         return "A database error occurred.";
     }

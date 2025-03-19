@@ -127,3 +127,26 @@ app-root {
 html {
   scroll-behavior: smooth;
 }
+
+/* Özelleştirilmiş Toastr Stilleri */
+.toast-container .ngx-toastr {
+  box-shadow: 0 0 15px rgba(255, 0, 230, 0.3);
+  border-radius: 8px;
+  background-position: 15px center;
+}
+
+.toast-success {
+  background: linear-gradient(45deg, rgba(0, 200, 80, 0.9), rgba(0, 160, 70, 0.9)) !important;
+}
+
+.toast-error {
+  background: linear-gradient(45deg, rgba(255, 59, 48, 0.9), rgba(220, 30, 30, 0.9)) !important;
+}
+
+.toast-info {
+  background: linear-gradient(45deg, rgba(45, 0, 247, 0.9), rgba(80, 110, 255, 0.9)) !important;
+}
+
+.toast-warning {
+  background: linear-gradient(45deg, rgba(255, 149, 0, 0.9), rgba(255, 200, 0, 0.9)) !important;
+}

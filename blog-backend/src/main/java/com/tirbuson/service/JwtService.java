@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,7 +21,6 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private final UserService userService;
     private final UserRepository userRepository;
     @Value("${security.jwt.secret-key}")
     private String secretKey;
@@ -31,7 +29,6 @@ public class JwtService {
     private long jwtExpiration;
 
     public JwtService(UserService userService, UserRepository userRepository) {
-        this.userService = userService;
         this.userRepository = userRepository;
     }
 

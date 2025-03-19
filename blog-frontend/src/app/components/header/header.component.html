@@ -1,7 +1,7 @@
 <header class="app-header">
   <div class="header-container">
     <div class="logo">
-      <a routerLink="/">NeoWrite</a>
+      <a routerLink="/"><img  src="assets/blogLogo.png" alt="NeoWrite" class="blog-logo">NeoWrite</a>
     </div>
     <button class="hamburger-menu" (click)="toggleMenu()" [class.active]="isMenuOpen">
       <span></span>
@@ -11,8 +11,20 @@
     
     <nav class="main-nav" [class.show]="isMenuOpen">
       <ul class="nav-links">
-        <li *ngIf="isLoggedIn" class="mobile-only">
-          <a routerLink="/create-post" class="mobile-profile-link" (click)="closeMenu()">Yazı Oluştur</a>
+        
+        <li class="desktop-only" *ngIf="isLoggedIn">
+          <a routerLink="/create-post" class="nav-link" (click)="closeMenu()">Yeni Yazı Oluştur</a>
+        </li>
+        <li class="desktop-only">
+          <a routerLink="/contact" class="nav-link" (click)="closeMenu()">İletişim</a>
+        </li>
+        
+          <li *ngIf="isLoggedIn" class="mobile-only">
+          <a routerLink="/create-post" class="mobile-profile-link" (click)="closeMenu()">Yeni Yazı Oluştur</a>
+        </li>
+        
+        <li class="mobile-only">
+          <a routerLink="/contact" class="mobile-profile-link" (click)="closeMenu()">İletişim</a>
         </li>
         <li *ngIf="!isLoggedIn" class="mobile-auth">
           <a routerLink="/login" class="mobile-btn-login" (click)="closeMenu()">Giriş Yap</a>

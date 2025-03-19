@@ -1,15 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 .app-header {
-  background: rgba(10, 10, 26, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 0, 136, 0.3);
-  box-shadow: 0 0 20px rgba(45, 0, 247, 0.3);
+  background: rgba(10, 10, 26, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 0, 136, 0.25);
+  box-shadow: 0 4px 25px rgba(45, 0, 247, 0.25);
   position: sticky;
   top: 0;
   z-index: 1000;
-  padding: 0.75rem 0;
+  padding: 0.85rem 0;
+  transition: all 0.4s ease;
+}
+
+.app-header:hover {
+  border-bottom: 1px solid rgba(255, 0, 136, 0.4);
+  box-shadow: 0 6px 30px rgba(45, 0, 247, 0.35);
 }
 
 .header-container {
@@ -36,11 +42,32 @@
   font-family: 'Montserrat', sans-serif;
   letter-spacing: -1px;
   transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  padding: 5px 0;
+}
+
+.blog-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(255, 0, 136, 0.7));
+  transition: all 0.4s ease;
 }
 
 .logo a:hover {
   filter: brightness(1.2);
   transform: scale(1.05);
+  background: linear-gradient(45deg, #ff0088, #5700ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo a:hover .blog-logo {
+  transform: rotate(10deg) scale(1.1);
+  filter: drop-shadow(0 0 15px rgba(255, 0, 136, 0.9));
 }
 
 .main-nav {
@@ -54,7 +81,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .nav-links li a {
@@ -66,6 +93,46 @@
   border-radius: 50px;
   transition: all 0.3s;
   font-family: 'Poppins', sans-serif;
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.6rem 0.8rem;
+  transition: all 0.4s;
+  font-family: 'Poppins', sans-serif;
+  border-bottom: 2px solid transparent;
+  position: relative;
+  letter-spacing: 0.3px;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+  border-bottom: none;
+  box-shadow: none;
+  background: transparent;
+  transform: none;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background: linear-gradient(90deg, #ff0088, #2d00f7);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateX(-50%);
+  opacity: 0;
+  box-shadow: 0 0 10px rgba(255, 0, 136, 0.7);
+}
+
+.nav-link:hover::after {
+  width: 80%;
+  opacity: 1;
 }
 
 .nav-links li a:hover, .nav-links li a.active {
@@ -85,39 +152,77 @@
 }
 
 .btn-login, .btn-signup {
-  padding: 0.5rem 1.5rem;
+  padding: 0.6rem 1.6rem;
   border-radius: 50px;
   text-decoration: none;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: all 0.4s;
   font-family: 'Poppins', sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
 }
 
 .btn-login {
   color: #ffffff;
-  background: transparent;
-  border: 2px solid #2d00f7;
+  background: linear-gradient(to right, rgba(45, 0, 247, 0.05), rgba(45, 0, 247, 0.2));
+  border: 1.5px solid #2d00f7;
   box-shadow: 0 0 10px rgba(45, 0, 247, 0.3);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.btn-login::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(45, 0, 247, 0.2), rgba(45, 0, 247, 0.4));
+  transition: all 0.4s ease;
+  z-index: -1;
 }
 
 .btn-login:hover {
-  background: rgba(45, 0, 247, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(45, 0, 247, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 0 20px rgba(45, 0, 247, 0.5);
+  border-color: rgba(45, 0, 247, 0.8);
+}
+
+.btn-login:hover::before {
+  width: 100%;
 }
 
 .btn-signup {
   background: linear-gradient(45deg, #ff0088, #ff5e5e);
   color: #ffffff;
   border: none;
-  box-shadow: 0 0 10px rgba(255, 0, 136, 0.3);
+  box-shadow: 0 0 15px rgba(255, 0, 136, 0.3);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.btn-signup::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(45deg, #ff0055, #ff0088);
+  transition: all 0.4s ease;
+  z-index: -1;
 }
 
 .btn-signup:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(255, 0, 136, 0.5);
-  background: linear-gradient(45deg, #ff0088, #ff0055);
+  transform: translateY(-3px);
+  box-shadow: 0 0 25px rgba(255, 0, 136, 0.5);
+}
+
+.btn-signup:hover::before {
+  width: 100%;
 }
 
 .user-dropdown {
