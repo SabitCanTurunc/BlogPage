@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 
@@ -21,7 +21,8 @@ export class VerifyEmailComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.verifyForm = this.fb.group({
       email: ['', [Validators.required, Validators.email, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')]],
@@ -30,11 +31,14 @@ export class VerifyEmailComponent implements OnInit {
   }
 
   ngOnInit() {
-    // URL'den e-posta adresini al
-    const email = this.router.parseUrl(this.router.url).queryParams['email'];
-    if (email) {
-      this.verifyForm.patchValue({ email });
-    }
+    // URL'den e-posta adresini al (ActivatedRoute kullanarak)
+    this.route.queryParams.subscribe(params => {
+      const email = params['email'];
+      if (email) {
+        console.log('E-posta adresi URL\'den alındı:', email);
+        this.verifyForm.patchValue({ email });
+      }
+    });
   }
 
   onSubmit() {

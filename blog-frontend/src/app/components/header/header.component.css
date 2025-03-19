@@ -32,7 +32,7 @@
 }
 
 .logo a {
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   font-weight: 800;
   text-decoration: none;
   background: linear-gradient(45deg, #ff0088, #2d00f7);
@@ -50,8 +50,8 @@
 }
 
 .blog-logo {
-  width: 42px;
-  height: 42px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
   filter: drop-shadow(0 0 8px rgba(255, 0, 136, 0.7));
   transition: all 0.4s ease;

@@ -78,7 +78,7 @@
       </button>
     </form>
 
-    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+    <div class="alert alert-danger" *ngIf="error" [innerHTML]="error"></div>
 
     <div class="mt-3">
       Hesabınız yok mu? <a routerLink="/signup">Kayıt Ol</a>

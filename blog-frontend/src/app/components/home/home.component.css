@@ -108,8 +108,8 @@
 }
 
 .blog-logo {
-  width: 180px;
-  height: 180px;
+  width: 220px;
+  height: 220px;
   object-fit: contain;
   filter: drop-shadow(0 0 15px rgba(255, 0, 136, 0.7));
   transition: all 0.3s ease;
@@ -121,7 +121,7 @@
 }
 
 .hero-content h1 {
-  font-size: 5rem;
+  font-size: 6rem;
   font-weight: 800;
   margin-bottom: 1.5rem;
   background: linear-gradient(45deg, #ff0088, #2d00f7);

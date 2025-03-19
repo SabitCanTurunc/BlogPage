@@ -440,7 +440,7 @@ export class SignupComponent implements OnInit {
     private router: Router
   ) {
     this.signupForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
+      username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
@@ -524,9 +524,6 @@ export class SignupComponent implements OnInit {
       return 'Şifre en az 6 karakter olmalıdır';
     }
     if (control?.hasError('pattern')) {
-      if (controlName === 'username') {
-        return 'Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir';
-      }
       return 'Şifre en az bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir';
     }
     if (control?.hasError('passwordMismatch')) {

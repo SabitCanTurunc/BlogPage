@@ -152,18 +152,46 @@ public class AuthenticationService {
     }
 
     public void sendVerificationEmail(User user){
-        String subject ="AccountVerification";
+        String subject ="NeoWrite Hesap Doğrulama";
         String verificationCode = user.getVerificationCode();
         String htmlMessage = "<html>"
-                + "<body style=\"font-family: Arial, sans-serif;\">"
-                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
-                + "<h2 style=\"color: #333;\">Welcome to myBLogApp !</h2>"
-                + "<p style=\"font-size: 16px;\">Please enter the verification code below to continue:</p>"
-                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
-                + "<h3 style=\"color: #333;\">Verification Code:</h3>"
-                + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + verificationCode + "</p>"
-                + "</div>"
-                + "</div>"
+                + "<head>"
+                + "<meta charset=\"UTF-8\">"
+                + "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"
+                + "</head>"
+                + "<body style=\"font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f2f2f2;\">"
+                + "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">"
+                + "<tr><td align=\"center\" style=\"padding: 20px;\">"
+                + "<table style=\"max-width: 600px; width: 100%; border-spacing: 0; border-collapse: collapse;\">"
+                
+                // Header - Standart tablo yapısı ve doğrudan bgcolor özelliği ile
+                + "<tr>"
+                + "<td style=\"background-color: #2e0c43; padding: 30px 20px; text-align: center; border-radius: 12px 12px 0 0;\">"
+                + "<div style=\"font-family: Arial, sans-serif; font-size: 4rem; font-weight: 800; color: white; letter-spacing: -2px; text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);\">NeoWrite</div>"
+                + "</td>"
+                + "</tr>"
+                
+                // İçerik
+                + "<tr>"
+                + "<td style=\"background-color: #1e1e30; padding: 30px; color: white; border-radius: 0 0 12px 12px;\">"
+                + "<h2 style=\"color: #ffffff; margin-bottom: 20px;\">Merhaba " + user.getUsername() + ",</h2>"
+                + "<p style=\"margin-bottom: 20px; line-height: 1.6;\">NeoWrite'a hoş geldiniz! Hesabınızı doğrulamak için aşağıdaki kodu kullanabilirsiniz:</p>"
+                + "<div style=\"background-color: rgba(40, 40, 80, 0.5); padding: 20px; margin: 20px 0; border-radius: 12px; font-size: 28px; font-weight: bold; text-align: center; letter-spacing: 5px; color: #ffffff; border: 1px solid #ff0088;\">" + verificationCode + "</div>"
+                + "<p style=\"margin-bottom: 20px; line-height: 1.6;\">Bu kod 15 dakika içinde geçerliliğini yitirecektir. Lütfen doğrulama işlemini bu süre içinde tamamlayın.</p>"
+                + "<p style=\"margin-bottom: 20px; line-height: 1.6;\">Eğer bu işlemi siz yapmadıysanız, lütfen bu e-postayı dikkate almayınız.</p>"
+                + "</td>"
+                + "</tr>"
+                
+                // Footer
+                + "<tr>"
+                + "<td style=\"text-align: center; padding: 20px; color: #666; font-size: 14px;\">"
+                + "<p>&copy; " + java.time.Year.now().getValue() + " NeoWrite. Tüm hakları saklıdır.</p>"
+                + "</td>"
+                + "</tr>"
+                
+                + "</table>"
+                + "</td></tr>"
+                + "</table>"
                 + "</body>"
                 + "</html>";
         try{
@@ -196,18 +224,46 @@ public class AuthenticationService {
 
     // Şifre sıfırlama e-postası gönderme
     private void sendPasswordResetEmail(User user) {
-        String subject = "Password Reset";
+        String subject = "NeoWrite Şifre Sıfırlama";
         String verificationCode = user.getVerificationCode();
         String htmlMessage = "<html>"
-                + "<body style=\"font-family: Arial, sans-serif;\">"
-                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
-                + "<h2 style=\"color: #333;\">myBLogApp Password Reset</h2>"
-                + "<p style=\"font-size: 16px;\">Please enter the verification code below to reset your password:</p>"
-                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
-                + "<h3 style=\"color: #333;\">Verification Code:</h3>"
-                + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + verificationCode + "</p>"
-                + "</div>"
-                + "</div>"
+                + "<head>"
+                + "<meta charset=\"UTF-8\">"
+                + "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"
+                + "</head>"
+                + "<body style=\"font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f2f2f2;\">"
+                + "<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">"
+                + "<tr><td align=\"center\" style=\"padding: 20px;\">"
+                + "<table style=\"max-width: 600px; width: 100%; border-spacing: 0; border-collapse: collapse;\">"
+                
+                // Header - Standart tablo yapısı ve doğrudan bgcolor özelliği ile
+                + "<tr>"
+                + "<td style=\"background-color: #2e0c43; padding: 30px 20px; text-align: center; border-radius: 12px 12px 0 0;\">"
+                + "<div style=\"font-family: Arial, sans-serif; font-size: 4rem; font-weight: 800; color: white; letter-spacing: -2px; text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);\">NeoWrite</div>"
+                + "</td>"
+                + "</tr>"
+                
+                // İçerik
+                + "<tr>"
+                + "<td style=\"background-color: #1e1e30; padding: 30px; color: white; border-radius: 0 0 12px 12px;\">"
+                + "<h2 style=\"color: #ffffff; margin-bottom: 20px;\">Merhaba " + user.getUsername() + ",</h2>"
+                + "<p style=\"margin-bottom: 20px; line-height: 1.6;\">NeoWrite hesabınız için şifre sıfırlama talebinde bulundunuz. Şifrenizi sıfırlamak için aşağıdaki doğrulama kodunu kullanabilirsiniz:</p>"
+                + "<div style=\"background-color: rgba(40, 40, 80, 0.5); padding: 20px; margin: 20px 0; border-radius: 12px; font-size: 28px; font-weight: bold; text-align: center; letter-spacing: 5px; color: #ffffff; border: 1px solid #ff0088;\">" + verificationCode + "</div>"
+                + "<p style=\"margin-bottom: 20px; line-height: 1.6;\">Bu kod 15 dakika içinde geçerliliğini yitirecektir. Lütfen şifre sıfırlama işlemini bu süre içinde tamamlayın.</p>"
+                + "<p style=\"margin-bottom: 20px; line-height: 1.6;\">Eğer bu işlemi siz talep etmediyseniz, lütfen bu e-postayı dikkate almayınız ve hesabınızın güvenliğini kontrol ediniz.</p>"
+                + "</td>"
+                + "</tr>"
+                
+                // Footer
+                + "<tr>"
+                + "<td style=\"text-align: center; padding: 20px; color: #666; font-size: 14px;\">"
+                + "<p>&copy; " + java.time.Year.now().getValue() + " NeoWrite. Tüm hakları saklıdır.</p>"
+                + "</td>"
+                + "</tr>"
+                
+                + "</table>"
+                + "</td></tr>"
+                + "</table>"
                 + "</body>"
                 + "</html>";
         try {

@@ -39,12 +39,24 @@ export class LoginComponent {
         next: (response) => {
           this.isLoading = false;
           if (response.token) {
-          this.router.navigate(['/home']);
+            this.router.navigate(['/home']);
           }
         },
         error: (err) => {
           this.isLoading = false;
-          this.error = err.message;
+          
+          if (err.message && err.message.includes('Hesabınız henüz doğrulanmamış')) {
+            this.error = `${err.message} <br><br>Doğrulama sayfasına yönlendiriliyorsunuz... <div class="spinner"><i class="fas fa-spinner fa-spin"></i></div>`;
+            
+            setTimeout(() => {
+              this.router.navigate(['/verify-email'], { 
+                queryParams: { email: this.loginForm.get('email')?.value } 
+              });
+            }, 4000);
+          } else {
+            this.error = err.message;
+          }
+          
           this.loginForm.get('password')?.reset();
         }
       });
