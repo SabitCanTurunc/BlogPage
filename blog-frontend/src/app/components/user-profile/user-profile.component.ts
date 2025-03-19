@@ -227,16 +227,60 @@ export class UserProfileComponent implements OnInit {
   }
   
   confirmDeletePost(post: PostResponseDto): void {
-    if (confirm(`"${post.title}" başlıklı yazıyı silmek istediğinizden emin misiniz?`)) {
-      this.postService.deletePost(post.id).subscribe({
-        next: () => {
-          this.userPosts = this.userPosts.filter(p => p.id !== post.id);
-        },
-        error: (err) => {
-          console.error('Yazı silinirken hata oluştu:', err);
-        }
-      });
-    }
+    Swal.fire({
+      title: 'Yazıyı Sil',
+      text: `"${post.title}" başlıklı yazıyı silmek istediğinizden emin misiniz?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Evet, Sil',
+      cancelButtonText: 'İptal',
+      background: '#1a1a2e',
+      color: '#ffffff',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title',
+        htmlContainer: 'modern-swal-content',
+        confirmButton: 'modern-swal-confirm',
+        cancelButton: 'modern-swal-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.postService.deletePost(post.id).subscribe({
+          next: () => {
+            this.userPosts = this.userPosts.filter(p => p.id !== post.id);
+            this.filteredPosts = this.filteredPosts.filter(p => p.id !== post.id);
+            Swal.fire({
+              title: 'Başarılı',
+              text: 'Yazı başarıyla silindi.',
+              icon: 'success',
+              background: '#1a1a2e',
+              color: '#ffffff',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
+            });
+          },
+          error: (err) => {
+            Swal.fire({
+              title: 'Hata',
+              text: 'Yazı silinirken bir hata oluştu.',
+              icon: 'error',
+              background: '#1a1a2e',
+              color: '#ffffff',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
+            });
+          }
+        });
+      }
+    });
   }
   
   confirmDeleteAccount(): void {
