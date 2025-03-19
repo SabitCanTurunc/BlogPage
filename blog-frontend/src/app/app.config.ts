@@ -17,8 +17,19 @@ export const appConfig: ApplicationConfig = {
       timeOut: 3000,
       positionClass: 'toast-top-right',
       preventDuplicates: true,
+      progressBar: true,
       closeButton: true,
-      progressBar: true
+      newestOnTop: true,
+      maxOpened: 3,
+      autoDismiss: true,
+      enableHtml: false,
+      includeTitleDuplicates: false,
+      tapToDismiss: true,
+      toastClass: 'ngx-toastr',
+      titleClass: 'toast-title',
+      messageClass: 'toast-message',
+      easing: 'ease-in',
+      easeTime: 300
     })
   ]
 };

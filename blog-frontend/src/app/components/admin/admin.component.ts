@@ -256,31 +256,40 @@ export class AdminComponent implements OnInit {
       return firstValueFrom(this.adminService.updateUserEnabled(userId, enabled));
     });
 
-    // Tüm promise'ları birleştir
-    const allPromises = [...updateRolePromises, ...updateEnabledPromises];
-
-    Promise.all(allPromises)
+    Promise.all([...updateRolePromises, ...updateEnabledPromises])
       .then(() => {
         this.loadUsers();
         this.userChanges.clear();
         this.userEnabledChanges.clear();
-        this.toastr.success('Tüm kullanıcı değişiklikleri kaydedildi');
+        this.toastr.success('Tüm kullanıcı değişiklikleri başarıyla kaydedildi', 'Başarılı', {
+          timeOut: 3000,
+          positionClass: 'toast-top-right',
+          progressBar: true
+        });
       })
       .catch(error => {
-        console.error('Kullanıcı değişiklikleri kaydedilirken hata:', error);
-        this.toastr.error('Kullanıcı değişiklikleri kaydedilirken bir hata oluştu');
+        console.error('Error updating users:', error);
+        this.toastr.error('Kullanıcı değişiklikleri kaydedilirken bir hata oluştu', 'Hata', {
+          timeOut: 5000,
+          positionClass: 'toast-top-right',
+          progressBar: true
+        });
       });
   }
 
   saveAllCategoryChanges() {
     if (this.categoryChanges.size === 0) {
-      this.toastr.info('Kaydedilecek kategori değişikliği bulunmuyor');
+      this.toastr.info('Kaydedilecek kategori değişikliği bulunmuyor', 'Bilgi', {
+        timeOut: 3000,
+        positionClass: 'toast-top-right',
+        progressBar: true
+      });
       return;
     }
 
     const updatePromises = Array.from(this.categoryChanges.entries()).map(([categoryId, newName]) => {
       const categoryRequest: CategoryRequestDto = {
-        name: newName
+        name: newName.trim()
       };
       return firstValueFrom(this.categoryService.updateCategory(categoryId, categoryRequest));
     });
@@ -289,11 +298,19 @@ export class AdminComponent implements OnInit {
       .then(() => {
         this.loadCategories();
         this.categoryChanges.clear();
-        this.toastr.success('Tüm kategori değişiklikleri kaydedildi');
+        this.toastr.success('Tüm kategori değişiklikleri başarıyla kaydedildi', 'Başarılı', {
+          timeOut: 3000,
+          positionClass: 'toast-top-right',
+          progressBar: true
+        });
       })
       .catch(error => {
-        console.error('Kategori değişiklikleri kaydedilirken hata:', error);
-        this.toastr.error('Kategori değişiklikleri kaydedilirken bir hata oluştu');
+        console.error('Error updating categories:', error);
+        this.toastr.error('Kategori değişiklikleri kaydedilirken bir hata oluştu', 'Hata', {
+          timeOut: 5000,
+          positionClass: 'toast-top-right',
+          progressBar: true
+        });
       });
   }
 
