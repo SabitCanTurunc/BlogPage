@@ -7,6 +7,7 @@ import com.tirbuson.model.Category;
 import com.tirbuson.repository.CategoryRepository;
 import com.tirbuson.service.CategoryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +26,7 @@ public class CategoryContoller extends BaseController<CategoryService, Category,
         this.mapper = mapper;
         this.service = service;
     }
-    
+
     // Kategori güncelleme özel endpoint
     @Override
     @PutMapping("/{id}")

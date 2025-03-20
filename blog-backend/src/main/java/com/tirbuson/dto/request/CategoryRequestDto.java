@@ -3,14 +3,13 @@ package com.tirbuson.dto.request;
 import com.tirbuson.dto.BaseDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Getter
+@Setter
 public class CategoryRequestDto extends BaseDto {
 
     @NotBlank(message = "name can not be empty")

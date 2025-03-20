@@ -76,7 +76,7 @@
     </aside>
 
     <!-- Posts Grid -->
-    <div class="posts-section">
+    <div class="posts-section" infiniteScroll [scrollThreshold]="400" [scrollDebounce]="300" (scrolled)="onScroll()">
       <div class="search-container">
         <div class="search-box">
           <input 
@@ -92,29 +92,59 @@
       </div>
       <div class="posts-grid">
         <article *ngFor="let post of filteredPosts" class="post-card">
-          <div class="card">
-            <div class="card-body">
-              <div class="post-meta">
-                <span class="post-date">{{ post.createdAt | date:'mediumDate' }}</span>
-                <span class="post-category">{{ post.categoryName }}</span>
-              </div>
-              <h2 class="post-title" [routerLink]="['/post', post.id]">{{ post.title }}</h2>
-              <p class="post-excerpt">{{ post.content | slice:0:200 }}{{ post.content.length > 200 ? '...' : '' }}</p>
-              <div class="post-footer">
-                <div class="post-author">
-                  <img [src]="'https://ui-avatars.com/api/?name=' + post.userEmail" alt="Yazar" class="author-avatar">
-                  <span class="author-name">{{ post.userEmail }}</span>
-                </div>
-                <a [routerLink]="['/post', post.id]" class="read-more">
-                  Devamını Oku
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-                  </svg>
-                </a>
-              </div>
+          <div class="card-body">
+            <div class="post-meta">
+              <span class="post-date">{{ post.createdAt | date:'mediumDate' }}</span>
+              <span class="post-category">{{ post.categoryName }}</span>
+            </div>
+            <h2 class="post-title" [routerLink]="['/post', post.id]">{{ post.title }}</h2>
+            
+            <div *ngIf="post.images && post.images.length > 0" class="post-image">
+              <img [src]="post.images[0]" [alt]="post.title" class="featured-image">
+            </div>
+            
+            <p *ngIf="!post.images || post.images.length === 0" class="post-excerpt">
+              {{ post.content | slice:0:200 }}{{ post.content.length > 200 ? '...' : '' }}
+            </p>
+            
+            <div class="post-footer">
+              <a [routerLink]="['/user', post.userEmail]" class="post-author">
+                <img [src]="'https://ui-avatars.com/api/?name=' + post.userEmail" alt="Yazar" class="author-avatar">
+                <span class="author-name">{{ post.userEmail }}</span>
+              </a>
+              
+              <a [routerLink]="['/post', post.id]" class="read-more">
+                Devamını Oku
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                </svg>
+              </a>
             </div>
           </div>
         </article>
+      </div>
+
+      <!-- Infinite Scroll Loading Indicator -->
+      <div *ngIf="loadingMore" class="loading-more">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Yükleniyor...</span>
+        </div>
+        <p>Daha fazla yazı yükleniyor...</p>
+      </div>
+      
+      <!-- Daha fazlasını görüntüle butonu -->
+      <div *ngIf="hasMorePosts && !loadingMore && !loading" class="load-more-container">
+        <button (click)="loadMorePosts()" class="load-more-button">
+          Daha Fazlasını Görüntüle
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- End of Results Message -->
+      <div *ngIf="!hasMorePosts && filteredPosts.length > 0 && !loadingMore && !loading && !searchQuery" class="end-of-results">
+        <p>Tüm yazılar yüklendi.</p>
       </div>
 
       <!-- No Posts Message -->

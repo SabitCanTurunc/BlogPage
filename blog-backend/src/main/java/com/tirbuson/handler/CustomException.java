@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class CustomException<E>{
+public class CustomException<E> {
     private String hostname;
     private String path;
     private Date createTime;

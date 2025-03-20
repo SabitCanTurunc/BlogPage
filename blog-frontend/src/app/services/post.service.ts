@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -40,6 +40,23 @@ export class PostService {
 
   getAllPosts(): Observable<PostResponseDto[]> {
     return this.http.get<PostResponseDto[]>(this.apiUrl)
+      .pipe(
+        retry(1),
+        catchError(this.handleError)
+      );
+  }
+  
+  // Sayfalama ile post getirme metodu
+  getPagedPosts(page: number = 0, size: number = 10, category?: string): Observable<any> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+      
+    if (category) {
+      params = params.set('category', category);
+    }
+    
+    return this.http.get<any>(`${this.apiUrl}/paged`, { params })
       .pipe(
         retry(1),
         catchError(this.handleError)

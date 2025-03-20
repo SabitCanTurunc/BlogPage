@@ -3,6 +3,7 @@ package com.tirbuson.mapper;
 import com.tirbuson.dto.request.CategoryRequestDto;
 import com.tirbuson.dto.response.CategoryResponseDto;
 import com.tirbuson.model.Category;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,6 +13,9 @@ public class CategoryMapper implements BaseMapper<Category, CategoryResponseDto,
     @Override
     public Category convertToEntity(CategoryRequestDto categoryRequestDto) {
         Category category = new Category();
+        if (categoryRequestDto.getName().length() < 3) {
+            throw new BadCredentialsException("Name too short");
+        }
         category.setName(categoryRequestDto.getName());
         return category;
     }

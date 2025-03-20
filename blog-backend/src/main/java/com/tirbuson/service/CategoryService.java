@@ -3,6 +3,7 @@ package com.tirbuson.service;
 import com.tirbuson.model.Category;
 import com.tirbuson.model.Post;
 import com.tirbuson.repository.CategoryRepository;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +18,16 @@ public class CategoryService extends BaseService<Category,Integer, CategoryRepos
         super(repository);
         this.repository = repository;
     }
-    
+
+    @Override
+    public Category save(Category entity) {
+
+        if (entity.getName().length() < 3) {
+            throw new BadCredentialsException("Name too short");
+        }
+        return super.save(entity);
+    }
+
     @Override
     @Transactional
     public Category update(Category entity) {

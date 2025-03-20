@@ -1,5 +1,10 @@
 package com.tirbuson.exception;
 
+import com.tirbuson.model.User;
+
+import java.util.LinkedList;
+import java.util.List;
+
 public class BaseException extends RuntimeException {
 
     public BaseException() {}
@@ -11,4 +16,5 @@ public class BaseException extends RuntimeException {
     public BaseException(String message) {
         super(message);
     }
+
 }

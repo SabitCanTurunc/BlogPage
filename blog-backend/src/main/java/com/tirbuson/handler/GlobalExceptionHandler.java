@@ -6,6 +6,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -16,6 +17,13 @@ import java.util.Date;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError<String>> handleDataIntegrityViolationException(MethodArgumentNotValidException e, WebRequest request) {
+        String message = extractUserFriendlyMessage(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(createApiError(message, HttpStatus.BAD_REQUEST, request));
+    }
 
     @ExceptionHandler(value = {BaseException.class})
     public ResponseEntity<ApiError<String>> handleBaseException(BaseException e, WebRequest request) {
@@ -46,8 +54,8 @@ public class GlobalExceptionHandler {
         } else {
             message = "An error occurred: " + e.getMessage();
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(createApiError(message, HttpStatus.INTERNAL_SERVER_ERROR, request));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(createApiError(message, HttpStatus.BAD_REQUEST, request));
     }
 
     @ExceptionHandler(value = {DataIntegrityViolationException.class})

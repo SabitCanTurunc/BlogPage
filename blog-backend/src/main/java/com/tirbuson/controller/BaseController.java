@@ -28,6 +28,7 @@ public abstract class BaseController<
         this.service = service;
         this.mapper = mapper;
     }
+
     @PostMapping
     public ResponseEntity<ResDto> create(@Valid @RequestBody ReqDto dtoEntity) {
         E entity= mapper.convertToEntity(dtoEntity);
