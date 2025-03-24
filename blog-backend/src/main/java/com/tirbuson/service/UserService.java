@@ -59,12 +59,10 @@ public class UserService extends BaseService<User, Integer, UserRepository> {
     public Map<String, Object> updatePassword(String email, String currentPassword, String newPassword) {
         User user = findByEmail(email);
         
-        // Mevcut şifreyi kontrol et
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             throw new BaseException(new ErrorMessage(MessageType.INVALID_CREDENTIALS, "Mevcut şifre yanlış"));
         }
         
-        // Yeni şifreyi hashle ve kaydet
         user.setPassword(passwordEncoder.encode(newPassword));
         super.update(user);
         
@@ -119,9 +117,8 @@ public class UserService extends BaseService<User, Integer, UserRepository> {
     @Transactional
     public void deleteById(Integer userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, userId.toString())));
         
-        // İlişkili yorumları ve yazıları manuel olarak temizle
         if (user.getComments() != null) {
             user.getComments().clear();
         }
@@ -130,7 +127,6 @@ public class UserService extends BaseService<User, Integer, UserRepository> {
             user.getPosts().clear();
         }
         
-        // Kullanıcıyı sil
         userRepository.delete(user);
     }
 

@@ -1,11 +1,15 @@
 package com.tirbuson.controller;
 
 import com.tirbuson.dto.VerifyUserDto;
+import com.tirbuson.dto.request.PasswordResetRequestDto;
 import com.tirbuson.dto.request.UserRequestDto;
 import com.tirbuson.dto.response.LoginResponseDto;
 import com.tirbuson.dto.response.VerificationResponseDto;
 import com.tirbuson.dto.response.CustomException;
 import com.tirbuson.exception.BaseException;
+import com.tirbuson.exception.ErrorMessage;
+import com.tirbuson.exception.MessageType;
+import com.tirbuson.mapper.UserMapper;
 import com.tirbuson.model.User;
 import com.tirbuson.service.AuthenticationService;
 import com.tirbuson.service.JwtService;
@@ -24,10 +28,12 @@ import java.util.HashMap;
 public class AuthenticationController {
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
+    private final UserMapper userMapper;
 
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService) {
+    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, UserMapper userMapper) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/signup")
@@ -48,97 +54,51 @@ public class AuthenticationController {
             LoginResponseDto errorResponse = new LoginResponseDto();
             errorResponse.setStatus(400);
             CustomException customException = new CustomException(
-                "GAMZE",
-                "uri=/auth/login",
-                java.time.LocalDateTime.now().toString(),
-                e.getMessage()
+                    "GAMZE",
+                    "uri=/auth/login",
+                    java.time.LocalDateTime.now().toString(),
+                    e.getMessage()
             );
             errorResponse.setCustomException(customException);
             return ResponseEntity.badRequest().body(errorResponse);
         }
     }
-    
+
     @PostMapping("/verify")
     public ResponseEntity<?> verify(@RequestBody VerifyUserDto verifyUserDto) {
-        try {
-            System.out.println("Verify endpoint çağrıldı: " + verifyUserDto.getEmail() + ", Kod: " + verifyUserDto.getVerificationCode());
-            authenticationService.verifyUser(verifyUserDto);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Hesabınız başarıyla doğrulandı");
-            
-            System.out.println("Doğrulama başarılı: " + verifyUserDto.getEmail());
-            return ResponseEntity.ok(response);
-        } catch (BaseException e) {
-            System.out.println("BaseException yakalandı: " + e.getMessage());
-            
-            // Eğer hata "zaten doğrulanmış" ile ilgili ise, başarılı yanıt döndür
-            if (e.getMessage() != null && e.getMessage().contains("zaten doğrulanmış")) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", true);
-                response.put("message", "Bu hesap zaten doğrulanmış");
-                return ResponseEntity.ok(response);
-            }
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        } catch (RuntimeException e) {
-            System.out.println("RuntimeException yakalandı: " + e.getClass().getName() + " - " + e.getMessage());
-            e.printStackTrace();
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "Doğrulama işlemi sırasında bir hata oluştu: " + e.getMessage());
-            
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        User user = authenticationService.verifyUser(verifyUserDto);
+
+        return ResponseEntity.ok(userMapper.convertToDto(user));
     }
 
     @PostMapping("/resend")
     public ResponseEntity<VerificationResponseDto> resendVerificationCode(@RequestBody Map<String, String> payload) {
-        try{
+        try {
             String email = payload.get("email");
             authenticationService.resendVerificationCode(email);
             return ResponseEntity.ok(new VerificationResponseDto("Doğrulama kodu başarıyla tekrar gönderildi", true));
-        } catch(BaseException e) {
-            // BaseException özel olarak işlenir
-            return ResponseEntity.badRequest().body(new VerificationResponseDto(e.getMessage(), false));
-        } catch(RuntimeException e) {
-            // Diğer hatalar için
-            return ResponseEntity.badRequest().body(new VerificationResponseDto("Kod gönderilirken bir hata oluştu: " + e.getMessage(), false));
+        } catch (Exception e) {
+            throw new BaseException(new ErrorMessage(MessageType.GENERAL_EXCEPTION,e.getMessage()));
         }
     }
-    
+
     @PostMapping("/forgot-password")
     public ResponseEntity<VerificationResponseDto> forgotPassword(@RequestBody Map<String, String> payload) {
-        try {
+
             String email = payload.get("email");
             authenticationService.sendPasswordResetCode(email);
             return ResponseEntity.ok(new VerificationResponseDto("Şifre sıfırlama kodu başarıyla gönderildi", true));
-        } catch(BaseException e) {
-            return ResponseEntity.badRequest().body(new VerificationResponseDto(e.getMessage(), false));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(new VerificationResponseDto("Şifre sıfırlama kodu gönderilirken bir hata oluştu: " + e.getMessage(), false));
-        }
+
     }
-    
+
     @PostMapping("/reset-password")
-    public ResponseEntity<VerificationResponseDto> resetPassword(@RequestBody Map<String, String> payload) {
-        try {
-            String email = payload.get("email");
-            String verificationCode = payload.get("verificationCode");
-            String newPassword = payload.get("newPassword");
-            
+    public ResponseEntity<VerificationResponseDto> resetPassword(@RequestBody PasswordResetRequestDto payload) {
+            String email = payload.email;
+            String verificationCode = payload.verificatonCode;
+            String newPassword = payload.newPassword;
+
             authenticationService.resetPassword(email, verificationCode, newPassword);
             return ResponseEntity.ok(new VerificationResponseDto("Şifreniz başarıyla sıfırlandı", true));
-        } catch(BaseException e) {
-            return ResponseEntity.badRequest().body(new VerificationResponseDto(e.getMessage(), false));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(new VerificationResponseDto("Şifre sıfırlanırken bir hata oluştu: " + e.getMessage(), false));
-        }
+
     }
 }

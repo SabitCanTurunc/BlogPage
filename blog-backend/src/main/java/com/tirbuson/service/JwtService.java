@@ -1,5 +1,8 @@
 package com.tirbuson.service;
 
+import com.tirbuson.exception.BaseException;
+import com.tirbuson.exception.ErrorMessage;
+import com.tirbuson.exception.MessageType;
 import com.tirbuson.model.User;
 import com.tirbuson.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -47,7 +50,7 @@ public class JwtService {
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.USER_NOT_FOUND,userDetails.getUsername())));
                 
         extraClaims.put("role", user.getRole().name());
         extraClaims.put("userId", user.getId());

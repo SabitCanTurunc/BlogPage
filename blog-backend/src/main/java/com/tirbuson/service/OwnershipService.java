@@ -30,7 +30,7 @@ public class OwnershipService {
                 .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, entityId.toString())));
 
         if (!isOwnerOrAdmin(entityId, repository)) {
-            throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED, "You are not authorized to perform this action on this entity with ID: " + entityId));
+            throw new BaseException(MessageType.UNAUTHORIZED_ACCESS, "Kayıt ID: " + entityId);
         }
 
 

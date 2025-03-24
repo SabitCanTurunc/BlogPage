@@ -3,7 +3,6 @@ package com.tirbuson.service;
 import com.tirbuson.dto.VerifyUserDto;
 import com.tirbuson.dto.request.UserRequestDto;
 import com.tirbuson.exception.BaseException;
-import com.tirbuson.exception.ErrorMessage;
 import com.tirbuson.exception.MessageType;
 import com.tirbuson.mapper.UserMapper;
 import com.tirbuson.model.User;
@@ -44,10 +43,10 @@ public class AuthenticationService {
     public User signup(UserRequestDto userRequestDto) {
         try {
             if (userRepository.findByEmail(userRequestDto.getEmail()).isPresent()) {
-                throw new BaseException("Email address is already registered.");
+                throw new BaseException(MessageType.EMAIL_ALREADY_EXISTS);
             }
             if (userRepository.findByUsername(userRequestDto.getUsername()).isPresent()) {
-                throw new BaseException("Username is already taken.");
+                throw new BaseException(MessageType.USERNAME_ALREADY_EXISTS);
             }
 
             User user = userMapper.convertToEntity(userRequestDto);
@@ -60,16 +59,19 @@ public class AuthenticationService {
             sendVerificationEmail(user);
             return userService.save(user);
         } catch (Exception e) {
-            throw new BaseException("Registration failed: " + e.getMessage());
+            if (e instanceof BaseException) {
+                throw e;
+            }
+            throw new BaseException(MessageType.PROCESS_FAILED, e.getMessage());
         }
     }
 
     public User authenticate(UserRequestDto input){
         User user = userRepository.findByEmail(input.getEmail())
-                .orElseThrow(() -> new BaseException("Invalid email or password"));
+                .orElseThrow(() -> new BaseException(MessageType.INVALID_CREDENTIALS));
         
         if(!user.isEnabled()) {
-            throw new BaseException("UNVERIFIED_USER");
+            throw new BaseException(MessageType.EMAIL_NOT_VERIFIED);
         }
         
         try {
@@ -80,35 +82,30 @@ public class AuthenticationService {
                     )
             );
         } catch (Exception e) {
-            throw new BaseException("Invalid email or password");
+            throw new BaseException(MessageType.INVALID_CREDENTIALS);
         }
         return user;
     }
 
-    public void verifyUser(VerifyUserDto input) {
-        System.out.println("Doğrulama isteği alındı: Email=" + input.getEmail() + ", Kod=" + input.getVerificationCode());
-        
-        Optional<User> optionalUser = userRepository.findByEmail(input.getEmail());
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
+    public User verifyUser(VerifyUserDto input) {
+
+        User user = userRepository.findByEmail(input.getEmail())
+                .orElseThrow(() -> new BaseException(MessageType.NO_RECORD_EXIST));
+
             LocalDateTime expiresAt = user.getVerificationCodeExpiresAt();
             String storedCode = user.getVerificationCode();
             
-            System.out.println("Kullanıcı bilgileri: Enabled=" + user.isEnabled() + ", StoredCode=" + storedCode + ", ExpiresAt=" + expiresAt);
 
             if (user.isEnabled() && expiresAt == null) {
-                System.out.println("Hata: Kullanıcı zaten doğrulanmış");
-                throw new BaseException("Bu e-posta adresi zaten doğrulanmış.");
+                throw new BaseException(MessageType.ALREADY_VERIFIED);
             }
 
             if (expiresAt == null) {
-                System.out.println("Hata: Doğrulama kodu yok");
-                throw new BaseException("Bu e-posta adresi için doğrulama kodu oluşturulmamış: " + input.getEmail());
+                throw new BaseException(MessageType.VERIFICATION_CODE_NOT_SET);
             }
 
             if (expiresAt.isBefore(LocalDateTime.now())) {
-                System.out.println("Hata: Doğrulama kodu süresi dolmuş");
-                throw new BaseException("Doğrulama kodunun süresi dolmuş. Lütfen yeni bir kod talep edin.");
+                throw new BaseException(MessageType.CODE_EXPIRED,expiresAt.toString());
             }
 
             if (storedCode.equals(input.getVerificationCode())) {
@@ -117,22 +114,11 @@ public class AuthenticationService {
                 user.setVerificationCode(null);
                 user.setVerificationCodeExpiresAt(null);
                 userRepository.save(user);
+                return user;
             } else {
-                System.out.println("Hata: Yanlış doğrulama kodu. Beklenen=" + storedCode + ", Gelen=" + input.getVerificationCode());
-                if (storedCode.trim().equalsIgnoreCase(input.getVerificationCode().trim())) {
-                    System.out.println("Ama case-insensitive veya trim edilmiş haliyle eşleşiyor, doğrulama kabul ediliyor");
-                    user.setEnabled(true);
-                    user.setVerificationCode(null);
-                    user.setVerificationCodeExpiresAt(null);
-                    userRepository.save(user);
-                } else {
-                    throw new BaseException("Yanlış doğrulama kodu. Lütfen tekrar deneyin.");
-                }
+                throw new BaseException(MessageType.INVALID_VERIFICATION_CODE);
             }
-        } else {
-            System.out.println("Hata: Kullanıcı bulunamadı - " + input.getEmail());
-            throw new BaseException("Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı: " + input.getEmail());
-        }
+
     }
 
     public void resendVerificationCode(String email){
@@ -140,14 +126,14 @@ public class AuthenticationService {
         if(optionalUser.isPresent()){
             User user = optionalUser.get();
             if(user.isEnabled()) {
-                throw new BaseException("Bu hesap zaten doğrulanmış.");
+                throw new BaseException(MessageType.ALREADY_VERIFIED);
             }
             user.setVerificationCode(generateVerificationCode());
             user.setVerificationCodeExpiresAt(LocalDateTime.now().plusHours(1));
             sendVerificationEmail(user);
             userRepository.save(user);
         }else{
-            throw new BaseException("Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı: " + email);
+            throw new BaseException(MessageType.USER_NOT_FOUND, email);
         }
     }
 
@@ -198,7 +184,7 @@ public class AuthenticationService {
             emailService.sendVerificationEmail(user.getEmail(),subject, htmlMessage);
 
         }catch(MessagingException e){
-            throw new BaseException(new ErrorMessage(MessageType.EMAIL_SENDING_FAILED,  user.getEmail()));
+            throw new BaseException(MessageType.EMAIL_SENDING_FAILED, user.getEmail());
         }
     }
 
@@ -210,16 +196,12 @@ public class AuthenticationService {
 
     // Şifre sıfırlama işlemi için kod gönderme
     public void sendPasswordResetCode(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-        if(optionalUser.isPresent()) {
-            User user = optionalUser.get();
+        User user = userRepository.findByEmail(email).orElseThrow(()->new BaseException(MessageType.USER_NOT_FOUND,email));
             user.setVerificationCode(generateVerificationCode());
             user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
             sendPasswordResetEmail(user);
             userRepository.save(user);
-        } else {
-            throw new BaseException("Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı: " + email);
-        }
+
     }
 
     // Şifre sıfırlama e-postası gönderme
@@ -269,7 +251,7 @@ public class AuthenticationService {
         try {
             emailService.sendVerificationEmail(user.getEmail(), subject, htmlMessage);
         } catch(MessagingException e) {
-            throw new BaseException(new ErrorMessage(MessageType.EMAIL_SENDING_FAILED, user.getEmail()));
+            throw new BaseException(MessageType.EMAIL_SENDING_FAILED, user.getEmail());
         }
     }
 
@@ -281,11 +263,11 @@ public class AuthenticationService {
             LocalDateTime expiresAt = user.getVerificationCodeExpiresAt();
 
             if (expiresAt == null) {
-                throw new BaseException("Bu e-posta adresi için şifre sıfırlama talebi oluşturulmamış.");
+                throw new BaseException(MessageType.VERIFICATION_CODE_NOT_SET);
             }
 
             if (expiresAt.isBefore(LocalDateTime.now())) {
-                throw new BaseException("Doğrulama kodunun süresi dolmuş. Lütfen yeni bir kod talep edin.");
+                throw new BaseException(MessageType.CODE_EXPIRED);
             }
 
             if (user.getVerificationCode().equals(verificationCode)) {
@@ -295,10 +277,10 @@ public class AuthenticationService {
                 user.setVerificationCodeExpiresAt(null);
                 userRepository.save(user);
             } else {
-                throw new BaseException("Yanlış doğrulama kodu. Lütfen tekrar deneyin.");
+                throw new BaseException(MessageType.INVALID_VERIFICATION_CODE);
             }
         } else {
-            throw new BaseException("Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı: " + email);
+            throw new BaseException(MessageType.USER_NOT_FOUND, email);
         }
     }
 }

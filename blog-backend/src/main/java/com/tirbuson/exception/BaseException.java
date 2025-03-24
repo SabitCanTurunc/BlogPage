@@ -1,20 +1,55 @@
 package com.tirbuson.exception;
 
-import com.tirbuson.model.User;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
-import java.util.LinkedList;
-import java.util.List;
 
+@Getter
 public class BaseException extends RuntimeException {
+    private HttpStatus status;
+    private MessageType messageType;
 
-    public BaseException() {}
-
-    public BaseException(ErrorMessage errorMessage) {
+    public BaseException(ErrorMessage errorMessage){
         super(errorMessage.prepareErrorMessage());
+        this.messageType=errorMessage.getMessageType();
+        this.status=determineStatus(messageType);
     }
 
-    public BaseException(String message) {
+    public BaseException(String message){
         super(message);
+        this.messageType=null;
+        this.status=HttpStatus.BAD_REQUEST;
     }
 
+    public BaseException(MessageType messageType){
+        super(messageType.getMessage());
+        this.messageType=messageType;
+        this.status=determineStatus(messageType);
+    }
+
+    public BaseException(MessageType messageType, String additionalMessage){
+        super(new ErrorMessage(messageType,additionalMessage).prepareErrorMessage());
+        this.messageType=messageType;
+        this.status=determineStatus(messageType);
+    }
+
+
+/// //////////////////////////
+
+    private HttpStatus determineStatus(MessageType messageType){
+        if(messageType == null){
+            return HttpStatus.BAD_REQUEST;
+        }
+
+        String codePrefix = messageType.getCode().substring(0,1);
+        switch(messageType.getCode()){
+            case "1": return HttpStatus.NOT_FOUND;
+            case "2": return HttpStatus.BAD_REQUEST;
+            case "3": return HttpStatus.UNAUTHORIZED;
+            case "4": return HttpStatus.FORBIDDEN;
+            case "5": return HttpStatus.CONFLICT;
+            case "6": return HttpStatus.UNPROCESSABLE_ENTITY;
+            default: return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
 }

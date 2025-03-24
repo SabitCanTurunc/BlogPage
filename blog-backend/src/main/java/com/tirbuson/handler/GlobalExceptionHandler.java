@@ -1,11 +1,15 @@
 package com.tirbuson.handler;
 
 import com.tirbuson.exception.BaseException;
+import com.tirbuson.exception.ErrorMessage;
+import com.tirbuson.exception.MessageType;
+import com.tirbuson.mapper.ExceptionMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,57 +18,95 @@ import org.springframework.web.context.request.WebRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError<String>> handleDataIntegrityViolationException(MethodArgumentNotValidException e, WebRequest request) {
-        String message = extractUserFriendlyMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(createApiError(message, HttpStatus.BAD_REQUEST, request));
-    }
 
     @ExceptionHandler(value = {BaseException.class})
     public ResponseEntity<ApiError<String>> handleBaseException(BaseException e, WebRequest request) {
-        return ResponseEntity.badRequest().body(createApiError(e.getMessage(), HttpStatus.BAD_REQUEST, request));
+
+        HttpStatus status = e.getStatus();
+        String errorCode = null;
+        if (e.getMessageType() != null) errorCode = e.getMessageType().getCode();
+
+        return ResponseEntity.status(status)
+                .body(createApiError(e.getMessage(), status, request, errorCode));
+
     }
 
-    @ExceptionHandler(value = {MalformedJwtException.class})
-    public ResponseEntity<ApiError<String>> handleMalformedJwtException(MalformedJwtException e, WebRequest request) {
-        String message = "Invalid JWT token: " + e.getMessage();
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createApiError(message, HttpStatus.UNAUTHORIZED, request));
-    }
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    public ResponseEntity<ApiError<String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, WebRequest request) {
+//        MessageType messageType = MessageType.INVALID_REQUEST;
+//
+//        String validationErrors = e.getBindingResult().getAllErrors().stream()
+//                .map(error -> error.getDefaultMessage())
+//                .collect(Collectors.joining(", "));
+//
+//        ErrorMessage errorMessage = new ErrorMessage(messageType, validationErrors);
+//        String formattedMessage = errorMessage.prepareErrorMessage();
+//
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                .body(createApiError(formattedMessage, HttpStatus.BAD_REQUEST, request, messageType.getCode()));
+//    }
+//
+//
+//    @ExceptionHandler(value = {MalformedJwtException.class, ExpiredJwtException.class})
+//    public ResponseEntity<ApiError<String>> handleJwtException(Exception e, WebRequest request) {
+//        MessageType messageType;
+//        String additionalInfo = null;
+//
+//        if (e instanceof MalformedJwtException) {
+//            messageType = MessageType.INVALID_TOKEN;
+//            additionalInfo = e.getMessage();
+//        } else { // ExpiredJwtException
+//            messageType = MessageType.TOKEN_EXPIRED;
+//        }
+//
+//        ErrorMessage errorMessage = new ErrorMessage(messageType, additionalInfo);
+//        String formattedMessage = errorMessage.prepareErrorMessage();
+//
+//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                .body(createApiError(formattedMessage, HttpStatus.UNAUTHORIZED, request, messageType.getCode()));
+//    }
+//
+//    @ExceptionHandler(value = {DataIntegrityViolationException.class})
+//    public ResponseEntity<ApiError<String>> handleDataIntegrityViolationException(DataIntegrityViolationException e, WebRequest request) {
+//        MessageType messageType = MessageType.DATABASE_ERROR;
+//
+//        String detail = e.getMessage();
+//
+//        ErrorMessage errorMessage = new ErrorMessage(messageType, detail);
+//        String formattedMessage = errorMessage.prepareErrorMessage();
+//
+//        return ResponseEntity.status(HttpStatus.CONFLICT)
+//                .body(createApiError(formattedMessage, HttpStatus.CONFLICT, request, messageType.getCode()));
+//    }
+//
+//    @ExceptionHandler(value = {BadCredentialsException.class})
+//    public ResponseEntity<ApiError<String>> handleBadCredentialsException(BadCredentialsException e, WebRequest request) {
+//        MessageType messageType = MessageType.INVALID_CREDENTIALS;
+//
+//        ErrorMessage errorMessage = new ErrorMessage(messageType, null);
+//        String formattedMessage = errorMessage.prepareErrorMessage();
+//
+//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                .body(createApiError(formattedMessage, HttpStatus.UNAUTHORIZED, request, messageType.getCode()));
+//    }
+//
+//
+//    @ExceptionHandler(value = {Exception.class})
+//    public ResponseEntity<ApiError<String>> handleGenericException(Exception e, WebRequest request) {
+//        // Exception'ı BaseException'a dönüştür
+//        BaseException baseException = ExceptionMapper.toBaseException(e);
+//
+//        // BaseException handler'ını kullan
+//        return handleBaseException(baseException, request);
+//    }
 
-    @ExceptionHandler(value = {ExpiredJwtException.class})
-    public ResponseEntity<ApiError<String>> handleExpiredJwtException(ExpiredJwtException e, WebRequest request) {
-        String message = "JWT token has expired. Please login again.";
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createApiError(message, HttpStatus.UNAUTHORIZED, request));
-    }
 
-    @ExceptionHandler(value = {Exception.class})
-    public ResponseEntity<ApiError<String>> handleGenericException(Exception e, WebRequest request) {
-        String message;
-        if (e.getMessage() != null && e.getMessage().contains("JSON parse error")) {
-            message = "Invalid JSON format. Please check your request data.";
-        } else if (e.getMessage() != null && e.getMessage().contains("Required request body is missing")) {
-            message = "Request body is missing. Please provide the required data.";
-        } else if (e.getMessage() != null && e.getMessage().contains("duplicate key value")) {
-            message = "A record with this information already exists.";
-        } else {
-            message = "An error occurred: " + e.getMessage();
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(createApiError(message, HttpStatus.BAD_REQUEST, request));
-    }
-
-    @ExceptionHandler(value = {DataIntegrityViolationException.class})
-    public ResponseEntity<ApiError<String>> handleDataIntegrityViolationException(DataIntegrityViolationException e, WebRequest request) {
-        String message = extractUserFriendlyMessage(e.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(createApiError(message, HttpStatus.CONFLICT, request));
-    }
-
+    /// /////////////////////////
     private String getHostname() {
         try {
             return InetAddress.getLocalHost().getHostName();
@@ -73,9 +115,10 @@ public class GlobalExceptionHandler {
         }
     }
 
-    private ApiError<String> createApiError(String message, HttpStatus status, WebRequest request) {
+    private ApiError<String> createApiError(String message, HttpStatus status, WebRequest request, String errorCode) {
         ApiError<String> error = new ApiError<>();
         error.setStatus(status.value());
+        error.setErrorCode(errorCode);
 
         CustomException<String> customException = new CustomException<>();
         customException.setMessage(message != null ? message : "Unknown error");
@@ -87,29 +130,7 @@ public class GlobalExceptionHandler {
         return error;
     }
 
-    private String extractUserFriendlyMessage(String errorMessage) {
-        if (errorMessage == null) {
-            return "A database error occurred.";
-        }
-        
-        if (errorMessage.contains("duplicate key value violates unique constraint \"user_email_key\"")) {
-            String email;
-            try {
-                email = errorMessage.split("Key \\(email\\)=\\(")[1].split("\\)")[0];
-                return "The email address '" + email + "' is already registered.";
-            } catch (Exception e) {
-                return "This email address is already registered.";
-            }
-        }
-        if (errorMessage.contains("duplicate key value violates unique constraint \"user_username_key\"")) {
-            String username;
-            try {
-                username = errorMessage.split("Key \\(username\\)=\\(")[1].split("\\)")[0];
-                return "The username '" + username + "' is already taken.";
-            } catch (Exception e) {
-                return "This username is already taken.";
-            }
-        }
-        return "A database error occurred.";
+    private ApiError<String> createApiError(String message, HttpStatus status, WebRequest request) {
+        return createApiError(message, status, request, null);
     }
 }

@@ -1,5 +1,8 @@
 package com.tirbuson.service;
 
+import com.tirbuson.exception.BaseException;
+import com.tirbuson.exception.ErrorMessage;
+import com.tirbuson.exception.MessageType;
 import com.tirbuson.model.Category;
 import com.tirbuson.model.Post;
 import com.tirbuson.repository.CategoryRepository;
@@ -22,33 +25,23 @@ public class CategoryService extends BaseService<Category,Integer, CategoryRepos
     @Override
     public Category save(Category entity) {
 
-        if (entity.getName().length() < 3) {
-            throw new BadCredentialsException("Name too short");
-        }
+
         return super.save(entity);
     }
 
     @Override
     @Transactional
     public Category update(Category entity) {
-        // Mevcut kategoriyi ve ona bağlı postları al
+
         Category existingCategory = repository.findById(entity.getId())
-                .orElseThrow(() -> new RuntimeException("Kategori bulunamadı: " + entity.getId()));
+                .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.CATEGORY_NOT_FOUND,entity.getName())));
         
-        // Post-kategori ilişkisini koru
-        List<Post> posts = existingCategory.getPosts();
-        
-        // Kategori adını güncelle
+
         existingCategory.setName(entity.getName());
         
-        // Kategoriyi veritabanına kaydet
-        Category updatedCategory = repository.save(existingCategory);
-        
-        // Log - Debug için kullanışlı
-        if (posts != null) {
-            System.out.println("Kategori güncellendi: " + updatedCategory.getName() + ", post sayısı: " + posts.size());
-        }
-        
-        return updatedCategory;
+
+
+
+        return repository.save(existingCategory);
     }
 }

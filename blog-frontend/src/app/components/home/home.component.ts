@@ -105,7 +105,6 @@ export class HomeComponent implements OnInit {
     // Sayfalı veri getirme
     this.postService.getPagedPosts(this.currentPage, this.pageSize, this.selectedCategory || undefined).subscribe({
       next: (response) => {
-        console.log('İlk sayfa başarıyla yüklendi:', response);
         
         this.posts = response.posts || [];
         this.filteredPosts = response.posts || [];
@@ -114,8 +113,7 @@ export class HomeComponent implements OnInit {
         // totalPages 1'den büyükse daha fazla post vardır
         this.hasMorePosts = response.totalPages > 1;
         
-        console.log('HasMorePosts:', this.hasMorePosts);
-        console.log('TotalPages:', this.totalPages);
+        
         
         if (isInitialLoad) {
           // İlk yüklemede kategorileri ve popüler yazarları hesapla
