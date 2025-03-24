@@ -41,8 +41,7 @@ public class BaseException extends RuntimeException {
             return HttpStatus.BAD_REQUEST;
         }
 
-        String codePrefix = messageType.getCode().substring(0,1);
-        switch(messageType.getCode()){
+        switch(messageType.getCode().substring(0,1)){
             case "1": return HttpStatus.NOT_FOUND;
             case "2": return HttpStatus.BAD_REQUEST;
             case "3": return HttpStatus.UNAUTHORIZED;

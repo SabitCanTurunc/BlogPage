@@ -60,7 +60,7 @@ public class UserService extends BaseService<User, Integer, UserRepository> {
         User user = findByEmail(email);
         
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new BaseException(new ErrorMessage(MessageType.INVALID_CREDENTIALS, "Mevcut şifre yanlış"));
+            throw new BaseException(new ErrorMessage(MessageType.INVALID_CREDENTIALS, email));
         }
         
         user.setPassword(passwordEncoder.encode(newPassword));

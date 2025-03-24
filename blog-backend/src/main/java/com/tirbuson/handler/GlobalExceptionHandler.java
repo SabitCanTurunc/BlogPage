@@ -36,74 +36,74 @@ public class GlobalExceptionHandler {
 
     }
 
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<ApiError<String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, WebRequest request) {
-//        MessageType messageType = MessageType.INVALID_REQUEST;
-//
-//        String validationErrors = e.getBindingResult().getAllErrors().stream()
-//                .map(error -> error.getDefaultMessage())
-//                .collect(Collectors.joining(", "));
-//
-//        ErrorMessage errorMessage = new ErrorMessage(messageType, validationErrors);
-//        String formattedMessage = errorMessage.prepareErrorMessage();
-//
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                .body(createApiError(formattedMessage, HttpStatus.BAD_REQUEST, request, messageType.getCode()));
-//    }
-//
-//
-//    @ExceptionHandler(value = {MalformedJwtException.class, ExpiredJwtException.class})
-//    public ResponseEntity<ApiError<String>> handleJwtException(Exception e, WebRequest request) {
-//        MessageType messageType;
-//        String additionalInfo = null;
-//
-//        if (e instanceof MalformedJwtException) {
-//            messageType = MessageType.INVALID_TOKEN;
-//            additionalInfo = e.getMessage();
-//        } else { // ExpiredJwtException
-//            messageType = MessageType.TOKEN_EXPIRED;
-//        }
-//
-//        ErrorMessage errorMessage = new ErrorMessage(messageType, additionalInfo);
-//        String formattedMessage = errorMessage.prepareErrorMessage();
-//
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                .body(createApiError(formattedMessage, HttpStatus.UNAUTHORIZED, request, messageType.getCode()));
-//    }
-//
-//    @ExceptionHandler(value = {DataIntegrityViolationException.class})
-//    public ResponseEntity<ApiError<String>> handleDataIntegrityViolationException(DataIntegrityViolationException e, WebRequest request) {
-//        MessageType messageType = MessageType.DATABASE_ERROR;
-//
-//        String detail = e.getMessage();
-//
-//        ErrorMessage errorMessage = new ErrorMessage(messageType, detail);
-//        String formattedMessage = errorMessage.prepareErrorMessage();
-//
-//        return ResponseEntity.status(HttpStatus.CONFLICT)
-//                .body(createApiError(formattedMessage, HttpStatus.CONFLICT, request, messageType.getCode()));
-//    }
-//
-//    @ExceptionHandler(value = {BadCredentialsException.class})
-//    public ResponseEntity<ApiError<String>> handleBadCredentialsException(BadCredentialsException e, WebRequest request) {
-//        MessageType messageType = MessageType.INVALID_CREDENTIALS;
-//
-//        ErrorMessage errorMessage = new ErrorMessage(messageType, null);
-//        String formattedMessage = errorMessage.prepareErrorMessage();
-//
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                .body(createApiError(formattedMessage, HttpStatus.UNAUTHORIZED, request, messageType.getCode()));
-//    }
-//
-//
-//    @ExceptionHandler(value = {Exception.class})
-//    public ResponseEntity<ApiError<String>> handleGenericException(Exception e, WebRequest request) {
-//        // Exception'ı BaseException'a dönüştür
-//        BaseException baseException = ExceptionMapper.toBaseException(e);
-//
-//        // BaseException handler'ını kullan
-//        return handleBaseException(baseException, request);
-//    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError<String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, WebRequest request) {
+        MessageType messageType = MessageType.INVALID_REQUEST;
+
+        String validationErrors = e.getBindingResult().getAllErrors().stream()
+                .map(error -> error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        ErrorMessage errorMessage = new ErrorMessage(messageType, validationErrors);
+        String formattedMessage = errorMessage.prepareErrorMessage();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(createApiError(formattedMessage, HttpStatus.BAD_REQUEST, request, messageType.getCode()));
+    }
+
+
+    @ExceptionHandler(value = {MalformedJwtException.class, ExpiredJwtException.class})
+    public ResponseEntity<ApiError<String>> handleJwtException(Exception e, WebRequest request) {
+        MessageType messageType;
+        String additionalInfo = null;
+
+        if (e instanceof MalformedJwtException) {
+            messageType = MessageType.INVALID_TOKEN;
+            additionalInfo = e.getMessage();
+        } else { // ExpiredJwtException
+            messageType = MessageType.TOKEN_EXPIRED;
+        }
+
+        ErrorMessage errorMessage = new ErrorMessage(messageType, additionalInfo);
+        String formattedMessage = errorMessage.prepareErrorMessage();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(createApiError(formattedMessage, HttpStatus.UNAUTHORIZED, request, messageType.getCode()));
+    }
+
+    @ExceptionHandler(value = {DataIntegrityViolationException.class})
+    public ResponseEntity<ApiError<String>> handleDataIntegrityViolationException(DataIntegrityViolationException e, WebRequest request) {
+        MessageType messageType = MessageType.DATABASE_ERROR;
+
+        String detail = e.getMessage();
+
+        ErrorMessage errorMessage = new ErrorMessage(messageType, detail);
+        String formattedMessage = errorMessage.prepareErrorMessage();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(createApiError(formattedMessage, HttpStatus.CONFLICT, request, messageType.getCode()));
+    }
+
+    @ExceptionHandler(value = {BadCredentialsException.class})
+    public ResponseEntity<ApiError<String>> handleBadCredentialsException(BadCredentialsException e, WebRequest request) {
+        MessageType messageType = MessageType.INVALID_CREDENTIALS;
+
+        ErrorMessage errorMessage = new ErrorMessage(messageType, null);
+        String formattedMessage = errorMessage.prepareErrorMessage();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(createApiError(formattedMessage, HttpStatus.UNAUTHORIZED, request, messageType.getCode()));
+    }
+
+
+    @ExceptionHandler(value = {Exception.class})
+    public ResponseEntity<ApiError<String>> handleGenericException(Exception e, WebRequest request) {
+        // Exception'ı BaseException'a dönüştür
+        BaseException baseException = ExceptionMapper.toBaseException(e);
+
+        // BaseException handler'ını kullan
+        return handleBaseException(baseException, request);
+    }
 
 
     /// /////////////////////////

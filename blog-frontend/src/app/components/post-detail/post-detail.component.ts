@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../../services/post.service';
-import { Post } from '../../models/post.model';
 import { PostResponseDto } from '../../models/post-response.dto';
 import { CommentComponent } from '../comment/comment.component';
 
@@ -15,7 +14,7 @@ import { CommentComponent } from '../comment/comment.component';
   styleUrl: './post-detail.component.css'
 })
 export class PostDetailComponent implements OnInit {
-  post: Post | null = null;
+  post: PostResponseDto | null = null;
   error: string = '';
   loading: boolean = true;
 

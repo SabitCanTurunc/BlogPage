@@ -45,20 +45,16 @@ public class PostController extends BaseController<PostService, Post,Integer, Po
     @GetMapping("/paged")
     public ResponseEntity<Map<String, Object>> getPagedPosts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "5") int size,
             @RequestParam(required = false) String category) {
         
         try {
-            System.out.println("Sayfalı veri istendi - Page: " + page + ", Size: " + size + ", Category: " + category);
-            
             Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
             Page<Post> pagePost;
             
             if (category == null || category.isEmpty()) {
-                System.out.println("Tüm postlar getiriliyor (sayfalı)");
                 pagePost = postService.getAllPosts(pageable);
             } else {
-                System.out.println("Kategori bazında postlar getiriliyor: " + category);
                 pagePost = postService.getPostsByCategory(category, pageable);
             }
             
@@ -73,18 +69,67 @@ public class PostController extends BaseController<PostService, Post,Integer, Po
             response.put("totalItems", pagePost.getTotalElements());
             response.put("totalPages", pagePost.getTotalPages());
             
-            System.out.println("Yanıt gönderiliyor - Toplam Sayfa: " + pagePost.getTotalPages() + 
-                    ", Mevcut Sayfa: " + pagePost.getNumber() + 
-                    ", Post Sayısı: " + postDtos.size());
-            
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.err.println("Sayfalı veri getirme hatası: " + e.getMessage());
             e.printStackTrace();
             
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "Postlar getirilirken bir hata oluştu: " + e.getMessage());
             return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+    
+    // Tüm kategorileri getiren endpoint
+    @GetMapping("/categories")
+    public ResponseEntity<List<String>> getAllCategories() {
+        try {
+            List<String> categories = postService.getAllCategories();
+            return ResponseEntity.ok(categories);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new ArrayList<>());
+        }
+    }
+    
+    // Popüler yazarları getiren endpoint (en çok yazı yazan 5 yazar)
+    @GetMapping("/popular-authors")
+    public ResponseEntity<List<String>> getPopularAuthors() {
+        try {
+            List<String> authors = postService.getPopularAuthors();
+            return ResponseEntity.ok(authors);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new ArrayList<>());
+        }
+    }
+    
+    // Son eklenen 5 yazıyı getiren endpoint
+    @GetMapping("/recent")
+    public ResponseEntity<List<PostResponseDto>> getRecentPosts() {
+        try {
+            List<Post> recentPosts = postService.getRecentPosts();
+            List<PostResponseDto> recentPostDtos = recentPosts.stream()
+                    .map(postMapper::convertToDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(recentPostDtos);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new ArrayList<>());
+        }
+    }
+    
+    // Arama yapan endpoint
+    @GetMapping("/search")
+    public ResponseEntity<List<PostResponseDto>> searchPosts(@RequestParam String query) {
+        try {
+            List<Post> searchResults = postService.searchPosts(query);
+            List<PostResponseDto> searchResultDtos = searchResults.stream()
+                    .map(postMapper::convertToDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(searchResultDtos);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(new ArrayList<>());
         }
     }
 }

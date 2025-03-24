@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
@@ -7,12 +7,15 @@ import { AuthService } from '../../services/auth.service';
 import { Post } from '../../models/post.model';
 import { PostResponseDto } from '../../models/post-response.dto';
 import { HeaderComponent } from '../header/header.component';
-import { InfiniteScrollDirective } from '../../directives/infinite-scroll.directive';
+import { Subscription } from 'rxjs';
+import { forkJoin } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, InfiniteScrollDirective],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -34,13 +37,17 @@ export class HomeComponent implements OnInit {
   currentPage: number = 0;
   pageSize: number = 10;
   totalPages: number = 0;
-  hasMorePosts: boolean = true;
-  loadingMore: boolean = false;
+  subscriptions: Subscription[] = [];
+  
+  // Yan panel yükleme durumları
+  loadingSidebar: boolean = true;
+  sidebarError: string = '';
 
   constructor(
     private postService: PostService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.isLoggedIn = this.authService.isLoggedIn();
     this.isAdmin = this.authService.isAdmin();
@@ -48,49 +55,118 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.loadPosts(true);
+    this.loadSidebarData();
   }
   
-  // Infinite scroll direktifinden gelen olayı dinle
-  onScroll() {
-    console.log("Infinite scroll olayı alındı");
-    if (!this.loading && !this.loadingMore && this.hasMorePosts && this.searchQuery.trim() === '') {
-      console.log('Daha fazla post yükleniyor...');
-      this.loadMorePosts();
-    }
+  ngOnDestroy() {
+    // Abonelikleri temizle
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
   
-  // Daha fazla post yükle
-  loadMorePosts(): void {
-    console.log('loadMorePosts çağrıldı. CurrentPage:', this.currentPage, 'TotalPages:', this.totalPages);
+  // Yan panel verilerini yükle
+  loadSidebarData() {
+    this.loadingSidebar = true;
+    this.sidebarError = '';
     
-    if (this.currentPage < this.totalPages - 1) {
-      this.loadingMore = true;
-      this.currentPage++;
-      
-      console.log('Yeni sayfa yükleniyor. Page:', this.currentPage, 'Size:', this.pageSize);
-      
-      this.postService.getPagedPosts(this.currentPage, this.pageSize, this.selectedCategory || undefined).subscribe({
-        next: (response) => {
-          console.log('Sayfa başarıyla yüklendi:', response);
-          console.log('Alınan post sayısı:', response.posts?.length || 0);
+    const categoriesSub = this.postService.getCategories().subscribe({
+      next: (categories: string[]) => {
+        this.categories = categories;
+      },
+      error: (err: any) => {
+        this.sidebarError = 'Yan panel verileri yüklenemedi';
+      }
+    });
+    
+    const popularAuthorsSub = this.postService.getPopularAuthors().subscribe({
+      next: (authors: string[]) => {
+        this.popularAuthors = authors;
+      },
+      error: (err: any) => {
+        if (!this.sidebarError) {
+          this.sidebarError = 'Yan panel verileri yüklenemedi';
+        }
+      }
+    });
+    
+    const recentPostsSub = this.postService.getRecentPosts().subscribe({
+      next: (recentPosts: PostResponseDto[]) => {
+        this.recentPosts = recentPosts;
+      },
+      error: (err: any) => {
+        if (!this.sidebarError) {
+          this.sidebarError = 'Yan panel verileri yüklenemedi';
+        }
+      }
+    });
+    
+    // Tüm isteklerin tamamlanmasını bekle
+    forkJoin({
+      categories: this.postService.getCategories().pipe(catchError(err => {
+        return of([]);
+      })),
+      authors: this.postService.getPopularAuthors().pipe(catchError(err => {
+        return of([]);
+      })),
+      recent: this.postService.getRecentPosts().pipe(catchError(err => {
+        return of([]);
+      }))
+    }).subscribe({
+      next: (results) => {
+        // Eğer üç veri de boş ise hata mesajı göster
+        if (results.categories.length === 0 && results.authors.length === 0 && results.recent.length === 0) {
+          this.sidebarError = 'Yan panel verileri yüklenemedi';
+        }
+        
+        // Sonuçları güncelle (yukarıdaki abonelikler zaten güncelliyor ama emin olmak için)
+        if (results.categories.length > 0) this.categories = results.categories;
+        if (results.authors.length > 0) this.popularAuthors = results.authors;
+        if (results.recent.length > 0) this.recentPosts = results.recent;
+      },
+      error: (err) => {
+        this.sidebarError = 'Yan panel verileri yüklenemedi';
+      },
+      complete: () => {
+        // Tüm işlemler tamamlandığında yükleme durumunu kapat
+        this.loadingSidebar = false;
+      }
+    });
+    
+    // Abonelikleri kaydet
+    this.subscriptions.push(categoriesSub, popularAuthorsSub, recentPostsSub);
+  }
+  
+  // Daha fazla yazı yüklemek için buton metodu
+  loadMorePosts() {
+    // Sayfa sınırlarını kontrol et
+    if (this.currentPage >= this.totalPages - 1 || this.loading) {
+      return;
+    }
+    
+    this.loading = true;
+    this.cdr.markForCheck();
+    
+    const sub = this.postService.getPagedPosts(this.currentPage + 1, this.pageSize, this.selectedCategory || undefined)
+      .pipe(take(1))
+      .subscribe({
+        next: (response: any) => {
+          const newPosts = response.posts || [];
           
-          const newPosts = response.posts as PostResponseDto[];
+          // Mevcut postlara ekle
           this.posts = [...this.posts, ...newPosts];
           this.filteredPosts = [...this.filteredPosts, ...newPosts];
-          this.loadingMore = false;
+          this.currentPage++;
+          this.loading = false;
           
-          console.log('Toplam post sayısı:', this.posts.length);
+          // UI'ı güncelle
+          this.cdr.markForCheck();
         },
-        error: (error) => {
-          console.error('Post yükleme hatası:', error);
-          this.error = 'Daha fazla yazı yüklenirken bir hata oluştu.';
-          this.loadingMore = false;
+        error: (err) => {
+          this.loading = false;
+          this.cdr.markForCheck();
         }
       });
-    } else {
-      console.log('Daha fazla sayfa yok. Yükleme durduruldu.');
-      this.hasMorePosts = false;
-    }
+      
+    this.subscriptions.push(sub);
   }
 
   // İlk yükleme veya kategori değişimi
@@ -98,49 +174,22 @@ export class HomeComponent implements OnInit {
     this.loading = true;
     this.error = '';
     this.currentPage = 0;
-    this.hasMorePosts = true;
-    
-    console.log('İlk postlar yükleniyor...');
     
     // Sayfalı veri getirme
-    this.postService.getPagedPosts(this.currentPage, this.pageSize, this.selectedCategory || undefined).subscribe({
+    const sub = this.postService.getPagedPosts(this.currentPage, this.pageSize, this.selectedCategory || undefined).subscribe({
       next: (response) => {
-        
         this.posts = response.posts || [];
         this.filteredPosts = response.posts || [];
         this.totalPages = response.totalPages || 0;
-        
-        // totalPages 1'den büyükse daha fazla post vardır
-        this.hasMorePosts = response.totalPages > 1;
-        
-        
-        
-        if (isInitialLoad) {
-          // İlk yüklemede kategorileri ve popüler yazarları hesapla
-          this.postService.getAllPosts().subscribe(allPosts => {
-            this.categories = [...new Set(allPosts.map(post => post.categoryName))].sort();
-            this.authorStats = allPosts.reduce((acc: { [key: string]: number }, post) => {
-              acc[post.userEmail] = (acc[post.userEmail] || 0) + 1;
-              return acc;
-            }, {});
-            this.popularAuthors = Object.entries(this.authorStats)
-              .sort(([,a], [,b]) => b - a)
-              .slice(0, 5)
-              .map(([author]) => author);
-            this.recentPosts = [...allPosts]
-              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-              .slice(0, 5);
-          });
-        }
-        
         this.loading = false;
       },
       error: (error) => {
-        console.error('İlk sayfa yükleme hatası:', error);
         this.error = 'Blog yazıları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
         this.loading = false;
       }
     });
+    
+    this.subscriptions.push(sub);
   }
 
   filterByCategory(category: string | null) {
@@ -151,18 +200,18 @@ export class HomeComponent implements OnInit {
 
   searchPosts() {
     if (this.searchQuery.trim()) {
-      // Arama yaparken sayfalama devre dışı, normal filtre kullan
-      this.postService.getAllPosts().subscribe({
+      // Arama yaparken sayfalama devre dışı, arama API'sini çağır
+      const sub = this.postService.searchPosts(this.searchQuery).subscribe({
         next: (posts: PostResponseDto[]) => {
-          const query = this.searchQuery.toLowerCase().trim();
-          this.filteredPosts = posts.filter(post => 
-            post.title.toLowerCase().includes(query) ||
-            post.content.toLowerCase().includes(query) ||
-            post.userEmail.toLowerCase().includes(query) ||
-            post.categoryName.toLowerCase().includes(query)
-          );
+          this.filteredPosts = posts;
+        },
+        error: (err) => {
+          console.error('Arama sırasında hata:', err);
+          this.error = 'Arama yapılırken bir hata oluştu';
         }
       });
+      
+      this.subscriptions.push(sub);
     } else {
       // Arama temizlendiğinde sayfalı verileri geri yükle
       this.loadPosts();

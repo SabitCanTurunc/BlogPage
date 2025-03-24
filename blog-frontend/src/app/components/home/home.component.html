@@ -29,54 +29,70 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-content">
-        <div class="sidebar-section">
-          <h3>Kategoriler</h3>
-          <div class="category-list">
-            <button 
-              class="category-item"
-              [class.active]="selectedCategory === null"
-              (click)="filterByCategory(null)">
-              <span class="category-text">Tümü</span>
-            </button>
-            <button 
-              *ngFor="let category of categories"
-              class="category-item"
-              [class.active]="selectedCategory === category"
-              (click)="filterByCategory(category)">
-              <span class="category-text">{{ category }}</span>
-            </button>
+        <!-- Sidebar Loading Indicator -->
+        <div *ngIf="loadingSidebar" class="sidebar-loading">
+          <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Yükleniyor...</span>
           </div>
+          <p>Yan panel yükleniyor...</p>
         </div>
-
-        <div class="sidebar-section">
-          <h3>Popüler Yazarlar</h3>
-          <div class="popular-authors">
-            <div *ngFor="let author of popularAuthors" class="author-item"
-                 [routerLink]="['/user', author]"
-                 style="cursor: pointer;">
-              <img [src]="'https://ui-avatars.com/api/?name=' + author" alt="Yazar" class="author-avatar">
-              <span class="author-name">{{ author }}</span>
+        
+        <!-- Sidebar Error Message -->
+        <div *ngIf="sidebarError" class="sidebar-error">
+          <p>{{ sidebarError }}</p>
+        </div>
+        
+        <!-- Sidebar Content (only show when loaded) -->
+        <ng-container *ngIf="!loadingSidebar && !sidebarError">
+          <div class="sidebar-section">
+            <h3>Kategoriler</h3>
+            <div class="category-list">
+              <button 
+                class="category-item"
+                [class.active]="selectedCategory === null"
+                (click)="filterByCategory(null)">
+                <span class="category-text">Tümü</span>
+              </button>
+              <button 
+                *ngFor="let category of categories"
+                class="category-item"
+                [class.active]="selectedCategory === category"
+                (click)="filterByCategory(category)">
+                <span class="category-text">{{ category }}</span>
+              </button>
             </div>
           </div>
-        </div>
 
-        <div class="sidebar-section">
-          <h3>Son Yazılar</h3>
-          <div class="recent-posts">
-            <div *ngFor="let post of recentPosts" class="recent-post-item"
-                 [routerLink]="['/post', post.id]" style="cursor: pointer;">
-              <div class="recent-post-text">
-                <span class="recent-post-link">{{ post.title }}</span>
-                <span class="recent-post-date">{{ post.createdAt | date:'shortDate' }}</span>
+          <div class="sidebar-section">
+            <h3>Popüler Yazarlar</h3>
+            <div class="popular-authors">
+              <div *ngFor="let author of popularAuthors" class="author-item"
+                  [routerLink]="['/user', author]"
+                  style="cursor: pointer;">
+                <img [src]="'https://ui-avatars.com/api/?name=' + author" alt="Yazar" class="author-avatar">
+                <span class="author-name">{{ author }}</span>
               </div>
             </div>
           </div>
-        </div>
+
+          <div class="sidebar-section">
+            <h3>Son Yazılar</h3>
+            <div class="recent-posts">
+              <div *ngFor="let post of recentPosts" class="recent-post-item"
+                  [routerLink]="['/post', post.id]" style="cursor: pointer;">
+                <div class="recent-post-text">
+                  <span class="recent-post-link">{{ post.title }}</span>
+                  <span class="recent-post-date">{{ post.createdAt | date:'shortDate' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
       </div>
     </aside>
 
     <!-- Posts Grid -->
-    <div class="posts-section" infiniteScroll [scrollThreshold]="400" [scrollDebounce]="300" (scrolled)="onScroll()">
+    <div class="posts-section">
       <div class="search-container">
         <div class="search-box">
           <input 
@@ -124,26 +140,26 @@
         </article>
       </div>
 
-      <!-- Infinite Scroll Loading Indicator -->
-      <div *ngIf="loadingMore" class="loading-more">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Yükleniyor...</span>
-        </div>
-        <p>Daha fazla yazı yükleniyor...</p>
-      </div>
-      
-      <!-- Daha fazlasını görüntüle butonu -->
-      <div *ngIf="hasMorePosts && !loadingMore && !loading" class="load-more-container">
+      <!-- Daha Fazla Yükle Butonu -->
+      <div *ngIf="!loading && currentPage < totalPages - 1 && filteredPosts.length > 0" class="load-more-container">
         <button (click)="loadMorePosts()" class="load-more-button">
-          Daha Fazlasını Görüntüle
+          <span>Daha Fazla Yazı Yükle</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/>
+            <path d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
           </svg>
         </button>
       </div>
+
+      <!-- Infinite Scroll Loading Indicator -->
+      <div *ngIf="loading && currentPage > 0" class="loading-more">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Yükleniyor...</span>
+        </div>
+        <p>Yazılar yükleniyor...</p>
+      </div>
       
       <!-- End of Results Message -->
-      <div *ngIf="!hasMorePosts && filteredPosts.length > 0 && !loadingMore && !loading && !searchQuery" class="end-of-results">
+      <div *ngIf="currentPage >= totalPages - 1 && filteredPosts.length > 0 && !loading && !searchQuery" class="end-of-results">
         <p>Tüm yazılar yüklendi.</p>
       </div>
 
@@ -159,11 +175,13 @@
         </div>
       </div>
 
+      <!-- Error Message -->
       <div *ngIf="error" class="alert alert-danger">
         {{ error }}
       </div>
 
-      <div *ngIf="loading" class="loading-spinner">
+      <!-- Initial Loading Spinner -->
+      <div *ngIf="loading && currentPage === 1" class="loading-spinner">
         <div class="spinner">
           <div class="spinner-inner"></div>
         </div>

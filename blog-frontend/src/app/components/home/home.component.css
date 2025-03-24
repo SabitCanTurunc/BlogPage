@@ -1217,44 +1217,83 @@
   opacity: 0.7;
 }
 
-/* Daha Fazlasını Görüntüle Butonu */
+/* Daha Fazla Yükle Butonu */
 .load-more-container {
   display: flex;
   justify-content: center;
-  margin: 2rem 0;
+  margin: 30px 0;
+  width: 100%;
 }
 
 .load-more-button {
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  padding: 12px 24px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
 }
 
 .load-more-button:hover {
-  background-color: #2563eb;
+  background-color: #0069d9;
   transform: translateY(-2px);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
 }
 
 .load-more-button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.load-more-button span {
+  margin-right: 8px;
 }
 
 .load-more-button svg {
-  transition: transform 0.2s ease;
+  transition: transform 0.3s ease;
 }
 
 .load-more-button:hover svg {
-  transform: translateY(2px);
+  transform: translateX(4px);
+}
+
+/* Sidebar Loading ve Error Styles */
+.sidebar-loading,
+.sidebar-error {
+  padding: 20px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.sidebar-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+}
+
+.sidebar-loading p {
+  margin-top: 10px;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.sidebar-error {
+  color: #dc3545;
+  padding: 15px;
+  background-color: rgba(220, 53, 69, 0.1);
+  border-radius: 5px;
+}
+
+.sidebar-error p {
+  margin: 0;
+  font-size: 14px;
 }
