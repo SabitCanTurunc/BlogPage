@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { ErrorHandlerUtil } from '../utils/error-handler.util';
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +14,7 @@ export class ImageService {
   constructor(private http: HttpClient) { }
 
   private handleError = (error: HttpErrorResponse) => {
-    if (error.status === 0) {
-      return throwError(() => new Error('Sunucuya bağlanılamıyor. Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.'));
-    }
-    
-    const errorMessage = error.error?.message || 'Resim yüklenirken bir hata oluştu.';
+    const errorMessage = ErrorHandlerUtil.handleError(error, 'Resim yüklenirken bir hata oluştu');
     return throwError(() => new Error(errorMessage));
   }
 

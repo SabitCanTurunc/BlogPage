@@ -5,6 +5,7 @@ import { catchError, retry, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { PostResponseDto } from '../models/post-response.dto';
 import { AuthService } from './auth.service';
+import { ErrorHandlerUtil } from '../utils/error-handler.util';
 
 @Injectable({
   providedIn: 'root'
@@ -26,15 +27,7 @@ export class PostService {
   }
 
   private handleError = (error: HttpErrorResponse) => {
-    if (error.status === 0) {
-      return throwError(() => new Error('Sunucuya bağlanılamıyor. Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.'));
-    }
-    
-    if (error.status === 401) {
-      return throwError(() => new Error('Oturum süresi dolmuş olabilir. Lütfen tekrar giriş yapın.'));
-    }
-    
-    const errorMessage = error.error?.message || 'Bilinmeyen bir hata oluştu.';
+    const errorMessage = ErrorHandlerUtil.handleError(error, 'Blog yazıları yüklenirken bir hata oluştu');
     return throwError(() => new Error(errorMessage));
   }
 

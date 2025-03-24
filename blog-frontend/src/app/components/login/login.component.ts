@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { ErrorHandlerUtil } from '../../utils/error-handler.util';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ export class LoginComponent {
   error: string = '';
   isLoading: boolean = false;
   showPassword: boolean = false;
+  redirectingMessage: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -32,6 +34,7 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this.isLoading = true;
       this.error = '';
+      this.redirectingMessage = false;
       
       const { email, password } = this.loginForm.value;
       
@@ -45,16 +48,26 @@ export class LoginComponent {
         error: (err) => {
           this.isLoading = false;
           
-          if (err.message && err.message.includes('Hesabınız henüz doğrulanmamış')) {
-            this.error = `${err.message} <br><br>Doğrulama sayfasına yönlendiriliyorsunuz... <div class="spinner"><i class="fas fa-spinner fa-spin"></i></div>`;
+          // ErrorHandlerUtil ile hata mesajını al
+          const errorMessage = ErrorHandlerUtil.handleError(err, 'Giriş yapılamadı');
+          
+          if (errorMessage.includes('doğrulanmamış') || 
+              errorMessage.includes('UNVERIFIED') ||
+              (err.error?.message && (
+                err.error.message.includes('not verified') ||
+                err.error.message.includes('UNVERIFIED')
+              ))) {
+            this.redirectingMessage = true;
+            this.error = 'E-posta adresiniz henüz doğrulanmamış, lütfen e-postanızı kontrol edin.';
             
+            // 3 saniye sonra yönlendir
             setTimeout(() => {
               this.router.navigate(['/verify-email'], { 
                 queryParams: { email: this.loginForm.get('email')?.value } 
               });
-            }, 4000);
+            }, 3000);
           } else {
-            this.error = err.message;
+            this.error = errorMessage;
           }
           
           this.loginForm.get('password')?.reset();

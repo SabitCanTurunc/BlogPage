@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { CommentService } from '../../services/comment.service';
 import { AuthService } from '../../services/auth.service';
 import { Comment } from '../../models/comment.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-comment',
@@ -114,7 +115,6 @@ import { Comment } from '../../models/comment.model';
       border-radius: 8px;
       font-size: 1rem;
       background: rgba(20, 20, 40, 0.6);
-
       color: #ffffff;
       transition: all 0.3s ease;
       resize: vertical;
@@ -248,57 +248,74 @@ import { Comment } from '../../models/comment.model';
     
     .comment-item {
       background: rgba(40, 40, 80, 0.5);
-      padding: 1.5rem;
       border-radius: 12px;
       margin-bottom: 1.5rem;
-      box-shadow: 0 0 15px rgba(80, 0, 255, 0.2);
+      padding: 1.25rem;
+      border: 1px solid rgba(255, 0, 230, 0.2);
+      box-shadow: 0 4px 15px rgba(10, 10, 26, 0.2);
       transition: all 0.3s ease;
-      border: 1px solid rgba(255, 0, 230, 0.3);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .comment-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(to bottom, #5000ff, #ff00e6);
+      border-radius: 4px 0 0 4px;
     }
     
     .comment-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 20px rgba(255, 0, 230, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(10, 10, 26, 0.3);
+      border-color: rgba(255, 0, 230, 0.3);
     }
     
     .comment-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid rgba(255, 0, 230, 0.3);
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 0.75rem;
     }
     
     .comment-author {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
     }
     
     .author-avatar {
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      border: 2px solid #ff00e6;
-      box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
+      margin-right: 0.5rem;
+      border: 2px solid rgba(255, 0, 230, 0.3);
+      box-shadow: 0 0 10px rgba(80, 0, 255, 0.2);
     }
     
     .author-name {
       font-weight: 600;
-      color: #ffffff;
+      color: #ff00e6;
+      text-shadow: 0 0 5px rgba(255, 0, 230, 0.3);
     }
     
     .comment-date {
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       color: rgba(255, 255, 255, 0.7);
+      font-style: italic;
     }
     
     .comment-content {
-      font-size: 1.1rem;
       line-height: 1.6;
       color: #ffffff;
-      white-space: pre-wrap;
+      font-size: 1rem;
+      word-break: break-word;
     }
     
     .comment-actions {
@@ -308,34 +325,50 @@ import { Comment } from '../../models/comment.model';
     }
     
     .btn-delete {
-      background: none;
-      border: none;
-      color: #ff00e6;
-      font-size: 0.875rem;
+      background: rgba(220, 53, 69, 0.2);
+      color: #ff3b30;
+      border: 1px solid rgba(220, 53, 69, 0.3);
+      border-radius: 50px;
+      padding: 0.4rem 1rem;
+      font-size: 0.9rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      text-shadow: 0 0 5px rgba(255, 0, 230, 0.5);
+      font-family: 'Poppins', sans-serif;
+      box-shadow: 0 0 10px rgba(220, 53, 69, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    .btn-delete::before {
+      content: '🗑️';
+      font-size: 0.9rem;
     }
     
     .btn-delete:hover {
-      color: #ffffff;
-      text-decoration: underline;
-      text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
+      background: rgba(220, 53, 69, 0.3);
+      box-shadow: 0 0 15px rgba(220, 53, 69, 0.2);
+      transform: translateY(-2px);
     }
     
-    @media (max-width: 768px) {
+    @media (max-width: 576px) {
       .comment-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.5rem;
       }
       
       .comment-date {
+        margin-top: 0.5rem;
         font-size: 0.8rem;
       }
       
-      .comment-content {
-        font-size: 1rem;
+      .comment-actions {
+        margin-top: 0.5rem;
+      }
+      
+      .btn-delete {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
       }
     }
   `]
@@ -436,22 +469,63 @@ export class CommentComponent implements OnInit {
   deleteComment(commentId?: number): void {
     if (!commentId) return;
     
-    if (confirm('Bu yorumu silmek istediğinizden emin misiniz?')) {
-      this.commentService.deleteComment(commentId).subscribe({
-        next: () => {
-          this.comments = this.comments.filter(c => c.id !== commentId);
-          this.success = 'Yorum başarıyla silindi.';
-          
-          // 3 saniye sonra başarı mesajını kaldır
-          setTimeout(() => {
-            this.success = '';
-          }, 3000);
-        },
-        error: (err) => {
-          console.error('Yorum silinirken hata oluştu:', err);
-          this.error = 'Yorum silinirken bir hata oluştu.';
-        }
-      });
-    }
+    Swal.fire({
+      title: 'Yorumu Sil',
+      text: 'Bu yorumu silmek istediğinizden emin misiniz?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Evet, Sil',
+      cancelButtonText: 'İptal',
+      background: '#1a1a2e',
+      color: '#ffffff',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title',
+        htmlContainer: 'modern-swal-content',
+        confirmButton: 'modern-swal-confirm',
+        cancelButton: 'modern-swal-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.commentService.deleteComment(commentId).subscribe({
+          next: () => {
+            this.comments = this.comments.filter(c => c.id !== commentId);
+            
+            Swal.fire({
+              title: 'Başarılı',
+              text: 'Yorum başarıyla silindi.',
+              icon: 'success',
+              background: '#1a1a2e',
+              color: '#ffffff',
+              timer: 3000,
+              showConfirmButton: false,
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
+            });
+          },
+          error: (err) => {
+            console.error('Yorum silinirken hata oluştu:', err);
+            
+            Swal.fire({
+              title: 'Hata',
+              text: 'Yorum silinirken bir hata oluştu.',
+              icon: 'error',
+              background: '#1a1a2e',
+              color: '#ffffff',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
+            });
+          }
+        });
+      }
+    });
   }
 }

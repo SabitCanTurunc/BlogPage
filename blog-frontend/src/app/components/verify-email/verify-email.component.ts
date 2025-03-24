@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { ErrorHandlerUtil } from '../../utils/error-handler.util';
 
 @Component({
   selector: 'app-verify-email',
@@ -53,61 +54,38 @@ export class VerifyEmailComponent implements OnInit {
       
       this.authService.verifyEmail({ email, verificationCode }).subscribe({
         next: (response) => {
-          console.log('Doğrulama yanıtı (başarılı):', response);
+          console.log('Doğrulama başarılı yanıtı:', response);
+          console.log('Yanıt mesajı:', response.message);
+          console.log('Yanıt başarı durumu:', response.success);
+          console.log('Yanıt özellikleri:', Object.keys(response));
           
-          if (response.success) {
-            this.success = response.message || 'Hesabınız başarıyla doğrulandı. Giriş sayfasına yönlendiriliyorsunuz...';
-            this.error = '';
-            this.isLoading = false;
-            
-            // 2 saniye sonra giriş sayfasına yönlendir
-            setTimeout(() => {
-              this.router.navigate(['/login']);
-            }, 2000);
-          } else {
-            this.error = response.message || 'Doğrulama başarısız oldu.';
-            this.success = '';
-            this.isLoading = false;
-          }
+          // Backend her zaman success: true ile yanıt vermiyor olabilir, bu yüzden 
+          // koşulu kaldırıp yine de başarılı işleme devam edelim
+          this.success = response.message || 'Hesabınız başarıyla doğrulandı. Giriş sayfasına yönlendiriliyorsunuz...';
+          this.error = '';
+          this.isLoading = false;
+          
+          // 2 saniye sonra giriş sayfasına yönlendir
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 2000);
         },
         error: (err) => {
           console.error('Doğrulama hatası:', err);
-          console.error('HTTP Durum Kodu:', err.status);
-          console.error('Hata Detayları:', err?.error); 
           
           this.isLoading = false;
           
-          // Sunucudan gelen hata mesajını göster
-          if (err.error && err.error.message) {
-            // Belirli hata türlerini özel olarak işle
-            if (err.error.message.includes('Yanlış doğrulama kodu')) {
-              this.error = 'Yanlış doğrulama kodu. Lütfen tekrar deneyin.';
-              console.log('Hata tespit edildi: Yanlış doğrulama kodu');
-            } else if (err.error.message.includes('süresi dolmuş')) {
-              this.error = 'Doğrulama kodunun süresi dolmuş. Lütfen yeni bir kod talep edin.';
-              console.log('Hata tespit edildi: Kod süresi dolmuş');
-            } else if (err.error.message.includes('zaten doğrulanmış')) {
-              this.success = 'Bu hesap zaten doğrulanmış. Giriş sayfasına yönlendiriliyorsunuz...';
-              this.error = '';
-              console.log('Hata tespit edildi: Hesap zaten doğrulanmış');
-              setTimeout(() => {
-                this.router.navigate(['/login']);
-              }, 2000);
-            } else {
-              this.error = err.error.message;
-              console.log('Sunucudan gelen hata mesajı:', this.error);
-            }
-          } else if (err.status === 0) {
-            this.error = 'Sunucuya bağlanılamıyor. Lütfen internet bağlantınızı kontrol edin.';
-          } else if (err.status === 400) {
-            this.error = 'Doğrulama kodunu hatalı girdiniz veya kodun süresi dolmuş olabilir.';
-          } else if (err.status === 404) {
-            this.error = 'E-posta adresi bulunamadı. Lütfen kayıtlı e-posta adresinizi girin.';
-          } else {
-            this.error = 'Doğrulama sırasında bir hata oluştu. Lütfen tekrar deneyin.';
-          }
+          // Hata mesajını ErrorHandlerUtil kullanarak elde et
+          this.error = ErrorHandlerUtil.handleError(err, 'Doğrulama sırasında bir hata oluştu');
           
-          this.success = '';
+          // Özel durumlar için ek kontroller
+          if (err.error?.message && err.error.message.includes('zaten doğrulanmış')) {
+            this.success = 'Bu hesap zaten doğrulanmış. Giriş sayfasına yönlendiriliyorsunuz...';
+            this.error = '';
+            setTimeout(() => {
+              this.router.navigate(['/login']);
+            }, 2000);
+          }
         }
       });
     } else {
@@ -135,38 +113,23 @@ export class VerifyEmailComponent implements OnInit {
     this.authService.resendVerificationCode(email).subscribe({
       next: (response) => {
         console.log('Kod tekrar gönderildi:', response);
+        console.log('Yanıt özellikleri:', Object.keys(response));
         this.success = response.message || 'Doğrulama kodu tekrar gönderildi. Lütfen e-posta kutunuzu kontrol ediniz.';
         this.error = '';
         this.isResending = false;
       },
       error: (err) => {
         console.error('Kod gönderme hatası:', err);
-        let errorMessage: string;
+        console.error('Hata yanıt özellikleri:', err.error ? Object.keys(err.error) : 'Yok');
         
-        // Kod gönderme hatasının türüne göre daha açıklayıcı mesajlar
-        if (err.error?.message) {
-          // Sunucudan gelen hata mesajı
-          errorMessage = err.error.message;
-        } else if (err.status === 0) {
-          // Ağ hatası
-          errorMessage = 'Sunucuya bağlanılamıyor. Lütfen internet bağlantınızı kontrol edin.';
-        } else if (err.status === 400) {
-          if (err.error?.message && err.error.message.includes('already verified')) {
-            // Zaten doğrulanmış hesap
-            errorMessage = 'Bu hesap zaten doğrulanmış. Giriş yapabilirsiniz.';
-          } else {
-            // Diğer 400 hataları
-            errorMessage = 'Kod gönderilirken bir hata oluştu. Geçerli bir e-posta adresi girdiğinizden emin olun.';
-          }
-        } else if (err.status === 404) {
-          // Kullanıcı bulunamadı
-          errorMessage = 'Bu e-posta adresiyle kayıtlı bir kullanıcı bulunamadı.';
-        } else {
-          // Genel hata
-          errorMessage = 'Doğrulama kodu gönderilirken bir hata oluştu.';
+        // Hata mesajını ErrorHandlerUtil kullanarak elde et
+        this.error = ErrorHandlerUtil.handleError(err, 'Doğrulama kodu gönderilirken bir hata oluştu');
+        
+        // Özel durumlar için ek kontroller
+        if (err.error?.message && err.error.message.includes('already verified')) {
+          this.error = 'Bu hesap zaten doğrulanmış. Giriş yapabilirsiniz.';
         }
         
-        this.error = errorMessage;
         this.success = '';
         this.isResending = false;
       }

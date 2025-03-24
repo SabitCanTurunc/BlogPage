@@ -169,28 +169,6 @@ export class UserProfileComponent implements OnInit {
     });
   }
   
-  // Doğrulama kodunu yeniden gönder
-  resendPasswordResetCode(): void {
-    this.isResendingCode = true;
-    this.passwordResetError = '';
-    this.passwordResetSuccess = '';
-    
-    this.authService.forgotPassword(this.userEmail).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.passwordResetSuccess = 'Doğrulama kodu tekrar gönderildi. Lütfen e-posta kutunuzu kontrol ediniz.';
-        } else {
-          this.passwordResetError = response.message || 'Doğrulama kodu gönderilemedi.';
-        }
-        this.isResendingCode = false;
-      },
-      error: (err) => {
-        this.passwordResetError = err.message || 'Doğrulama kodu gönderilirken bir hata oluştu.';
-        this.isResendingCode = false;
-      }
-    });
-  }
-  
   // Şifre değiştirme işlemi
   updatePassword(): void {
     if (this.passwordForm.valid) {
@@ -201,10 +179,14 @@ export class UserProfileComponent implements OnInit {
       const verificationCode = this.passwordForm.get('verificationCode')?.value;
       const newPassword = this.passwordForm.get('newPassword')?.value;
       
+      console.log('Şifre sıfırlama başlatılıyor:', { email: this.userEmail, codeLength: verificationCode?.length });
+      
       this.authService.resetPassword(this.userEmail, verificationCode, newPassword).subscribe({
         next: (response) => {
+          console.log('Şifre sıfırlama başarılı:', response);
+          
           if (response.success) {
-            this.passwordResetSuccess = 'Şifreniz başarıyla değiştirildi.';
+            this.passwordResetSuccess = response.message || 'Şifreniz başarıyla değiştirildi.';
             this.passwordForm.reset();
             
             // 3 saniye sonra adım 1'e dön
@@ -219,11 +201,71 @@ export class UserProfileComponent implements OnInit {
           this.isSubmittingPassword = false;
         },
         error: (err) => {
-          this.passwordResetError = err.message || 'Şifre değiştirme sırasında bir hata oluştu.';
+          console.error('Şifre sıfırlama hatası:', err);
+          console.error('Hata detayları:', err.error);
+          
+          // Backend'den gelen detaylı hata mesajını göster
+          if (err.error?.customException?.message) {
+            // Backend üzerinde oluşturulan özel hata mesajı
+            this.passwordResetError = err.error.customException.message;
+          } else if (err.error?.message) {
+            // Standart hata mesajı
+            this.passwordResetError = err.error.message;
+          } else if (err.message) {
+            // Error sınıfı üzerindeki mesaj
+            this.passwordResetError = err.message;
+          } else {
+            // Genel hata mesajı
+            this.passwordResetError = 'Şifre değiştirme sırasında bir hata oluştu. Lütfen tekrar deneyin.';
+          }
+          
           this.isSubmittingPassword = false;
         }
       });
     }
+  }
+  
+  // Doğrulama kodunu yeniden gönder
+  resendPasswordResetCode(): void {
+    this.isResendingCode = true;
+    this.passwordResetError = '';
+    this.passwordResetSuccess = '';
+    
+    console.log('Kod yeniden gönderme isteği:', this.userEmail);
+    
+    this.authService.forgotPassword(this.userEmail).subscribe({
+      next: (response) => {
+        console.log('Kod yeniden gönderme başarılı:', response);
+        
+        if (response.success) {
+          this.passwordResetSuccess = response.message || 'Doğrulama kodu tekrar gönderildi. Lütfen e-posta kutunuzu kontrol ediniz.';
+        } else {
+          this.passwordResetError = response.message || 'Doğrulama kodu gönderilemedi.';
+        }
+        this.isResendingCode = false;
+      },
+      error: (err) => {
+        console.error('Kod yeniden gönderme hatası:', err);
+        console.error('Hata detayları:', err.error);
+        
+        // Backend'den gelen detaylı hata mesajını göster
+        if (err.error?.customException?.message) {
+          // Backend üzerinde oluşturulan özel hata mesajı
+          this.passwordResetError = err.error.customException.message;
+        } else if (err.error?.message) {
+          // Standart hata mesajı
+          this.passwordResetError = err.error.message;
+        } else if (err.message) {
+          // Error sınıfı üzerindeki mesaj
+          this.passwordResetError = err.message;
+        } else {
+          // Genel hata mesajı
+          this.passwordResetError = 'Doğrulama kodu gönderilirken bir hata oluştu. Lütfen tekrar deneyin.';
+        }
+        
+        this.isResendingCode = false;
+      }
+    });
   }
   
   confirmDeletePost(post: PostResponseDto): void {

@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { catchError, of } from 'rxjs';
+import { ErrorHandlerUtil } from '../../utils/error-handler.util';
 
 @Component({
   selector: 'app-home',
@@ -73,7 +74,7 @@ export class HomeComponent implements OnInit {
         this.categories = categories;
       },
       error: (err: any) => {
-        this.sidebarError = 'Yan panel verileri yüklenemedi';
+        this.sidebarError = ErrorHandlerUtil.handleError(err, 'Kategoriler yüklenemedi');
       }
     });
     
@@ -83,7 +84,7 @@ export class HomeComponent implements OnInit {
       },
       error: (err: any) => {
         if (!this.sidebarError) {
-          this.sidebarError = 'Yan panel verileri yüklenemedi';
+          this.sidebarError = ErrorHandlerUtil.handleError(err, 'Popüler yazarlar yüklenemedi');
         }
       }
     });
@@ -94,7 +95,7 @@ export class HomeComponent implements OnInit {
       },
       error: (err: any) => {
         if (!this.sidebarError) {
-          this.sidebarError = 'Yan panel verileri yüklenemedi';
+          this.sidebarError = ErrorHandlerUtil.handleError(err, 'Son yazılar yüklenemedi');
         }
       }
     });
@@ -123,7 +124,7 @@ export class HomeComponent implements OnInit {
         if (results.recent.length > 0) this.recentPosts = results.recent;
       },
       error: (err) => {
-        this.sidebarError = 'Yan panel verileri yüklenemedi';
+        this.sidebarError = ErrorHandlerUtil.handleError(err, 'Yan panel verileri yüklenemedi');
       },
       complete: () => {
         // Tüm işlemler tamamlandığında yükleme durumunu kapat
@@ -162,6 +163,7 @@ export class HomeComponent implements OnInit {
         },
         error: (err) => {
           this.loading = false;
+          this.error = ErrorHandlerUtil.handleError(err, 'Daha fazla yazı yüklenirken bir hata oluştu');
           this.cdr.markForCheck();
         }
       });
@@ -184,7 +186,7 @@ export class HomeComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'Blog yazıları yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+        this.error = ErrorHandlerUtil.handleError(error, 'Blog yazıları yüklenirken bir hata oluştu');
         this.loading = false;
       }
     });
@@ -207,7 +209,7 @@ export class HomeComponent implements OnInit {
         },
         error: (err) => {
           console.error('Arama sırasında hata:', err);
-          this.error = 'Arama yapılırken bir hata oluştu';
+          this.error = ErrorHandlerUtil.handleError(err, 'Arama yapılırken bir hata oluştu');
         }
       });
       

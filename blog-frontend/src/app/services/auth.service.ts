@@ -5,6 +5,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
+import { ErrorHandlerUtil } from '../utils/error-handler.util';
 
 export interface UserRequestDto {
   username: string;
@@ -59,48 +60,8 @@ export class AuthService {
   }
 
   private handleError = (error: HttpErrorResponse) => {
-    if (error.error?.customException?.message) {
-      const errorMessage = error.error.customException.message;
-      const translatedMessage = this.translateErrorMessage(errorMessage);
-      return throwError(() => new Error(translatedMessage || errorMessage));
-    } else if (error.status === 0) {
-      return throwError(() => new Error('Sunucuya bağlanılamıyor'));
-    } else if (error.error?.message) {
-      const errorMessage = error.error.message;
-      const translatedMessage = this.translateErrorMessage(errorMessage);
-      return throwError(() => new Error(translatedMessage || errorMessage));
-    } else {
-      return throwError(() => new Error('Bir hata oluştu'));
-    }
-  }
-
-  private translateErrorMessage(message: string): string | null {
-    if (message.includes('Email address is already registered')) {
-      return 'Bu e-posta adresi zaten kayıtlı.';
-    } else if (message.includes('Username is already taken')) {
-      return 'Bu kullanıcı adı zaten alınmış.';
-    } else if (message.includes('Registration failed')) {
-      return 'Kayıt işlemi başarısız oldu. Lütfen tekrar deneyin.';
-    } else if (message.includes('Invalid verification code')) {
-      return 'Geçersiz doğrulama kodu.';
-    } else if (message.includes('Verification code expired')) {
-      return 'Doğrulama kodu süresi dolmuş. Lütfen yeni kod isteyin.';
-    } else if (message.includes('Email not found')) {
-      return 'E-posta adresi bulunamadı.';
-    } else if (message.includes('Invalid credentials')) {
-      return 'Geçersiz e-posta veya şifre.';
-    } else if (message.includes('Invalid email or password')) {
-      return 'Geçersiz e-posta veya şifre.';
-    } else if (message.includes('Account not verified')) {
-      return 'Hesabınız henüz doğrulanmamış. Lütfen e-postanızı kontrol edin.';
-    } else if (message.includes('UNVERIFIED_USER')) {
-      return 'Hesabınız henüz doğrulanmamış. Lütfen e-postanıza gönderilen doğrulama kodunu kullanın.';
-    } else if (message.includes('User not found')) {
-      return 'Kullanıcı bulunamadı.';
-    } else if (message.includes('Invalid password')) {
-      return 'Geçersiz şifre.';
-    }
-    return null;
+    const errorMessage = ErrorHandlerUtil.handleError(error);
+    return throwError(() => new Error(errorMessage));
   }
 
   private loadStoredUser() {
@@ -141,7 +102,12 @@ export class AuthService {
         }),
         catchError(error => {
           if (error.error?.message === 'UNVERIFIED_USER' || 
-              (error.error?.customException?.message && error.error.customException.message.includes('UNVERIFIED_USER'))) {
+              error.error?.message?.includes('not verified') ||
+              error.error?.message?.includes('doğrulanmamış') ||
+              (error.error?.customException?.message && 
+               (error.error.customException.message.includes('UNVERIFIED_USER') || 
+                error.error.customException.message.includes('not verified') ||
+                error.error.customException.message.includes('doğrulanmamış')))) {
             console.log('Doğrulanmamış kullanıcı tespit edildi. Yönlendirme LoginComponent tarafından yapılacak.');
           }
           
@@ -154,9 +120,25 @@ export class AuthService {
     console.log('API isteği gönderiliyor:', `${environment.apiUrl}/auth/verify`, data);
     return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/verify`, data)
       .pipe(
-        tap(response => console.log('API yanıtı alındı:', response)),
+        tap(response => {
+          console.log('API yanıtı alındı:', response);
+          
+          // Başarılı yanıtı standart hale getir
+          if (!response.hasOwnProperty('success')) {
+            // Eğer response içinde success alanı yoksa, başarılı kabul et
+            console.log('Yanıtta success alanı yok, başarılı kabul edildi');
+            (response as any).success = true;
+          }
+          
+          // Yanıtın yapısını logla
+          console.log('Yanıt türü:', typeof response);
+          console.log('Yanıt özellikleri:', Object.keys(response));
+          console.log('Yanıt stringify:', JSON.stringify(response));
+        }),
         catchError(error => {
           console.error('API hatası:', error);
+          console.error('Yanıt içeriği:', error.error);
+          
           if (error.error && error.error.message && error.error.message.includes('Yanlış doğrulama kodu')) {
             console.log('Doğrulama kodu hatası algılandı');
             return throwError(() => ({
@@ -185,13 +167,56 @@ export class AuthService {
       );
   }
 
-  resetPassword(email: string, verificationCode: string, newPassword: string): Observable<{message: string, success: boolean}> {
-    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/reset-password`, {
+  resetPassword(email: string, verificatonCode: string, newPassword: string): Observable<{message: string, success: boolean}> {
+    console.log(`Şifre sıfırlama isteği:`, {
       email,
-      verificationCode,
+      verificatonCodeLength: verificatonCode?.length,
+      newPasswordLength: newPassword?.length
+    });
+
+    // Giriş kontrolü
+    if (!email || !verificatonCode || !newPassword) {
+      console.error('Şifre sıfırlama için gerekli alanlar eksik:', { 
+        emailVarMi: !!email, 
+        verificatonCodeVarMi: !!verificatonCode, 
+        newPasswordVarMi: !!newPassword 
+      });
+      return throwError(() => new Error('Gerekli bilgiler eksik. E-posta, doğrulama kodu ve yeni şifre gereklidir.'));
+    }
+
+    // Doğrulama kodu 6 basamaklı sayı olmalıdır
+    if (!/^\d{6}$/.test(verificatonCode)) {
+      console.error('Geçersiz doğrulama kodu formatı:', verificatonCode);
+      return throwError(() => new Error('Doğrulama kodu 6 basamaklı bir sayı olmalıdır.'));
+    }
+
+    // Backend'e gönderilecek veriler - backend ile uyumlu olmalı
+    const resetData = {
+      email,
+      verificatonCode, // ÖNEMLİ: Backend ile uyumlu olması için 'verificatonCode' olarak gönderilmeli (typo var)
       newPassword
-    }).pipe(
-      catchError(this.handleError)
+    };
+
+    console.log('Şifre sıfırlama isteği gönderiliyor:', resetData);
+
+    return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/reset-password`, resetData).pipe(
+      tap(response => {
+        console.log('Şifre sıfırlama yanıtı:', response);
+      }),
+      catchError(error => {
+        console.error('Şifre sıfırlama hatası:', error);
+        console.error('Hata detayları:', error.error);
+        
+        // Frontend log için spesifik hata mesajı kontrolleri
+        if (error.error?.customException?.message) {
+          console.error('Backend özel hatası:', error.error.customException.message);
+        }
+        if (error.error?.message) {
+          console.error('Genel hata mesajı:', error.error.message);
+        }
+        
+        return throwError(() => error);
+      })
     );
   }
 
