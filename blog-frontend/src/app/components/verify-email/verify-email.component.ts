@@ -36,7 +36,6 @@ export class VerifyEmailComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       const email = params['email'];
       if (email) {
-        console.log('E-posta adresi URL\'den alındı:', email);
         this.verifyForm.patchValue({ email });
       }
     });
@@ -50,17 +49,9 @@ export class VerifyEmailComponent implements OnInit {
       
       const email = this.verifyForm.get('email')?.value;
       const verificationCode = this.verifyForm.get('verificationCode')?.value;
-      console.log(`Doğrulama denemesi: Email=${email}, Kod=${verificationCode}`);
       
       this.authService.verifyEmail({ email, verificationCode }).subscribe({
         next: (response) => {
-          console.log('Doğrulama başarılı yanıtı:', response);
-          console.log('Yanıt mesajı:', response.message);
-          console.log('Yanıt başarı durumu:', response.success);
-          console.log('Yanıt özellikleri:', Object.keys(response));
-          
-          // Backend her zaman success: true ile yanıt vermiyor olabilir, bu yüzden 
-          // koşulu kaldırıp yine de başarılı işleme devam edelim
           this.success = response.message || 'Hesabınız başarıyla doğrulandı. Giriş sayfasına yönlendiriliyorsunuz...';
           this.error = '';
           this.isLoading = false;
@@ -71,8 +62,6 @@ export class VerifyEmailComponent implements OnInit {
           }, 2000);
         },
         error: (err) => {
-          console.error('Doğrulama hatası:', err);
-          
           this.isLoading = false;
           
           // Hata mesajını ErrorHandlerUtil kullanarak elde et
@@ -112,16 +101,11 @@ export class VerifyEmailComponent implements OnInit {
 
     this.authService.resendVerificationCode(email).subscribe({
       next: (response) => {
-        console.log('Kod tekrar gönderildi:', response);
-        console.log('Yanıt özellikleri:', Object.keys(response));
         this.success = response.message || 'Doğrulama kodu tekrar gönderildi. Lütfen e-posta kutunuzu kontrol ediniz.';
         this.error = '';
         this.isResending = false;
       },
       error: (err) => {
-        console.error('Kod gönderme hatası:', err);
-        console.error('Hata yanıt özellikleri:', err.error ? Object.keys(err.error) : 'Yok');
-        
         // Hata mesajını ErrorHandlerUtil kullanarak elde et
         this.error = ErrorHandlerUtil.handleError(err, 'Doğrulama kodu gönderilirken bir hata oluştu');
         

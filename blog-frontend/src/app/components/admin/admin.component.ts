@@ -58,11 +58,9 @@ export class AdminComponent implements OnInit {
     this.currentUserId = this.authService.getUserId();
     
     if (!this.isAdmin) {
-      console.log('Yetkisiz erişim denemesi');
       return;
     }
 
-    console.log('Admin erişimi onaylandı');
     this.loadUsers();
     this.loadCategories();
     this.loadPosts();
@@ -78,7 +76,6 @@ export class AdminComponent implements OnInit {
         if (err.status === 403) {
           this.router.navigate(['/login']);
         }
-        console.error('Error fetching users', err);
         this.toastr.error('Kullanıcılar yüklenirken bir hata oluştu');
       }
     });
@@ -94,14 +91,12 @@ export class AdminComponent implements OnInit {
 
     this.adminService.updateUserRole(userId, userRequestDto).subscribe({
       next: (updatedUser: UserResponseDto) => {
-        console.log('Kullanıcı rolü güncellendi:', updatedUser);
         const index = this.users.findIndex(u => u.id === userId);
         if (index !== -1) {
           this.users[index] = updatedUser;
         }
       },
       error: (error: any) => {
-        console.error('Rol güncellenirken hata:', error);
         if (error.status === 401) {
           this.router.navigate(['/login']);
         }
@@ -167,7 +162,6 @@ export class AdminComponent implements OnInit {
         this.filteredCategories = [...this.categories];
       },
       error: (err: any) => {
-        console.error('Error fetching categories', err);
         this.toastr.error('Kategoriler yüklenirken bir hata oluştu');
       }
     });
@@ -203,7 +197,6 @@ export class AdminComponent implements OnInit {
 
     this.categoryService.updateCategory(category.id, categoryRequestDto).subscribe({
       next: (updatedCategory) => {
-        console.log('Kategori güncellendi:', updatedCategory);
         const index = this.categories.findIndex(c => c.id === category.id);
         if (index !== -1) {
           this.categories[index] = updatedCategory;

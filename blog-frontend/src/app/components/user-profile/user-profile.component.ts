@@ -75,40 +75,33 @@ export class UserProfileComponent implements OnInit {
       if (params['email']) {
         // URL'den email parametresi alındı, başka bir kullanıcının profili görüntüleniyor
         this.viewedUserEmail = params['email'];
-        this.isOwnProfile = this.viewedUserEmail === this.authService.getUserEmail();
-        this.checkAuth();
+        this.isOwnProfile = this.authService.isLoggedIn() && this.viewedUserEmail === this.authService.getUserEmail();
         this.loadUserPosts(this.viewedUserEmail);
+        this.loadUserProfileByEmail(this.viewedUserEmail);
       } else {
         // Parametre yok, kendi profili görüntüleniyor
+        if (!this.authService.isLoggedIn()) {
+          this.router.navigate(['/login']);
+          return;
+        }
         this.isOwnProfile = true;
-        this.checkAuth();
         this.loadUserPosts(this.userEmail);
-      }
-      
-      if (this.isOwnProfile) {
         this.loadUserProfile();
       }
     });
-  }
-  
-  checkAuth(): void {
-    if (this.isOwnProfile && !this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
-      return;
-    }
     
+    // Sadece email'i ayarla, isAdmin kontrolü loadUserProfile ve loadUserProfileByEmail metodlarında yapılıyor
     this.userEmail = this.authService.getUserEmail() || '';
-    this.isAdmin = this.authService.isAdmin();
   }
   
   loadUserPosts(email: string): void {
     this.postService.getAllPosts().subscribe({
       next: (posts) => {
         this.userPosts = posts.filter(post => post.userEmail === email);
-        this.filteredPosts = [...this.userPosts]; // Filtrelenmiş postları başlangıçta tüm postlar olarak ayarla
+        this.filteredPosts = [...this.userPosts];
       },
       error: (err) => {
-        console.error('Kullanıcı yazıları yüklenirken hata oluştu:', err);
+        // Sessizce devam et
       }
     });
   }
@@ -130,10 +123,50 @@ export class UserProfileComponent implements OnInit {
           if (userData.profileImageUrl) {
             this.userProfileImage = userData.profileImageUrl;
           }
+
+          this.isAdmin = userData.role === 'ADMIN';
         }
       },
       error: (err) => {
-        console.error('Kullanıcı profili yüklenirken hata oluştu:', err);
+        const errorMessage = err.error?.customException?.message || err.error?.message || 'Profil bilgileri yüklenirken bir hata oluştu.';
+        Swal.fire({
+          title: 'Hata',
+          text: errorMessage,
+          icon: 'error',
+          background: '#1a1a2e',
+          color: '#ffffff',
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content'
+          }
+        });
+      }
+    });
+  }
+  
+  loadUserProfileByEmail(email: string): void {
+    this.userService.getUserProfileByEmail(email).subscribe({
+      next: (userData) => {
+        if (userData) {
+          this.accountForm.patchValue({
+            username: userData.username || '',
+            email: userData.email || '',
+            name: userData.name || '',
+            surname: userData.surname || '',
+            phoneNumber: userData.phoneNumber || '',
+            gender: userData.gender || '',
+            description: userData.description || ''
+          });
+          
+          if (userData.profileImageUrl) {
+            this.userProfileImage = userData.profileImageUrl;
+          }
+
+          this.isAdmin = userData.role === 'ADMIN';
+        }
+      },
+      error: (err) => {
         const errorMessage = err.error?.customException?.message || err.error?.message || 'Profil bilgileri yüklenirken bir hata oluştu.';
         Swal.fire({
           title: 'Hata',
@@ -236,12 +269,8 @@ export class UserProfileComponent implements OnInit {
       const verificationCode = this.passwordForm.get('verificationCode')?.value;
       const newPassword = this.passwordForm.get('newPassword')?.value;
       
-      console.log('Şifre sıfırlama başlatılıyor:', { email: this.userEmail, codeLength: verificationCode?.length });
-      
       this.authService.resetPassword(this.userEmail, verificationCode, newPassword).subscribe({
         next: (response) => {
-          console.log('Şifre sıfırlama başarılı:', response);
-          
           if (response.success) {
             this.passwordResetSuccess = response.message || 'Şifreniz başarıyla değiştirildi.';
             this.passwordForm.reset();
@@ -258,9 +287,6 @@ export class UserProfileComponent implements OnInit {
           this.isSubmittingPassword = false;
         },
         error: (err) => {
-          console.error('Şifre sıfırlama hatası:', err);
-          console.error('Hata detayları:', err.error);
-          
           // Backend'den gelen detaylı hata mesajını göster
           if (err.error?.customException?.message) {
             // Backend üzerinde oluşturulan özel hata mesajı
@@ -288,12 +314,8 @@ export class UserProfileComponent implements OnInit {
     this.passwordResetError = '';
     this.passwordResetSuccess = '';
     
-    console.log('Kod yeniden gönderme isteği:', this.userEmail);
-    
     this.authService.forgotPassword(this.userEmail).subscribe({
       next: (response) => {
-        console.log('Kod yeniden gönderme başarılı:', response);
-        
         if (response.success) {
           this.passwordResetSuccess = response.message || 'Doğrulama kodu tekrar gönderildi. Lütfen e-posta kutunuzu kontrol ediniz.';
         } else {
@@ -302,9 +324,6 @@ export class UserProfileComponent implements OnInit {
         this.isResendingCode = false;
       },
       error: (err) => {
-        console.error('Kod yeniden gönderme hatası:', err);
-        console.error('Hata detayları:', err.error);
-        
         // Backend'den gelen detaylı hata mesajını göster
         if (err.error?.customException?.message) {
           // Backend üzerinde oluşturulan özel hata mesajı

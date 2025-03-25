@@ -240,34 +240,23 @@
 }
 
 .sidebar-section {
-  margin-bottom: 2rem;
-}
-
-.sidebar-section:last-child {
-  margin-bottom: 0;
+  background: rgba(10, 10, 26, 0.6);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 0, 230, 0.3);
+  box-shadow: 0 0 20px rgba(80, 0, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .sidebar-section h3 {
-  color: #ff00e6;
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  font-weight: 700;
-  position: relative;
-  padding-bottom: 0.5rem;
-  font-family: "Orbitron", sans-serif;
-  letter-spacing: 1px;
-}
-
-.sidebar-section h3::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 50px;
-  height: 3px;
-  background: linear-gradient(45deg, #5000ff, #ff00e6);
-  border-radius: 3px;
-  box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
+  color: #ffffff;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  text-shadow: 0 0 10px rgba(255, 0, 230, 0.5);
 }
 
 .category-list {
@@ -311,7 +300,7 @@
   border: 1px solid rgba(255, 0, 230, 0.5);
 }
 
-/* Popular Authors */
+/* Popüler Yazarlar */
 .popular-authors {
   display: flex;
   flex-direction: column;
@@ -319,22 +308,23 @@
 }
 
 .author-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  transition: all 0.3s;
-  background: rgba(80, 0, 255, 0.1);
-  border: 1px solid rgba(255, 0, 230, 0.2);
-  width: 100%;
-  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.author-item:hover {
+.author-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.author-link:hover {
   background: rgba(255, 0, 230, 0.2);
-  transform: translateX(5px) scale(1.02);
-  box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
+  transform: translateX(5px);
 }
 
 .author-avatar {
@@ -344,24 +334,28 @@
   border: 2px solid #ff00e6;
   box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
   transition: all 0.3s;
+  object-fit: cover;
 }
 
-.author-item:hover .author-avatar {
-  border-color: rgba(80, 0, 255, 0.8);
+.author-link:hover .author-avatar {
   transform: scale(1.1);
+  border-color: rgba(80, 0, 255, 0.8);
   box-shadow: 0 0 15px rgba(80, 0, 255, 0.8);
 }
 
-.author-name {
-  color: #ffffff;
-  font-size: 0.9rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 180px;
+.author-info {
+  display: flex;
+  flex-direction: column;
 }
 
-/* Recent Posts */
+.author-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ffffff;
+  text-shadow: 0 0 5px rgba(255, 0, 230, 0.5);
+}
+
+/* Son Yazılar */
 .recent-posts {
   display: flex;
   flex-direction: column;
@@ -369,54 +363,41 @@
 }
 
 .recent-post-item {
-  display: flex;
-  justify-content: space-between;
-
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  background: rgba(80, 0, 255, 0.1);
-  margin-bottom: 0.75rem;
-  border: 1px solid rgba(255, 0, 230, 0.2);
   transition: all 0.3s ease;
-  cursor: pointer;
-  width: 100%;
-}
-
-.recent-post-item:hover {
-  background: rgba(255, 0, 230, 0.2);
-  transform: translateX(5px);
-  box-shadow: 0 0 15px rgba(255, 0, 230, 0.3);
-}
-
-.recent-post-text {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
 }
 
 .recent-post-link {
-  color: #ffffff;
-  text-decoration: none;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  transition: color 0.2s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   display: block;
+  padding: 0.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #ffffff;
+  transition: all 0.3s ease;
 }
 
-.recent-post-item:hover .recent-post-link {
+.recent-post-link:hover {
+  background: rgba(255, 0, 230, 0.2);
+  transform: translateX(5px);
+}
+
+.recent-post-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.recent-post-title {
+  font-size: 0.9rem;
+  font-weight: 500;
   color: #ffffff;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  margin: 0;
+  line-height: 1.4;
+  text-shadow: 0 0 5px rgba(255, 0, 230, 0.5);
 }
 
 .recent-post-date {
-  color: rgba(255, 255, 255, 0.6);
   font-size: 0.8rem;
-  margin-top: 0.25rem;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* Posts Section */

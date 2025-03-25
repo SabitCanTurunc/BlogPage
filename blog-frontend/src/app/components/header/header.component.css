@@ -232,35 +232,37 @@
 .dropdown-toggle {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  background: rgba(45, 0, 247, 0.1);
-  border: 1px solid rgba(255, 0, 136, 0.3);
-  color: #ffffff;
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
+  background: none;
+  border: none;
+  padding: 5px 10px;
   cursor: pointer;
   transition: all 0.3s;
 }
 
-.dropdown-toggle:hover {
-  background: rgba(255, 0, 136, 0.2);
-  box-shadow: 0 0 15px rgba(255, 0, 136, 0.3);
+.dropdown-toggle:hover .user-avatar {
+  transform: scale(1.1);
+  border-color: rgba(80, 0, 255, 0.8);
+  box-shadow: 0 0 15px rgba(80, 0, 255, 0.8);
 }
 
 .user-avatar {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  border: 2px solid #ff0088;
-  box-shadow: 0 0 10px rgba(255, 0, 136, 0.5);
+  border: 2px solid #ff00e6;
+  box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
+  transition: all 0.3s;
+  object-fit: cover;
 }
 
 .user-email {
-  font-size: 0.9rem;
+  margin-left: 10px;
+  font-weight: 500;
+  color: #ffffff;
   max-width: 150px;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dropdown-menu {

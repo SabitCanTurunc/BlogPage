@@ -55,8 +55,8 @@
       </div>
       <div *ngIf="isLoggedIn" class="user-dropdown">
         <button class="dropdown-toggle" (click)="toggleDropdown()">
-          <img [src]="'https://ui-avatars.com/api/?name=' + userEmail" alt="Kullanıcı" class="user-avatar">
-          <span class="user-email">{{ userEmail }}</span>
+          <img [src]="userProfile?.profileImageUrl || 'https://ui-avatars.com/api/?name=' + userEmail" alt="Kullanıcı" class="user-avatar">
+          <span class="user-email">{{ getDisplayName() }}</span>
         </button>
         <div class="dropdown-menu" [class.show]="isDropdownOpen">
           <a routerLink="/create-post" class="dropdown-item" (click)="closeDropdownAndMenu()">Yazı Oluştur</a>

@@ -417,7 +417,6 @@ export class CommentComponent implements OnInit {
         this.comments = comments;
       },
       error: (err) => {
-        console.error('Yorumlar yüklenirken hata oluştu:', err);
         this.error = 'Yorumlar yüklenirken bir hata oluştu.';
       }
     });
@@ -450,7 +449,6 @@ export class CommentComponent implements OnInit {
           }, 3000);
         },
         error: (err) => {
-          console.error('Yorum eklenirken hata oluştu:', err);
           if (err.error?.customException?.message) {
             this.error = err.error.customException.message;
           } else {
@@ -509,8 +507,6 @@ export class CommentComponent implements OnInit {
             });
           },
           error: (err) => {
-            console.error('Yorum silinirken hata oluştu:', err);
-            
             Swal.fire({
               title: 'Hata',
               text: 'Yorum silinirken bir hata oluştu.',

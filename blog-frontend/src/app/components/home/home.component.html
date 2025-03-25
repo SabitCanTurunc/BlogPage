@@ -63,27 +63,32 @@
             </div>
           </div>
 
+          <!-- Popüler Yazarlar -->
           <div class="sidebar-section">
             <h3>Popüler Yazarlar</h3>
             <div class="popular-authors">
-              <div *ngFor="let author of popularAuthors" class="author-item"
-                  [routerLink]="['/user', author]"
-                  style="cursor: pointer;">
-                <img [src]="'https://ui-avatars.com/api/?name=' + author" alt="Yazar" class="author-avatar">
-                <span class="author-name">{{ author }}</span>
+              <div *ngFor="let author of popularAuthors" class="author-item">
+                <a [routerLink]="['/user', author.email]" class="author-link">
+                  <img [src]="author.profileImage" [alt]="author.name" class="author-avatar" (error)="handleImageError($event)">
+                  <div class="author-info">
+                    <span class="author-name">{{ author.name }}</span>
+                  </div>
+                </a>
               </div>
             </div>
           </div>
 
+          <!-- Son Yazılar -->
           <div class="sidebar-section">
             <h3>Son Yazılar</h3>
             <div class="recent-posts">
-              <div *ngFor="let post of recentPosts" class="recent-post-item"
-                  [routerLink]="['/post', post.id]" style="cursor: pointer;">
-                <div class="recent-post-text">
-                  <span class="recent-post-link">{{ post.title }}</span>
-                  <span class="recent-post-date">{{ post.createdAt | date:'shortDate' }}</span>
-                </div>
+              <div *ngFor="let post of recentPosts" class="recent-post-item">
+                <a [routerLink]="['/post', post.id]" class="recent-post-link">
+                  <div class="recent-post-content">
+                    <h4 class="recent-post-title">{{ post.title }}</h4>
+                    <span class="recent-post-date">{{ post.createdAt | date:'mediumDate' }}</span>
+                  </div>
+                </a>
               </div>
             </div>
           </div>

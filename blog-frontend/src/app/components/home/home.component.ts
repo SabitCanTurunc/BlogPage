@@ -5,11 +5,19 @@ import { RouterModule, Router } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { AuthService } from '../../services/auth.service';
 import { PostResponseDto } from '../../models/post-response.dto';
+import { UserResponseDto } from '../../models/user-response.dto';
 import { Subscription } from 'rxjs';
 import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { catchError, of } from 'rxjs';
 import { ErrorHandlerUtil } from '../../utils/error-handler.util';
+import { UserService } from '../../services/user.service';
+
+interface Author {
+  email: string;
+  name: string;
+  profileImage: string;
+}
 
 @Component({
   selector: 'app-home',
@@ -27,7 +35,7 @@ export class HomeComponent implements OnInit {
   loading: boolean = true;
   isLoggedIn: boolean = false;
   isAdmin: boolean = false;
-  popularAuthors: string[] = [];
+  popularAuthors: Author[] = [];
   recentPosts: PostResponseDto[] = [];
   authorStats: { [key: string]: number } = {};
   searchQuery: string = '';
@@ -46,7 +54,8 @@ export class HomeComponent implements OnInit {
     private postService: PostService,
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private userService: UserService
   ) {
     this.isLoggedIn = this.authService.isLoggedIn();
     this.isAdmin = this.authService.isAdmin();
@@ -76,7 +85,36 @@ export class HomeComponent implements OnInit {
     
     const popularAuthorsSub = this.postService.getPopularAuthors().subscribe({
       next: (authors: string[]) => {
-        this.popularAuthors = authors;
+        // Her yazar için profil bilgilerini al
+        const authorProfiles = authors.map(email => 
+          this.userService.getUserProfileByEmail(email).pipe(
+            catchError(err => {
+              return of({
+                email: email,
+                name: email.split('@')[0],
+                profileImageUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}`
+              } as UserResponseDto);
+            })
+          )
+        );
+        
+        // Tüm profil bilgilerini al
+        forkJoin(authorProfiles).subscribe({
+          next: (profiles: UserResponseDto[]) => {
+            this.popularAuthors = profiles.map(profile => ({
+              email: profile.email,
+              name: profile.name || profile.email.split('@')[0],
+              profileImage: profile.profileImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.email)}`
+            }));
+          },
+          error: (err) => {
+            this.popularAuthors = authors.map(email => ({
+              email: email,
+              name: email.split('@')[0],
+              profileImage: `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}`
+            }));
+          }
+        });
       },
       error: (err: any) => {
         if (!this.sidebarError) {
@@ -114,16 +152,46 @@ export class HomeComponent implements OnInit {
           this.sidebarError = 'Yan panel verileri yüklenemedi';
         }
         
-        // Sonuçları güncelle (yukarıdaki abonelikler zaten güncelliyor ama emin olmak için)
+        // Sonuçları güncelle
         if (results.categories.length > 0) this.categories = results.categories;
-        if (results.authors.length > 0) this.popularAuthors = results.authors;
+        if (results.authors.length > 0) {
+          // Her yazar için profil bilgilerini al
+          const authorProfiles = results.authors.map(email => 
+            this.userService.getUserProfileByEmail(email).pipe(
+              catchError(err => {
+                return of({
+                  email: email,
+                  name: email.split('@')[0],
+                  profileImageUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}`
+                } as UserResponseDto);
+              })
+            )
+          );
+          
+          // Tüm profil bilgilerini al
+          forkJoin(authorProfiles).subscribe({
+            next: (profiles: UserResponseDto[]) => {
+              this.popularAuthors = profiles.map(profile => ({
+                email: profile.email,
+                name: profile.name || profile.email.split('@')[0],
+                profileImage: profile.profileImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.email)}`
+              }));
+            },
+            error: (err) => {
+              this.popularAuthors = results.authors.map(email => ({
+                email: email,
+                name: email.split('@')[0],
+                profileImage: `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}`
+              }));
+            }
+          });
+        }
         if (results.recent.length > 0) this.recentPosts = results.recent;
       },
       error: (err) => {
         this.sidebarError = ErrorHandlerUtil.handleError(err, 'Yan panel verileri yüklenemedi');
       },
       complete: () => {
-        // Tüm işlemler tamamlandığında yükleme durumunu kapat
         this.loadingSidebar = false;
       }
     });
@@ -204,7 +272,6 @@ export class HomeComponent implements OnInit {
           this.filteredPosts = posts;
         },
         error: (err) => {
-          console.error('Arama sırasında hata:', err);
           this.error = ErrorHandlerUtil.handleError(err, 'Arama yapılırken bir hata oluştu');
         }
       });
@@ -236,5 +303,13 @@ export class HomeComponent implements OnInit {
     this.authService.logout();
     this.isLoggedIn = false;
     this.router.navigate(['/home']);
+  }
+
+  handleImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      const name = img.alt || img.getAttribute('data-email') || 'User';
+      img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
+    }
   }
 }

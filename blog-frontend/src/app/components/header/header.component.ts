@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
+import { UserResponseDto } from '../../models/user-response.dto';
 
 @Component({
   selector: 'app-header',
@@ -17,9 +19,11 @@ export class HeaderComponent implements OnInit {
   isAdmin: boolean = false;
   isDropdownOpen: boolean = false;
   isMenuOpen: boolean = false;
+  userProfile: UserResponseDto | null = null;
   
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {}
   
@@ -29,8 +33,22 @@ export class HeaderComponent implements OnInit {
       if (user) {
         this.userEmail = this.authService.getUserEmail() || '';
         this.isAdmin = this.authService.isAdmin();
+        this.loadUserProfile();
       }
     });
+  }
+
+  loadUserProfile(): void {
+    if (this.isLoggedIn) {
+      this.userService.getUserProfile().subscribe({
+        next: (profile) => {
+          this.userProfile = profile;
+        },
+        error: (err) => {
+          // Hata durumunda sessizce devam et
+        }
+      });
+    }
   }
   
   toggleDropdown(): void {
@@ -61,5 +79,12 @@ export class HeaderComponent implements OnInit {
     this.authService.logout();
     this.router.navigate(['/']);
     window.location.reload();
+  }
+
+  getDisplayName(): string {
+    if (this.userProfile?.name && this.userProfile?.surname) {
+      return `${this.userProfile.name} ${this.userProfile.surname}`;
+    }
+    return this.userEmail;
   }
 }

@@ -105,4 +105,15 @@ public class UserController extends BaseController<UserService,User,Integer, Use
         UserResponseDto userResponseDto = userMapper.convertToDto(user);
         return ResponseEntity.ok(userResponseDto);
     }
+
+    @GetMapping("/profile/{email}")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<UserResponseDto> getUserProfileByEmail(@PathVariable String email) {
+        User user = userService.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        UserResponseDto userResponseDto = userMapper.convertToDto(user);
+        return ResponseEntity.ok(userResponseDto);
+    }
 }

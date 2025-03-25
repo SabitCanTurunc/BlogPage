@@ -30,21 +30,21 @@
               </div>
             </div>
             <h2 class="profile-name" [title]="viewedUserEmail || userEmail">
-              <span *ngIf="(isOwnProfile && accountForm.get('name')?.value && accountForm.get('surname')?.value)">
+              <span *ngIf="accountForm.get('name')?.value && accountForm.get('surname')?.value">
                 {{ accountForm.get('name')?.value }} {{ accountForm.get('surname')?.value }}
               </span>
-              <span *ngIf="!(isOwnProfile && accountForm.get('name')?.value && accountForm.get('surname')?.value)">
+              <span *ngIf="!(accountForm.get('name')?.value && accountForm.get('surname')?.value)">
                 {{ getDisplayedEmail() }}
               </span>
             </h2>
-            <p class="profile-role" *ngIf="isOwnProfile">{{ isAdmin ? "Yönetici" : "Kullanıcı" }}</p>
-            <p class="profile-description" *ngIf="isOwnProfile && accountForm.get('description')?.value">
+            <p class="profile-role">{{ isAdmin ? "Yönetici" : "Kullanıcı" }}</p>
+            <p class="profile-description" *ngIf="accountForm.get('description')?.value">
               {{ accountForm.get('description')?.value }}
             </p>
           </div>
 
-          <div class="profile-info" *ngIf="isOwnProfile">
-            <div class="info-item" *ngIf="accountForm.get('name')?.value || accountForm.get('surname')?.value">
+          <div class="profile-info">
+            <div class="info-item">
               <span class="info-label">Email:</span>
               <span class="info-value">{{ accountForm.get('email')?.value }}</span>
             </div>

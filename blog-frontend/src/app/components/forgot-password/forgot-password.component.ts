@@ -69,8 +69,6 @@ export class ForgotPasswordComponent implements OnInit {
 
       this.authService.forgotPassword(this.email).subscribe({
         next: (response) => {
-          console.log('Kod gönderme yanıtı:', response);
-          
           if (response.success) {
             this.success = response.message || 'Doğrulama kodu e-posta adresinize gönderildi.';
             this.error = '';
@@ -91,7 +89,6 @@ export class ForgotPasswordComponent implements OnInit {
           this.isLoading = false;
         },
         error: (err) => {
-          console.error('Kod gönderme hatası:', err);
           this.error = ErrorHandlerUtil.handleError(err, 'Doğrulama kodu gönderilirken bir hata oluştu');
           this.success = '';
           this.isLoading = false;
@@ -111,16 +108,7 @@ export class ForgotPasswordComponent implements OnInit {
       const verificationCode = this.resetForm.get('verificationCode')?.value?.trim();
       const newPassword = this.resetForm.get('newPassword')?.value;
       
-      // Debug logları
-      console.log('Şifre sıfırlama isteği gönderiliyor:');
-      console.log('E-posta:', this.email);
-      console.log('Doğrulama kodu:', verificationCode);
-      console.log('resetForm değerleri:', this.resetForm.value);
-      console.log('Tüm form geçerli mi:', this.resetForm.valid);
-      console.log('Doğrulama kodu alanı geçerli mi:', this.resetForm.get('verificationCode')?.valid);
-      
       if (!verificationCode) {
-        console.error('Doğrulama kodu boş veya null!');
         this.error = 'Lütfen geçerli bir doğrulama kodu giriniz.';
         this.isLoading = false;
         return;
@@ -131,8 +119,6 @@ export class ForgotPasswordComponent implements OnInit {
       
       this.authService.resetPassword(this.email, codeAsString, newPassword).subscribe({
         next: (response) => {
-          console.log('Şifre sıfırlama yanıtı:', response);
-          
           if (response.success) {
             this.success = response.message || 'Şifreniz başarıyla sıfırlandı. Giriş sayfasına yönlendiriliyorsunuz...';
             this.error = '';
@@ -148,9 +134,6 @@ export class ForgotPasswordComponent implements OnInit {
           this.isLoading = false;
         },
         error: (err) => {
-          console.error('Şifre sıfırlama hatası:', err);
-          console.error('Hata detayları:', err.error);
-          
           // Backend'den gelen spesifik hataları daha kullanıcı dostu hale getir
           if (err.error?.customException?.message) {
             const errorMsg = err.error.customException.message;
@@ -171,13 +154,6 @@ export class ForgotPasswordComponent implements OnInit {
         }
       });
     } else {
-      // Form geçerli değilse, hangi alanların hatalı olduğunu görelim
-      console.log('Form geçerli değil!');
-      console.log('Form hatası:', this.resetForm.errors);
-      console.log('verificationCode hatası:', this.resetForm.get('verificationCode')?.errors);
-      console.log('newPassword hatası:', this.resetForm.get('newPassword')?.errors);
-      console.log('confirmPassword hatası:', this.resetForm.get('confirmPassword')?.errors);
-      
       this.markFormGroupTouched(this.resetForm);
     }
   }
@@ -189,9 +165,6 @@ export class ForgotPasswordComponent implements OnInit {
 
     this.authService.forgotPassword(this.email).subscribe({
       next: (response) => {
-        console.log('Kod tekrar gönderildi:', response);
-        console.log('Yanıt özellikleri:', Object.keys(response));
-        
         // FormControl'ü sıfırla - tarayıcı otodoldurma sorunlarını önle
         this.resetForm.get('verificationCode')?.setValue('');
         this.resetForm.get('verificationCode')?.markAsPristine();
@@ -202,9 +175,6 @@ export class ForgotPasswordComponent implements OnInit {
         this.isResending = false;
       },
       error: (err) => {
-        console.error('Kod gönderme hatası:', err);
-        console.error('Hata yanıt özellikleri:', err.error ? Object.keys(err.error) : 'Yok');
-        
         this.error = ErrorHandlerUtil.handleError(err, 'Doğrulama kodu gönderilirken bir hata oluştu');
         this.success = '';
         this.isResending = false;

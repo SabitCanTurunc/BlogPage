@@ -16,22 +16,16 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   private handleError = (error: HttpErrorResponse) => {
-    console.error('Kullanıcı servisi hatası:', error);
-    
-    // Backend'den gelen özel hata mesajını yakala ve doğrudan ilet
     if (error.error?.customException?.message) {
       const errorMsg = error.error.customException.message;
-      console.log('Backend customException hata mesajı:', errorMsg);
       return throwError(() => new Error(errorMsg));
     }
     
     if (error.error?.message) {
       const errorMsg = error.error.message;
-      console.log('Backend hata mesajı:', errorMsg);
       return throwError(() => new Error(errorMsg));
     }
     
-    // Hata mesajının detaylı ve spesifik olması için ErrorHandlerUtil kullan
     const errorMessage = ErrorHandlerUtil.handleError(error, 'Kullanıcı işlemi sırasında bir hata oluştu');
     return throwError(() => new Error(errorMessage));
   }
@@ -79,5 +73,12 @@ export class UserService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  // Başka bir kullanıcının profilini getir
+  getUserProfileByEmail(email: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/profile/${email}`).pipe(
+      catchError(this.handleError)
+    );
   }
 } 

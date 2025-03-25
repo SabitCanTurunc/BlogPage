@@ -117,30 +117,15 @@ export class AuthService {
   }
 
   verifyEmail(data: { email: string; verificationCode: string }) {
-    console.log('API isteği gönderiliyor:', `${environment.apiUrl}/auth/verify`, data);
     return this.http.post<{message: string, success: boolean}>(`${environment.apiUrl}/auth/verify`, data)
       .pipe(
         tap(response => {
-          console.log('API yanıtı alındı:', response);
-          
-          // Başarılı yanıtı standart hale getir
           if (!response.hasOwnProperty('success')) {
-            // Eğer response içinde success alanı yoksa, başarılı kabul et
-            console.log('Yanıtta success alanı yok, başarılı kabul edildi');
             (response as any).success = true;
           }
-          
-          // Yanıtın yapısını logla
-          console.log('Yanıt türü:', typeof response);
-          console.log('Yanıt özellikleri:', Object.keys(response));
-          console.log('Yanıt stringify:', JSON.stringify(response));
         }),
         catchError(error => {
-          console.error('API hatası:', error);
-          console.error('Yanıt içeriği:', error.error);
-          
           if (error.error && error.error.message && error.error.message.includes('Yanlış doğrulama kodu')) {
-            console.log('Doğrulama kodu hatası algılandı');
             return throwError(() => ({
               status: error.status,
               error: {
@@ -298,8 +283,9 @@ export class AuthService {
     
     try {
       const decodedToken = this.parseJwt(user.token);
-      return decodedToken?.role === 'ADMIN';
+      return decodedToken?.role === 'ADMIN' || decodedToken?.role === 'ROLE_ADMIN';
     } catch (e) {
+      console.error('Token parse hatası:', e);
       return false;
     }
   }
