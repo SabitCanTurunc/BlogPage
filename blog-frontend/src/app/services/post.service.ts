@@ -147,4 +147,13 @@ export class PostService {
         catchError(this.handleError)
       );
   }
+
+  // Kullanıcının yazılarını getir
+  getUserPosts(userId: number): Observable<PostResponseDto[]> {
+    return this.http.get<PostResponseDto[]>(`${this.apiUrl}/user/${userId}`)
+      .pipe(
+        retry(1),
+        catchError(this.handleError)
+      );
+  }
 } 

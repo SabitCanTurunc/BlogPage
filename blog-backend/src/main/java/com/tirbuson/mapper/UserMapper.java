@@ -22,6 +22,7 @@ public class UserMapper implements BaseMapper<User, UserResponseDto, UserRequest
         user.setEmail(dto.getEmail());
         user.setUsername(dto.getUsername());
         user.setRole(dto.getRole());
+        user.setPassword(dto.getPassword());
         
         if (dto.getProfileImageUrl() != null) {
             Image profileImage = new Image();

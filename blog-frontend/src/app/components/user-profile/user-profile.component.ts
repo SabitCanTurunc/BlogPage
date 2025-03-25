@@ -71,11 +71,14 @@ export class UserProfileComponent implements OnInit {
   }
   
   ngOnInit(): void {
+    // Önce email'i ayarla
+    this.userEmail = this.authService.getUserEmail() || '';
+    
     this.route.params.subscribe(params => {
       if (params['email']) {
         // URL'den email parametresi alındı, başka bir kullanıcının profili görüntüleniyor
         this.viewedUserEmail = params['email'];
-        this.isOwnProfile = this.authService.isLoggedIn() && this.viewedUserEmail === this.authService.getUserEmail();
+        this.isOwnProfile = this.authService.isLoggedIn() && this.viewedUserEmail === this.userEmail;
         this.loadUserPosts(this.viewedUserEmail);
         this.loadUserProfileByEmail(this.viewedUserEmail);
       } else {
@@ -89,19 +92,56 @@ export class UserProfileComponent implements OnInit {
         this.loadUserProfile();
       }
     });
-    
-    // Sadece email'i ayarla, isAdmin kontrolü loadUserProfile ve loadUserProfileByEmail metodlarında yapılıyor
-    this.userEmail = this.authService.getUserEmail() || '';
   }
   
   loadUserPosts(email: string): void {
-    this.postService.getAllPosts().subscribe({
-      next: (posts) => {
-        this.userPosts = posts.filter(post => post.userEmail === email);
-        this.filteredPosts = [...this.userPosts];
+    if (!email) {
+      console.error('Email adresi bulunamadı');
+      return;
+    }
+
+    this.userService.getUserProfileByEmail(email).subscribe({
+      next: (userData) => {
+        if (userData && userData.id) {
+          this.postService.getUserPosts(userData.id).subscribe({
+            next: (posts) => {
+              this.userPosts = posts;
+              this.filteredPosts = [...this.userPosts];
+            },
+            error: (err) => {
+              console.error('Yazılar yüklenirken hata oluştu:', err);
+              Swal.fire({
+                title: 'Hata',
+                text: 'Yazılar yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.',
+                icon: 'error',
+                background: '#1a1a2e',
+                color: '#ffffff',
+                customClass: {
+                  popup: 'modern-swal-popup',
+                  title: 'modern-swal-title',
+                  htmlContainer: 'modern-swal-content'
+                }
+              });
+            }
+          });
+        } else {
+          console.error('Kullanıcı bilgileri bulunamadı');
+        }
       },
       error: (err) => {
-        // Sessizce devam et
+        console.error('Kullanıcı bilgileri yüklenirken hata oluştu:', err);
+        Swal.fire({
+          title: 'Hata',
+          text: 'Kullanıcı bilgileri yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.',
+          icon: 'error',
+          background: '#1a1a2e',
+          color: '#ffffff',
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content'
+          }
+        });
       }
     });
   }

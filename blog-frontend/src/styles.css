@@ -125,11 +125,6 @@ app-root {
   border-radius: 2px;
 }
 
-/* Smooth scroll davranışı */
-html {
-  scroll-behavior: smooth;
-}
-
 /* Özelleştirilmiş Toastr Stilleri */
 .toast-container .ngx-toastr {
   background-image: none !important;

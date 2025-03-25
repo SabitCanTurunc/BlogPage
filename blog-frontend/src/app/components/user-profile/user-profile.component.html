@@ -97,7 +97,7 @@
       <div class="col-md-8">
         <div class="profile-content">
           <!-- Yazılar Sekmesi -->
-          <div *ngIf="(isOwnProfile && activeTab === 'posts') || !isOwnProfile" class="posts-tab">
+          <div *ngIf="activeTab === 'posts'" class="posts-tab">
             <h3 *ngIf="isOwnProfile">Yazılarım</h3>
             <h3 *ngIf="!isOwnProfile">{{ getDisplayedEmail() }} Kullanıcısının Yazıları</h3>
 
