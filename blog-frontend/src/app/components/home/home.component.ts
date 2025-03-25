@@ -4,9 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { AuthService } from '../../services/auth.service';
-import { Post } from '../../models/post.model';
 import { PostResponseDto } from '../../models/post-response.dto';
-import { HeaderComponent } from '../header/header.component';
 import { Subscription } from 'rxjs';
 import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -36,7 +34,7 @@ export class HomeComponent implements OnInit {
   
   // Sayfalama değişkenleri
   currentPage: number = 0;
-  pageSize: number = 10;
+  pageSize: number = 5;
   totalPages: number = 0;
   subscriptions: Subscription[] = [];
   
@@ -60,11 +58,9 @@ export class HomeComponent implements OnInit {
   }
   
   ngOnDestroy() {
-    // Abonelikleri temizle
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
   
-  // Yan panel verilerini yükle
   loadSidebarData() {
     this.loadingSidebar = true;
     this.sidebarError = '';

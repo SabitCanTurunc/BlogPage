@@ -8,6 +8,8 @@ import com.tirbuson.repository.UserRepository;
 import com.tirbuson.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -17,10 +19,12 @@ import java.util.Map;
 public class UserController extends BaseController<UserService,User,Integer, UserRepository, UserResponseDto, UserRequestDto, UserMapper> {
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
-    protected UserController(UserService service, UserMapper mapper, UserService userService) {
+    protected UserController(UserService service, UserMapper mapper, UserService userService, UserMapper userMapper) {
         super(service, mapper);
         this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/setRole/{id}")
@@ -40,11 +44,10 @@ public class UserController extends BaseController<UserService,User,Integer, Use
     }
     
     @PostMapping("/update-profile")
-    public ResponseEntity<Map<String, Object>> updateProfile(@RequestBody Map<String, String> profileData) {
-        String email = profileData.get("email");
-        String username = profileData.get("username");
+    public ResponseEntity<Map<String, Object>> updateProfile(@RequestBody UserRequestDto userRequestDto) {
+
         
-        Map<String, Object> result = userService.updateProfile(email, username);
+        Map<String, Object> result = userService.updateProfile(userRequestDto);
         return ResponseEntity.ok(result);
     }
     
@@ -66,5 +69,16 @@ public class UserController extends BaseController<UserService,User,Integer, Use
         }
         
         return ResponseEntity.ok(userService.updateEnabled(id, enabled));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserResponseDto> getUserProfile() {
+        // SecurityContextHolder'dan mevcut kimliği doğrulanmış kullanıcıyı al
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        
+        User user = userService.findByEmail(email);
+        UserResponseDto userResponseDto = userMapper.convertToDto(user);
+        return ResponseEntity.ok(userResponseDto);
     }
 }

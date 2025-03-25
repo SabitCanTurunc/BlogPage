@@ -22,7 +22,7 @@ public abstract class BaseController<
 
 
     private final S service;
-    private final M mapper;
+    private  M mapper;
 
     protected BaseController(S service, M mapper) {
         this.service = service;

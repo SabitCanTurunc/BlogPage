@@ -70,12 +70,43 @@ public class UserService extends BaseService<User, Integer, UserRepository> {
     }
     
     @Transactional
-    public Map<String, Object> updateProfile(String email, String username) {
-        User user = findByEmail(email);
-        user.setUsername(username);
-        super.update(user);
+    public Map<String, Object> updateProfile(UserRequestDto payload) {
+        // Email ile kullanıcıyı bul
+        User existingUser = findByEmail(payload.getEmail());
         
-        return Map.of("message", "Profil başarıyla güncellendi", "success", true);
+        // Yeni bilgileri güncelle
+        if (payload.getUsername() != null) {
+            existingUser.setUsername(payload.getUsername());
+        }
+        
+        if (payload.getName() != null) {
+            existingUser.setName(payload.getName());
+        }
+        
+        if (payload.getSurname() != null) {
+            existingUser.setSurname(payload.getSurname());
+        }
+        
+        if (payload.getPhoneNumber() != null) {
+            existingUser.setPhoneNumber(payload.getPhoneNumber());
+        }
+        
+        if (payload.getGender() != null) {
+            existingUser.setGender(payload.getGender());
+        }
+        
+        if (payload.getDescription() != null) {
+            existingUser.setDescription(payload.getDescription());
+        }
+        
+        // Güncelle
+        super.update(existingUser);
+        
+        return Map.of(
+            "message", "Profil başarıyla güncellendi", 
+            "success", true,
+            "user", userMapper.convertToDto(existingUser)
+        );
     }
     
     @Transactional

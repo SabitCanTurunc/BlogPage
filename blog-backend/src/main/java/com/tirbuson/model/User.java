@@ -1,5 +1,6 @@
 package com.tirbuson.model;
 
+import com.tirbuson.model.enums.Gender;
 import com.tirbuson.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,11 +27,14 @@ public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false, unique = true)
     private String username;
 
-//    private String name;
-//    private String surname;
-//    private String phoneNumber;
-//    private Gender gender;
-//    private String description;
+    private String name;
+    private String surname;
+    private String phoneNumber;
+    
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+    
+    private String description;
 
 
     @Column(nullable = false, unique = true)

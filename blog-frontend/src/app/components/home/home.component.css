@@ -113,6 +113,7 @@
   object-fit: contain;
   filter: drop-shadow(0 0 15px rgba(255, 0, 136, 0.7));
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .blog-logo:hover {

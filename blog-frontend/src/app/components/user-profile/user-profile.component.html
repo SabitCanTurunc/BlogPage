@@ -11,8 +11,32 @@
                 class="avatar"
               />
             </div>
-            <h2 class="profile-name" [title]="viewedUserEmail || userEmail">{{ getDisplayedEmail() }}</h2>
+            <h2 class="profile-name" [title]="viewedUserEmail || userEmail">
+              <span *ngIf="(isOwnProfile && accountForm.get('name')?.value && accountForm.get('surname')?.value)">
+                {{ accountForm.get('name')?.value }} {{ accountForm.get('surname')?.value }}
+              </span>
+              <span *ngIf="!(isOwnProfile && accountForm.get('name')?.value && accountForm.get('surname')?.value)">
+                {{ getDisplayedEmail() }}
+              </span>
+            </h2>
             <p class="profile-role" *ngIf="isOwnProfile">{{ isAdmin ? "Yönetici" : "Kullanıcı" }}</p>
+            <p class="profile-description" *ngIf="isOwnProfile && accountForm.get('description')?.value">
+              {{ accountForm.get('description')?.value }}
+            </p>
+          </div>
+
+          <div class="profile-info" *ngIf="isOwnProfile">
+            <div class="info-item" *ngIf="accountForm.get('phoneNumber')?.value">
+              <span class="info-label">Telefon:</span>
+              <span class="info-value">{{ accountForm.get('phoneNumber')?.value }}</span>
+            </div>
+            <div class="info-item" *ngIf="accountForm.get('gender')?.value">
+              <span class="info-label">Cinsiyet:</span>
+              <span class="info-value">
+                {{ accountForm.get('gender')?.value === 'MALE' ? 'Erkek' : 
+                   accountForm.get('gender')?.value === 'FEMALE' ? 'Kadın' : 'Diğer' }}
+              </span>
+            </div>
           </div>
 
           <div class="profile-stats">
@@ -150,6 +174,56 @@
                 <small class="form-text text"
                   >E-posta adresi değiştirilemez</small
                 >
+              </div>
+
+              <div class="form-group">
+                <label for="name">Ad</label>
+                <input
+                  type="text"
+                  id="name"
+                  formControlName="name"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="surname">Soyad</label>
+                <input
+                  type="text"
+                  id="surname"
+                  formControlName="surname"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="phoneNumber">Telefon Numarası</label>
+                <input
+                  type="text"
+                  id="phoneNumber"
+                  formControlName="phoneNumber"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="gender">Cinsiyet</label>
+                <select id="gender" formControlName="gender" class="form-control">
+                  <option value="">Seçiniz</option>
+                  <option value="MALE">Erkek</option>
+                  <option value="FEMALE">Kadın</option>
+                  <option value="OTHER">Diğer</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="description">Hakkımda</label>
+                <textarea
+                  id="description"
+                  formControlName="description"
+                  class="form-control"
+                  rows="4"
+                ></textarea>
               </div>
 
               <div *ngIf="updateError" class="alert alert-danger">

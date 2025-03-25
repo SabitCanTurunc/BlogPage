@@ -52,7 +52,12 @@ export class UserProfileComponent implements OnInit {
     // Hesap formu
     this.accountForm = this.fb.group({
       username: ['', [Validators.required]],
-      email: [{ value: '', disabled: true }]
+      email: [{ value: '', disabled: true }],
+      name: [''],
+      surname: [''],
+      phoneNumber: [''],
+      gender: [''],
+      description: ['']
     });
     
     // Şifre değiştirme formu
@@ -107,10 +112,23 @@ export class UserProfileComponent implements OnInit {
   }
   
   loadUserProfile(): void {
-    // Burada kullanıcı bilgilerini yükleyeceğiz
-    // Şimdilik sadece email'i dolduruyoruz
-    this.accountForm.patchValue({
-      email: this.userEmail
+    this.userService.getUserProfile().subscribe({
+      next: (userData) => {
+        if (userData) {
+          this.accountForm.patchValue({
+            username: userData.username || '',
+            email: userData.email || '',
+            name: userData.name || '',
+            surname: userData.surname || '',
+            phoneNumber: userData.phoneNumber || '',
+            gender: userData.gender || '',
+            description: userData.description || ''
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Kullanıcı profili yüklenirken hata oluştu:', err);
+      }
     });
   }
   
@@ -132,17 +150,37 @@ export class UserProfileComponent implements OnInit {
       this.updateError = '';
       this.updateSuccess = '';
       
-      // Burada kullanıcı bilgilerini güncelleyeceğiz
-      // Şimdilik sadece başarılı mesajı gösteriyoruz
-      setTimeout(() => {
-        this.updateSuccess = 'Hesap bilgileriniz başarıyla güncellendi.';
-        this.isSubmitting = false;
-        
-        // 3 saniye sonra başarı mesajını kaldır
-        setTimeout(() => {
-          this.updateSuccess = '';
-        }, 3000);
-      }, 1000);
+      const updateData = {
+        email: this.userEmail,
+        username: this.accountForm.get('username')?.value,
+        name: this.accountForm.get('name')?.value,
+        surname: this.accountForm.get('surname')?.value,
+        phoneNumber: this.accountForm.get('phoneNumber')?.value,
+        gender: this.accountForm.get('gender')?.value,
+        description: this.accountForm.get('description')?.value
+      };
+      
+      this.userService.updateUserProfile(updateData).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.updateSuccess = response.message || 'Hesap bilgileriniz başarıyla güncellendi.';
+            this.loadUserProfile();
+          } else {
+            this.updateError = response.message || 'Güncelleme sırasında bir hata oluştu.';
+          }
+          this.isSubmitting = false;
+          
+          if (this.updateSuccess) {
+            setTimeout(() => {
+              this.updateSuccess = '';
+            }, 3000);
+          }
+        },
+        error: (err) => {
+          this.updateError = err.message || 'Güncelleme sırasında bir hata oluştu.';
+          this.isSubmitting = false;
+        }
+      });
     }
   }
   
