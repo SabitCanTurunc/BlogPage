@@ -25,6 +25,8 @@ export class UserProfileComponent implements OnInit {
   isOwnProfile: boolean = true;
   viewedUserEmail: string = '';
   searchQuery: string = '';
+  userProfileImage: string | null = null;
+  isUploadingImage: boolean = false;
   
   // Hesap güncelleme formu
   accountForm: FormGroup;
@@ -124,10 +126,27 @@ export class UserProfileComponent implements OnInit {
             gender: userData.gender || '',
             description: userData.description || ''
           });
+          
+          if (userData.profileImageUrl) {
+            this.userProfileImage = userData.profileImageUrl;
+          }
         }
       },
       error: (err) => {
         console.error('Kullanıcı profili yüklenirken hata oluştu:', err);
+        const errorMessage = err.error?.customException?.message || err.error?.message || 'Profil bilgileri yüklenirken bir hata oluştu.';
+        Swal.fire({
+          title: 'Hata',
+          text: errorMessage,
+          icon: 'error',
+          background: '#1a1a2e',
+          color: '#ffffff',
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content'
+          }
+        });
       }
     });
   }
@@ -483,5 +502,62 @@ export class UserProfileComponent implements OnInit {
       post.content.toLowerCase().includes(query) ||
       post.categoryName.toLowerCase().includes(query)
     );
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        Swal.fire({
+          title: 'Hata',
+          text: 'Resim boyutu 5MB\'dan küçük olmalıdır.',
+          icon: 'error',
+          background: '#1a1a2e',
+          color: '#ffffff',
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content'
+          }
+        });
+        return;
+      }
+
+      this.isUploadingImage = true;
+      this.userService.uploadProfileImage(file).subscribe({
+        next: (response) => {
+          this.userProfileImage = response.profileImageUrl || null;
+          this.isUploadingImage = false;
+          
+          Swal.fire({
+            title: 'Başarılı',
+            text: 'Profil resminiz başarıyla güncellendi.',
+            icon: 'success',
+            background: '#1a1a2e',
+            color: '#ffffff',
+            customClass: {
+              popup: 'modern-swal-popup',
+              title: 'modern-swal-title',
+              htmlContainer: 'modern-swal-content'
+            }
+          });
+        },
+        error: (err) => {
+          this.isUploadingImage = false;
+          Swal.fire({
+            title: 'Hata',
+            text: err.error?.message || 'Profil resmi yüklenirken bir hata oluştu.',
+            icon: 'error',
+            background: '#1a1a2e',
+            color: '#ffffff',
+            customClass: {
+              popup: 'modern-swal-popup',
+              title: 'modern-swal-title',
+              htmlContainer: 'modern-swal-content'
+            }
+          });
+        }
+      });
+    }
   }
 } 

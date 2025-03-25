@@ -60,6 +60,10 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "verification_expiration")
     private LocalDateTime verificationCodeExpiresAt;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_image_id")
+    private Image profileImage;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_"+ role.name());

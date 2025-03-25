@@ -21,4 +21,5 @@ public class UserResponseDto extends BaseDto {
     private String description;
     private Role role;
     private boolean enabled;
+    private String profileImageUrl;
 }

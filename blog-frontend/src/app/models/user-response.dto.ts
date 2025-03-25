@@ -11,4 +11,5 @@ export interface UserResponseDto {
   enabled: boolean;
   createdAt: string;
   updatedAt: string;
+  profileImageUrl?: string;
 } 

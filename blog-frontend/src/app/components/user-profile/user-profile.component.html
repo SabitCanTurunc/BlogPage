@@ -6,10 +6,28 @@
           <div class="profile-header">
             <div class="profile-avatar">
               <img
-                [src]="'https://ui-avatars.com/api/?name=' + getDisplayedEmail()"
+                [src]="userProfileImage || 'https://ui-avatars.com/api/?name=' + getDisplayedEmail()"
                 alt="Profil"
                 class="avatar"
               />
+              <div *ngIf="isOwnProfile" class="avatar-upload">
+                <input
+                  type="file"
+                  #fileInput
+                  (change)="onFileSelected($event)"
+                  accept="image/*"
+                  class="file-input"
+                  style="display: none"
+                />
+                <button class="upload-button" (click)="fileInput.click()" [disabled]="isUploadingImage">
+                  <svg *ngIf="!isUploadingImage" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                  </svg>
+                  <div *ngIf="isUploadingImage" class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                  </div>
+                </button>
+              </div>
             </div>
             <h2 class="profile-name" [title]="viewedUserEmail || userEmail">
               <span *ngIf="(isOwnProfile && accountForm.get('name')?.value && accountForm.get('surname')?.value)">
@@ -26,6 +44,10 @@
           </div>
 
           <div class="profile-info" *ngIf="isOwnProfile">
+            <div class="info-item" *ngIf="accountForm.get('name')?.value || accountForm.get('surname')?.value">
+              <span class="info-label">Email:</span>
+              <span class="info-value">{{ accountForm.get('email')?.value }}</span>
+            </div>
             <div class="info-item" *ngIf="accountForm.get('phoneNumber')?.value">
               <span class="info-label">Telefon:</span>
               <span class="info-value">{{ accountForm.get('phoneNumber')?.value }}</span>

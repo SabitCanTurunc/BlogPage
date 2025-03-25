@@ -4,12 +4,14 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { ErrorHandlerUtil } from '../utils/error-handler.util';
+import { User } from '../models/user.model';
+import { UserResponseDto } from '../models/user-response.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = environment.apiUrl;
+  private apiUrl = `${environment.apiUrl}/user`;
 
   constructor(private http: HttpClient) { }
 
@@ -35,37 +37,47 @@ export class UserService {
   }
 
   // Kullanıcı bilgilerini getir
-  getUserProfile(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/user/profile`).pipe(
+  getUserProfile(): Observable<UserResponseDto> {
+    return this.http.get<UserResponseDto>(`${this.apiUrl}/profile`).pipe(
       catchError(this.handleError)
     );
   }
 
   // Kullanıcı bilgilerini güncelle
   updateUserProfile(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/user/update-profile`, userData).pipe(
+    return this.http.post(`${this.apiUrl}/update-profile`, userData).pipe(
       catchError(this.handleError)
     );
   }
 
   // Kullanıcı şifresini güncelle
   updatePassword(passwordData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/user/update-password`, passwordData).pipe(
+    return this.http.post(`${this.apiUrl}/update-password`, passwordData).pipe(
       catchError(this.handleError)
     );
   }
 
   // Kullanıcı hesabını sil
   deleteAccount(credentials: { email: string, password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/user/delete-account`, credentials).pipe(
+    return this.http.post(`${this.apiUrl}/delete-account`, credentials).pipe(
       catchError(this.handleError)
     );
   }
 
   // Kullanıcının yazılarını getir
   getUserPosts(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/user/posts`).pipe(
+    return this.http.get(`${this.apiUrl}/posts`).pipe(
       catchError(this.handleError)
     );
+  }
+
+  uploadProfileImage(file: File): Observable<User> {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return this.http.post<User>(`${this.apiUrl}/upload-profile-image`, formData)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 } 

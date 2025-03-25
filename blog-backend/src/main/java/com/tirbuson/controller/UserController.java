@@ -6,12 +6,16 @@ import com.tirbuson.mapper.UserMapper;
 import com.tirbuson.model.User;
 import com.tirbuson.repository.UserRepository;
 import com.tirbuson.service.UserService;
+import com.tirbuson.service.ImageService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -20,11 +24,31 @@ public class UserController extends BaseController<UserService,User,Integer, Use
 
     private final UserService userService;
     private final UserMapper userMapper;
+    private final ImageService imageService;
 
-    protected UserController(UserService service, UserMapper mapper, UserService userService, UserMapper userMapper) {
+    protected UserController(UserService service, UserMapper mapper, UserService userService, UserMapper userMapper, ImageService imageService) {
         super(service, mapper);
         this.userService = userService;
         this.userMapper = userMapper;
+        this.imageService = imageService;
+    }
+
+    @PostMapping("/upload-profile-image")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserResponseDto> uploadProfileImage(@RequestParam("file") MultipartFile file) throws IOException {
+        // Kullanıcıyı bul
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        User user = userService.findByEmail(email);
+
+        // Resmi yükle
+        var imageResponse = imageService.uploadImage(file);
+        
+        // Kullanıcının profil resmini güncelle
+        user.setProfileImage(imageService.findById(imageResponse.getId()));
+        User updatedUser = userService.update(user);
+
+        return ResponseEntity.ok(userMapper.convertToDto(updatedUser));
     }
 
     @PostMapping("/setRole/{id}")

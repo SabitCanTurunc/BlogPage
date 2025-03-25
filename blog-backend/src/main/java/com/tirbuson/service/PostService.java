@@ -2,6 +2,7 @@ package com.tirbuson.service;
 
 import com.tirbuson.model.Post;
 import com.tirbuson.model.Category;
+import com.tirbuson.model.Image;
 import com.tirbuson.repository.PostRepository;
 import com.tirbuson.repository.CategoryRepository;
 import org.springframework.data.domain.Page;
@@ -19,12 +20,14 @@ public class PostService extends BaseService<Post,Integer, PostRepository>{
     private final PostRepository repository;
     private final OwnershipService ownershipService;
     private final CategoryRepository categoryRepository;
+    private final ImageService imageService;
 
-    public PostService(PostRepository repository, OwnershipService ownershipService, CategoryRepository categoryRepository) {
+    public PostService(PostRepository repository, OwnershipService ownershipService, CategoryRepository categoryRepository, ImageService imageService) {
         super(repository);
         this.repository = repository;
         this.ownershipService = ownershipService;
         this.categoryRepository = categoryRepository;
+        this.imageService = imageService;
     }
 
     public List<Post> getPostByUserId(int userId) {
@@ -119,7 +122,15 @@ public class PostService extends BaseService<Post,Integer, PostRepository>{
     @Transactional
     public void deleteById(Integer id) {
         ownershipService.verifyOwnership(id, repository);
-        super.deleteById(id);
+        Post post = findById(id);
+        if (post != null && post.getImages() != null) {
+            // Önce tüm resimleri sil
+            for (Image image : post.getImages()) {
+                imageService.deleteById(image.getId());
+            }
+            // Sonra postu sil
+            super.deleteById(id);
+        }
     }
 
     @Override

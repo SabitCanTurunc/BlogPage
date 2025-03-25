@@ -8,6 +8,7 @@ import com.tirbuson.repository.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Map;
@@ -25,29 +26,44 @@ public class ImageService extends BaseService<Image,Integer, ImageRepository> {
     }
     
     public ImageResponseDto uploadImage(MultipartFile file) throws IOException {
-        // Dosya adını benzersiz yap
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
         
-        // Cloudinary'ye yükle
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), 
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
                 ObjectUtils.asMap(
                         "public_id", "blog/" + fileName,
                         "overwrite", true
                 ));
         
-        // Cloudinary URL'ini al
         String url = (String) uploadResult.get("secure_url");
         
-        // Veritabanına kaydet
         Image image = new Image();
         image.setUrl(url);
         
         Image savedImage = save(image);
         
-        // Yanıt oluştur
         ImageResponseDto responseDto = new ImageResponseDto();
+        responseDto.setId(savedImage.getId());
         responseDto.setUrl(savedImage.getUrl());
         
         return responseDto;
+    }
+
+    public void deleteImageFromCloudinary(String imageUrl) {
+        try {
+            String publicId = imageUrl.substring(imageUrl.lastIndexOf("/") + 1, imageUrl.lastIndexOf("."));
+            cloudinary.uploader().destroy("blog/" + publicId, ObjectUtils.emptyMap());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Integer id) {
+        Image image = findById(id);
+        if (image != null) {
+            deleteImageFromCloudinary(image.getUrl());
+            super.deleteById(id);
+        }
     }
 }

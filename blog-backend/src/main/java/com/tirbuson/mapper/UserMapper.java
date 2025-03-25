@@ -2,49 +2,54 @@ package com.tirbuson.mapper;
 
 import com.tirbuson.dto.request.UserRequestDto;
 import com.tirbuson.dto.response.UserResponseDto;
+import com.tirbuson.model.Image;
 import com.tirbuson.model.User;
+import com.tirbuson.service.ImageService;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserMapper implements BaseMapper<User, UserResponseDto,UserRequestDto> {
+public class UserMapper implements BaseMapper<User, UserResponseDto, UserRequestDto> {
 
+    private final ImageService imageService;
+
+    public UserMapper(ImageService imageService) {
+        this.imageService = imageService;
+    }
 
     @Override
-    public User convertToEntity(UserRequestDto baseDto) {
-        if (baseDto == null) {
-            System.out.println("baseDto is null");
-            return null;
-        }
-
+    public User convertToEntity(UserRequestDto dto) {
         User user = new User();
-        user.setRole(baseDto.getRole());
-        user.setUsername(baseDto.getUsername());
-        user.setEmail(baseDto.getEmail());
-        user.setPassword(baseDto.getPassword());
-        user.setName(baseDto.getName());
-        user.setSurname(baseDto.getSurname());
-        user.setPhoneNumber(baseDto.getPhoneNumber());
-        user.setGender(baseDto.getGender());
-        user.setDescription(baseDto.getDescription());
-
+        user.setEmail(dto.getEmail());
+        user.setUsername(dto.getUsername());
+        user.setRole(dto.getRole());
+        
+        if (dto.getProfileImageUrl() != null) {
+            Image profileImage = new Image();
+            profileImage.setUrl(dto.getProfileImageUrl());
+            user.setProfileImage(profileImage);
+        }
+        
         return user;
     }
 
     @Override
     public UserResponseDto convertToDto(User entity) {
-        if (entity == null) return null;
-
-        UserResponseDto responseDto = new UserResponseDto();
-        responseDto.setId(entity.getId());
-        responseDto.setUsername(entity.getUsername());
-        responseDto.setRole(entity.getRole());
-        responseDto.setEmail(entity.getEmail());
-        responseDto.setEnabled(entity.isEnabled());
-        responseDto.setName(entity.getName());
-        responseDto.setSurname(entity.getSurname());
-        responseDto.setPhoneNumber(entity.getPhoneNumber());
-        responseDto.setGender(entity.getGender());
-        responseDto.setDescription(entity.getDescription());
-        return responseDto;
+        UserResponseDto dto = new UserResponseDto();
+        dto.setId(entity.getId());
+        dto.setEmail(entity.getEmail());
+        dto.setUsername(entity.getUsername());
+        dto.setRole(entity.getRole());
+        dto.setEnabled(entity.isEnabled());
+        dto.setName(entity.getName());
+        dto.setSurname(entity.getSurname());
+        dto.setPhoneNumber(entity.getPhoneNumber());
+        dto.setGender(entity.getGender());
+        dto.setDescription(entity.getDescription());
+        
+        if (entity.getProfileImage() != null) {
+            dto.setProfileImageUrl(entity.getProfileImage().getUrl());
+        }
+        
+        return dto;
     }
 }

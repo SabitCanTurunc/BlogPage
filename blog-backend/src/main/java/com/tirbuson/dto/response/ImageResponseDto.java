@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImageResponseDto extends BaseDto {
+    private Integer id;
     private String url;
-
 }
 
