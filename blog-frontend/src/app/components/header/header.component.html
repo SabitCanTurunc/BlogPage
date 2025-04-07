@@ -13,45 +13,50 @@
       <ul class="nav-links">
         
         <li class="desktop-only" *ngIf="isLoggedIn">
-          <a routerLink="/create-post" class="nav-link" (click)="closeMenu()">Yeni Yazı Oluştur</a>
+          <a routerLink="/create-post" class="nav-link" (click)="closeMenu()">{{ 'create_post' | translate }}</a>
         </li>
         <li class="desktop-only">
-          <a routerLink="/contact" class="nav-link" (click)="closeMenu()">İletişim</a>
+          <a routerLink="/contact" class="nav-link" (click)="closeMenu()">{{ 'contact' | translate }}</a>
         </li>
         
           <li *ngIf="isLoggedIn" class="mobile-only">
-          <a routerLink="/create-post" class="mobile-profile-link" (click)="closeMenu()">Yeni Yazı Oluştur</a>
+          <a routerLink="/create-post" class="mobile-profile-link" (click)="closeMenu()">{{ 'create_post' | translate }}</a>
         </li>
         
         <li class="mobile-only">
-          <a routerLink="/contact" class="mobile-profile-link" (click)="closeMenu()">İletişim</a>
+          <a routerLink="/contact" class="mobile-profile-link" (click)="closeMenu()">{{ 'contact' | translate }}</a>
         </li>
         <li *ngIf="!isLoggedIn" class="mobile-auth">
-          <a routerLink="/login" class="mobile-btn-login" (click)="closeMenu()">Giriş Yap</a>
+          <a routerLink="/login" class="mobile-btn-login" (click)="closeMenu()">{{ 'login' | translate }}</a>
         </li>
         <li *ngIf="!isLoggedIn" class="mobile-auth">
-          <a routerLink="/signup" class="mobile-btn-signup" (click)="closeMenu()">Kayıt Ol</a>
+          <a routerLink="/signup" class="mobile-btn-signup" (click)="closeMenu()">{{ 'signup' | translate }}</a>
         </li>
         <li *ngIf="isLoggedIn" class="mobile-only">
-          <a routerLink="/profile" class="mobile-profile-link" (click)="closeMenu()">Profil</a>
+          <a routerLink="/profile" class="mobile-profile-link" (click)="closeMenu()">{{ 'profile' | translate }}</a>
         </li>
         <li *ngIf="isLoggedIn && isAdmin" class="mobile-only">
           <a routerLink="/admin" class="mobile-admin-link" (click)="closeMenu()">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="admin-icon">
               <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
             </svg>
-            Admin Paneli
+            {{ 'admin' | translate }}
           </a>
         </li>
         <li *ngIf="isLoggedIn" class="mobile-only">
-          <button class="mobile-logout-btn" (click)="logoutAndCloseAll()">Çıkış Yap</button>
+          <button class="mobile-logout-btn" (click)="logoutAndCloseAll()">{{ 'logout' | translate }}</button>
         </li>
       </ul>
     </nav>
     <div class="user-actions desktop-only">
+      <div class="language-selector">
+        <button class="btn-language" (click)="toggleLanguageAndReload()">
+          {{ currentLanguage === 'tr' ? '🇹🇷 TR' : '🇬🇧 EN' }}
+        </button>
+      </div>
       <div *ngIf="!isLoggedIn" class="auth-buttons">
-        <a routerLink="/login" class="btn-login" (click)="closeMenu()">Giriş Yap</a>
-        <a routerLink="/signup" class="btn-signup" (click)="closeMenu()">Kayıt Ol</a>
+        <a routerLink="/login" class="btn-login" (click)="closeMenu()">{{ 'login' | translate }}</a>
+        <a routerLink="/signup" class="btn-signup" (click)="closeMenu()">{{ 'signup' | translate }}</a>
       </div>
       <div *ngIf="isLoggedIn" class="user-dropdown">
         <button class="dropdown-toggle" (click)="toggleDropdown()">
@@ -59,16 +64,16 @@
           <span class="user-email">{{ getDisplayName() }}</span>
         </button>
         <div class="dropdown-menu" [class.show]="isDropdownOpen">
-          <a routerLink="/create-post" class="dropdown-item" (click)="closeDropdownAndMenu()">Yazı Oluştur</a>
-          <a routerLink="/profile" class="dropdown-item" (click)="closeDropdownAndMenu()">Profil</a>
+          <a routerLink="/create-post" class="dropdown-item" (click)="closeDropdownAndMenu()">{{ 'create_post' | translate }}</a>
+          <a routerLink="/profile" class="dropdown-item" (click)="closeDropdownAndMenu()">{{ 'profile' | translate }}</a>
           <a *ngIf="isAdmin" routerLink="/admin" class="dropdown-item admin-item" (click)="closeDropdownAndMenu()">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="admin-icon">
               <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
             </svg>
-            Admin Paneli
+            {{ 'admin' | translate }}
           </a>
           <div class="dropdown-divider"></div>
-          <button class="dropdown-item logout" (click)="logoutAndCloseAll()">Çıkış Yap</button>
+          <button class="dropdown-item logout" (click)="logoutAndCloseAll()">{{ 'logout' | translate }}</button>
         </div>
       </div>
     </div>

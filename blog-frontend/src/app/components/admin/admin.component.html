@@ -1,7 +1,7 @@
 <div class="admin-container">
   <div class="admin-sidebar">
     <div class="sidebar-header">
-      <h3>Admin Paneli</h3>
+      <h3>{{ 'admin_panel' | translate }}</h3>
     </div>
     <nav class="sidebar-nav">
       <button 
@@ -11,7 +11,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
           <path d="M7 14s-1 0-1-1 1-4 4-4 4 3 4 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 4 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
         </svg>
-        Kullanıcı Yönetimi
+        {{ 'admin_user_management' | translate }}
       </button>
       <button 
         (click)="selectSection('categories')" 
@@ -22,7 +22,7 @@
           <path d="M2.267 14.854a.5.5 0 0 0 .708.708l7.433-7.434a.5.5 0 0 0-.708-.708L2.267 14.854z"/>
           <path d="M2.267 14.854a.5.5 0 0 1-.708-.708l7.434-7.433a.5.5 0 0 1 .708.708L2.267 14.854z"/>
         </svg>
-        Kategori Yönetimi
+        {{ 'admin_category_management' | translate }}
       </button>
       <button 
         (click)="selectSection('posts')" 
@@ -32,27 +32,26 @@
           <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
           <path d="M3.5 3.5a.5.5 0 0 1 1 0v8.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L3.5 12.293V3.5z"/>
         </svg>
-        Post Yönetimi
+        {{ 'admin_post_management' | translate }}
       </button>
     </nav>
-    
   </div>
 
   <div class="admin-content">
     <div *ngIf="!isAdmin" class="alert alert-warning">
-      Bu sayfaya erişim yetkiniz bulunmamaktadır.
+      {{ 'admin_access_denied' | translate }}
     </div>
 
     <div *ngIf="isAdmin">
       <!-- Kullanıcı Yönetimi -->
       <div *ngIf="selectedSection === 'users'" class="admin-section">
         <div class="section-header">
-          <h3>Kullanıcı Yönetimi</h3>
+          <h3>{{ 'admin_user_management' | translate }}</h3>
           <div class="search-container">
             <input type="text" 
                    [(ngModel)]="userSearchQuery" 
                    (input)="searchUsers()" 
-                   placeholder="Kullanıcı ara..." 
+                   [placeholder]="'admin_search_users' | translate"
                    class="search-input">
             <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
               <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5 1.5-1.5-5-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -64,19 +63,19 @@
             class="btn btn-save-all" 
             (click)="saveAllUserChanges()"
             [disabled]="!hasUserChanges()">
-            Değişiklikleri Kaydet
+            {{ 'admin_save_changes' | translate }}
           </button>
         </div>
         <div class="users-table">
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Kullanıcı Adı</th>
-                <th>E-posta</th>
-                <th>Rol</th>
-                <th>Durum</th>
-                <th>İşlemler</th>
+                <th>{{ 'admin_id' | translate }}</th>
+                <th>{{ 'admin_username' | translate }}</th>
+                <th>{{ 'admin_email' | translate }}</th>
+                <th>{{ 'admin_role' | translate }}</th>
+                <th>{{ 'admin_status' | translate }}</th>
+                <th>{{ 'admin_actions' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -90,13 +89,13 @@
                     (change)="onUserRoleChange(user.id, $event)"
                     class="role-select"
                     [disabled]="isCurrentUser(user.id)">
-                    <option value="USER">Kullanıcı</option>
-                    <option value="ADMIN">Admin</option>
+                    <option value="USER">{{ 'admin_user_role' | translate }}</option>
+                    <option value="ADMIN">{{ 'admin_admin_role' | translate }}</option>
                   </select>
                 </td>
                 <td>
                   <span [class]="user.enabled ? 'status-active' : 'status-inactive'">
-                    {{ user.enabled ? 'Aktif' : 'Pasif' }}
+                    {{ user.enabled ? ('admin_active' | translate) : ('admin_inactive' | translate) }}
                   </span>
                   <label class="switch" [class.disabled]="isCurrentUser(user.id)">
                     <input 
@@ -112,7 +111,7 @@
                     (click)="deleteUser(user.id)"
                     class="btn btn-danger"
                     [disabled]="isCurrentUser(user.id)">
-                    Sil
+                    {{ 'admin_delete' | translate }}
                   </button>
                 </td>
               </tr>
@@ -124,12 +123,12 @@
       <!-- Kategori Yönetimi -->
       <div *ngIf="selectedSection === 'categories'" class="admin-section">
         <div class="section-header">
-          <h3>Kategori Yönetimi</h3>
+          <h3>{{ 'admin_category_management' | translate }}</h3>
           <div class="search-container">
             <input type="text" 
                    [(ngModel)]="categorySearchQuery" 
                    (input)="searchCategories()" 
-                   placeholder="Kategori ara..." 
+                   [placeholder]="'admin_search_categories' | translate"
                    class="search-input">
             <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
               <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5 1.5-1.5-5-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -141,23 +140,23 @@
           <input 
             type="text" 
             [(ngModel)]="newCategoryName" 
-            placeholder="Yeni kategori adı"
+            [placeholder]="'admin_new_category' | translate"
             class="form-input">
           <button 
             (click)="createCategory()" 
             class="btn btn-primary"
             [disabled]="!newCategoryName.trim()">
-            Ekle
+            {{ 'admin_add_category' | translate }}
           </button>
         </div>
         <div class="categories-table">
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Kategori Adı</th>
-                <th>Oluşturulma Tarihi</th>
-                <th>İşlemler</th>
+                <th>{{ 'admin_id' | translate }}</th>
+                <th>{{ 'admin_name' | translate }}</th>
+                <th>{{ 'admin_created_at' | translate }}</th>
+                <th>{{ 'admin_actions' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -175,7 +174,7 @@
                   <button 
                     (click)="deleteCategory(category.id)"
                     class="btn btn-danger">
-                    Sil
+                    {{ 'admin_delete' | translate }}
                   </button>
                 </td>
               </tr>
@@ -187,12 +186,12 @@
       <!-- Post Yönetimi -->
       <div *ngIf="selectedSection === 'posts'" class="admin-section">
         <div class="section-header">
-          <h3>Post Yönetimi</h3>
+          <h3>{{ 'admin_post_management' | translate }}</h3>
           <div class="search-container">
             <input type="text" 
                    [(ngModel)]="postSearchQuery" 
                    (input)="searchPosts()" 
-                   placeholder="Yazı ara..." 
+                   [placeholder]="'admin_search_posts' | translate"
                    class="search-input">
             <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
               <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5 1.5-1.5-5-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
@@ -204,12 +203,12 @@
           <table>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Başlık</th>
-                <th>Yazar</th>
-                <th>Kategori</th>
-                <th>Oluşturulma Tarihi</th>
-                <th>İşlemler</th>
+                <th>{{ 'admin_id' | translate }}</th>
+                <th>{{ 'admin_title' | translate }}</th>
+                <th>{{ 'admin_author' | translate }}</th>
+                <th>{{ 'admin_category' | translate }}</th>
+                <th>{{ 'admin_created_at' | translate }}</th>
+                <th>{{ 'admin_actions' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -218,18 +217,18 @@
                 <td>{{ post.title }}</td>
                 <td>{{ post.userEmail }}</td>
                 <td>{{ post.categoryName }}</td>
-                <td>{{ post.createdAt ? (post.createdAt | date:'dd.MM.yyyy HH:mm') : 'Tarih yok' }}</td>
+                <td>{{ post.createdAt ? (post.createdAt | date:'dd.MM.yyyy HH:mm') : ('admin_no_date' | translate) }}</td>
                 <td>
                   <div class="action-buttons">
                     <button 
                       (click)="editPost(post.id)"
                       class="btn btn-edit">
-                      Düzenle
+                      {{ 'admin_edit' | translate }}
                     </button>
                     <button 
                       (click)="deletePost(post.id)"
                       class="btn btn-danger">
-                      Sil
+                      {{ 'admin_delete' | translate }}
                     </button>
                   </div>
                 </td>

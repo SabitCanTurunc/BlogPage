@@ -31,7 +31,6 @@ export class ForgotPasswordComponent implements OnInit {
       email: ['', [Validators.required, Validators.email, Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')]]
     });
 
-    // Sadece rakam içeren 6 haneli doğrulama kodu için pattern
     const digitsOnlyPattern = '^[0-9]{6}$';
 
     this.resetForm = this.fb.group({

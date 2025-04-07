@@ -12,6 +12,8 @@ import { take } from 'rxjs/operators';
 import { catchError, of } from 'rxjs';
 import { ErrorHandlerUtil } from '../../utils/error-handler.util';
 import { UserService } from '../../services/user.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 interface Author {
   email: string;
@@ -22,7 +24,7 @@ interface Author {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TranslatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -55,7 +57,8 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private userService: UserService
+    private userService: UserService,
+    private translationService: TranslationService
   ) {
     this.isLoggedIn = this.authService.isLoggedIn();
     this.isAdmin = this.authService.isAdmin();
@@ -79,7 +82,7 @@ export class HomeComponent implements OnInit {
         this.categories = categories;
       },
       error: (err: any) => {
-        this.sidebarError = ErrorHandlerUtil.handleError(err, 'Kategoriler yüklenemedi');
+        this.sidebarError = this.translationService.getTranslation('categories_load_error');
       }
     });
     
@@ -118,7 +121,7 @@ export class HomeComponent implements OnInit {
       },
       error: (err: any) => {
         if (!this.sidebarError) {
-          this.sidebarError = ErrorHandlerUtil.handleError(err, 'Popüler yazarlar yüklenemedi');
+          this.sidebarError = this.translationService.getTranslation('authors_load_error');
         }
       }
     });
@@ -129,7 +132,7 @@ export class HomeComponent implements OnInit {
       },
       error: (err: any) => {
         if (!this.sidebarError) {
-          this.sidebarError = ErrorHandlerUtil.handleError(err, 'Son yazılar yüklenemedi');
+          this.sidebarError = this.translationService.getTranslation('recent_posts_load_error');
         }
       }
     });
@@ -149,7 +152,7 @@ export class HomeComponent implements OnInit {
       next: (results) => {
         // Eğer üç veri de boş ise hata mesajı göster
         if (results.categories.length === 0 && results.authors.length === 0 && results.recent.length === 0) {
-          this.sidebarError = 'Yan panel verileri yüklenemedi';
+          this.sidebarError = this.translationService.getTranslation('sidebar_load_error');
         }
         
         // Sonuçları güncelle
@@ -189,7 +192,7 @@ export class HomeComponent implements OnInit {
         if (results.recent.length > 0) this.recentPosts = results.recent;
       },
       error: (err) => {
-        this.sidebarError = ErrorHandlerUtil.handleError(err, 'Yan panel verileri yüklenemedi');
+        this.sidebarError = this.translationService.getTranslation('sidebar_load_error');
       },
       complete: () => {
         this.loadingSidebar = false;
@@ -227,7 +230,7 @@ export class HomeComponent implements OnInit {
         },
         error: (err) => {
           this.loading = false;
-          this.error = ErrorHandlerUtil.handleError(err, 'Daha fazla yazı yüklenirken bir hata oluştu');
+          this.error = this.translationService.getTranslation('load_more_error');
           this.cdr.markForCheck();
         }
       });

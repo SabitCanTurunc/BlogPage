@@ -1,11 +1,13 @@
-s pring:
+spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: spring-data-jpa
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: 1244
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     properties:
@@ -17,10 +19,10 @@ s pring:
       ddl-auto: update
 
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: denemedenemecioglu8@gmail.com
-    password: pkfxypnpugqqftxz
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -28,14 +30,12 @@ s pring:
           starttls:
             enabled: true
 
-
-
 security:
   jwt:
-    secret-key: "dGhlc2VjcmV0a2V5bXVzdGJldGhpc2xvbmcyNTZiaXRz"
-    expiration-time: 3600000
+    secret-key: ${JWT_SECRET_KEY}
+    expiration-time: ${JWT_EXPIRATION_TIME}
 
 cloudinary:
-  cloud_name: dquzrdxog
-  api_key: 782368751769339
-  api_secret: SjQexhNC77z-Lzx5XqwZUfSbGC4
+  cloud_name: ${CLOUDINARY_CLOUD_NAME}
+  api_key: ${CLOUDINARY_API_KEY}
+  api_secret: ${CLOUDINARY_API_SECRET}

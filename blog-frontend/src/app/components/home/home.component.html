@@ -11,15 +11,14 @@
         <img  (click)="navigateToCreatePost()" src="assets/blogLogo.png" alt="NeoWrite" class="blog-logo">
       </div>
       <h1>NeoWrite</h1> 
-      <p class="hero-subtitle">Düşüncelerinizi paylaşın, bilgi birikimini artırın</p>
+      <p class="hero-subtitle">{{ 'welcome' | translate }}</p>
       <div class="hero-buttons">
         <button *ngIf="!isLoggedIn" (click)="navigateToSignup()" class="btn-light">
-          <span class="btn-text">Ücretsiz Hesap Oluştur</span>
+          <span class="btn-text">{{ 'signup' | translate }}</span>
         </button>
         <button *ngIf="!isLoggedIn" (click)="navigateToLogin()" class="btn-outline-light">
-          <span class="btn-text">Giriş Yap</span>
+          <span class="btn-text">{{ 'login' | translate }}</span>
         </button>
-        
       </div>
     </div>
   </div>
@@ -32,9 +31,9 @@
         <!-- Sidebar Loading Indicator -->
         <div *ngIf="loadingSidebar" class="sidebar-loading">
           <div class="spinner-border spinner-border-sm" role="status">
-            <span class="visually-hidden">Yükleniyor...</span>
+            <span class="visually-hidden">{{ 'loading' | translate }}</span>
           </div>
-          <p>Yan panel yükleniyor...</p>
+          <p>{{ 'loading' | translate }}</p>
         </div>
         
         <!-- Sidebar Error Message -->
@@ -45,13 +44,13 @@
         <!-- Sidebar Content (only show when loaded) -->
         <ng-container *ngIf="!loadingSidebar && !sidebarError">
           <div class="sidebar-section">
-            <h3>Kategoriler</h3>
+            <h3>{{ 'category' | translate }}</h3>
             <div class="category-list">
               <button 
                 class="category-item"
                 [class.active]="selectedCategory === null"
                 (click)="filterByCategory(null)">
-                <span class="category-text">Tümü</span>
+                <span class="category-text">{{ 'all' | translate }}</span>
               </button>
               <button 
                 *ngFor="let category of categories"
@@ -65,7 +64,7 @@
 
           <!-- Popüler Yazarlar -->
           <div class="sidebar-section">
-            <h3>Popüler Yazarlar</h3>
+            <h3>{{ 'popular_authors' | translate }}</h3>
             <div class="popular-authors">
               <div *ngFor="let author of popularAuthors" class="author-item">
                 <a [routerLink]="['/user', author.email]" class="author-link">
@@ -80,7 +79,7 @@
 
           <!-- Son Yazılar -->
           <div class="sidebar-section">
-            <h3>Son Yazılar</h3>
+            <h3>{{ 'recent_posts' | translate }}</h3>
             <div class="recent-posts">
               <div *ngFor="let post of recentPosts" class="recent-post-item">
                 <a [routerLink]="['/post', post.id]" class="recent-post-link">
@@ -104,7 +103,7 @@
             type="text" 
             [(ngModel)]="searchQuery" 
             (ngModelChange)="searchPosts()"
-            placeholder="Blog yazılarında ara..."
+            [placeholder]="'search_placeholder' | translate"
             class="search-input">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
             <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
@@ -135,7 +134,7 @@
               </a>
               
               <a [routerLink]="['/post', post.id]" class="read-more">
-                Devamını Oku
+                {{ 'read_more' | translate }}
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
                 </svg>
@@ -148,21 +147,21 @@
       <!-- Daha Fazla Yükle Butonu -->
       <div *ngIf="!loading && currentPage < totalPages - 1 && filteredPosts.length > 0" class="load-more-container">
         <button (click)="loadMorePosts()" class="load-more-btn" [disabled]="loading">
-          Daha Fazla Yazı Yükle
+          {{ 'load_more' | translate }}
         </button>
       </div>
 
       <!-- Infinite Scroll Loading Indicator -->
       <div *ngIf="loading && currentPage > 0" class="loading-more">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Yükleniyor...</span>
+          <span class="visually-hidden">{{ 'loading' | translate }}</span>
         </div>
-        <p>Yazılar yükleniyor...</p>
+        <p>{{ 'loading_posts' | translate }}</p>
       </div>
       
       <!-- End of Results Message -->
       <div *ngIf="currentPage >= totalPages - 1 && filteredPosts.length > 0 && !loading && !searchQuery" class="end-of-results">
-        <p>Tüm yazılar yüklendi.</p>
+        <p>{{ 'all_posts_loaded' | translate }}</p>
       </div>
 
       <!-- No Posts Message -->
@@ -172,8 +171,8 @@
             <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
             <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
           </svg>
-          <h3>Henüz Yazı Bulunamadı</h3>
-          <p>Bu kategoride henüz yazı bulunmuyor. Daha sonra tekrar kontrol edin veya başka bir kategori seçin.</p>
+          <h3>{{ 'no_posts_found' | translate }}</h3>
+          <p>{{ 'no_posts_message' | translate }}</p>
         </div>
       </div>
 

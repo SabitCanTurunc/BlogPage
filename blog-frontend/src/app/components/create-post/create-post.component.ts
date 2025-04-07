@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import { ImageService } from '../../services/image.service';
 import { RouterModule } from '@angular/router';
 import { CategoryResponseDto } from '../../models/category-response.dto';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 interface UploadedImage {
   url: string;
@@ -16,7 +17,7 @@ interface UploadedImage {
 @Component({
   selector: 'app-create-post',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, TranslatePipe],
   templateUrl: './create-post.component.html',
   styleUrl: './create-post.component.css'
 })

@@ -3,92 +3,93 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe],
   template: `
     <div class="signup-container">
       <a routerLink="/" class="home-icon">
         <i class="fas fa-home"></i>
       </a>
       <div class="signup-box">
-        <h2>Hesap Oluştur</h2>
-        <p class="subtitle">Blog platformuna katılın ve düşüncelerinizi paylaşın</p>
+        <h2>{{ 'signup_title' | translate }}</h2>
+        <p class="subtitle">{{ 'signup_subtitle' | translate }}</p>
         
         <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
           <div class="form-group">
-            <label for="username">Kullanıcı Adı</label>
+            <label for="username">{{ 'username' | translate }}</label>
             <input 
               type="text" 
               id="username" 
               formControlName="username" 
               class="form-control"
               [class.is-invalid]="signupForm.get('username')?.invalid && signupForm.get('username')?.touched"
-              placeholder="Kullanıcı adınızı giriniz">
+              [placeholder]="'username_placeholder' | translate">
             <div class="invalid-feedback" *ngIf="signupForm.get('username')?.errors?.['required'] && signupForm.get('username')?.touched">
-              Kullanıcı adı zorunludur
+              {{ 'username_required' | translate }}
             </div>
             <div class="invalid-feedback" *ngIf="signupForm.get('username')?.errors?.['minlength'] && signupForm.get('username')?.touched">
-              Kullanıcı adı en az 3 karakter olmalıdır
+              {{ 'username_minlength' | translate }}
             </div>
           </div>
 
           <div class="form-group">
-            <label for="email">E-posta</label>
+            <label for="email">{{ 'email' | translate }}</label>
             <input 
               type="email" 
               id="email" 
               formControlName="email" 
               class="form-control"
               [class.is-invalid]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched"
-              placeholder="E-posta adresinizi giriniz">
+              [placeholder]="'email_placeholder' | translate">
             <div class="invalid-feedback" *ngIf="signupForm.get('email')?.errors?.['required'] && signupForm.get('email')?.touched">
-              E-posta adresi zorunludur
+              {{ 'email_required' | translate }}
             </div>
             <div class="invalid-feedback" *ngIf="signupForm.get('email')?.errors?.['email'] && signupForm.get('email')?.touched">
-              Geçerli bir e-posta adresi giriniz
+              {{ 'email_invalid' | translate }}
             </div>
           </div>
 
           <div class="form-group">
-            <label for="password">Şifre</label>
+            <label for="password">{{ 'password' | translate }}</label>
             <input 
               type="password" 
               id="password" 
               formControlName="password" 
               class="form-control"
               [class.is-invalid]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched"
-              placeholder="Şifrenizi giriniz">
+              [placeholder]="'password_placeholder' | translate">
             <div class="invalid-feedback" *ngIf="signupForm.get('password')?.errors?.['required'] && signupForm.get('password')?.touched">
-              Şifre zorunludur
+              {{ 'password_required' | translate }}
             </div>
             <div class="invalid-feedback" *ngIf="signupForm.get('password')?.errors?.['minlength'] && signupForm.get('password')?.touched">
-              Şifre en az 6 karakter olmalıdır
+              {{ 'password_minlength' | translate }}
             </div>
           </div>
 
           <div class="form-group">
-            <label for="confirmPassword">Şifre Tekrarı</label>
+            <label for="confirmPassword">{{ 'confirm_password' | translate }}</label>
             <input 
               type="password" 
               id="confirmPassword" 
               formControlName="confirmPassword" 
               class="form-control"
               [class.is-invalid]="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched"
-              placeholder="Şifrenizi tekrar giriniz">
+              [placeholder]="'confirm_password_placeholder' | translate">
             <div class="invalid-feedback" *ngIf="signupForm.get('confirmPassword')?.errors?.['required'] && signupForm.get('confirmPassword')?.touched">
-              Şifre tekrarı zorunludur
+              {{ 'confirm_password_required' | translate }}
             </div>
             <div class="invalid-feedback" *ngIf="signupForm.get('confirmPassword')?.errors?.['passwordMismatch'] && signupForm.get('confirmPassword')?.touched">
-              Şifreler eşleşmiyor
+              {{ 'password_mismatch' | translate }}
             </div>
           </div>
 
           <button type="submit" class="btn btn-primary" [disabled]="signupForm.invalid || isLoading">
-            <span *ngIf="!isLoading">Hesap Oluştur</span>
-            <span *ngIf="isLoading">Oluşturuluyor...</span>
+            <span *ngIf="!isLoading">{{ 'signup_button' | translate }}</span>
+            <span *ngIf="isLoading">{{ 'signup_loading' | translate }}</span>
           </button>
         </form>
 
@@ -96,7 +97,7 @@ import { CommonModule } from '@angular/common';
         <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
 
         <div class="mt-3">
-          Zaten hesabınız var mı? <a routerLink="/login">Giriş Yap</a>
+          {{ 'already_have_account' | translate }} <a routerLink="/login">{{ 'login' | translate }}</a>
         </div>
       </div>
     </div>

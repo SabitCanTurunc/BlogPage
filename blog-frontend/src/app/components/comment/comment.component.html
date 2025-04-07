@@ -1,0 +1,79 @@
+<div class="comments-section">
+  <h3>{{ "comments" | translate }}</h3>
+
+  <div *ngIf="isLoggedIn" class="comment-form">
+    <form [formGroup]="commentForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <textarea
+          formControlName="comment"
+          class="form-control"
+          [placeholder]="'write_comment' | translate"
+          rows="3"
+        ></textarea>
+        <div
+          *ngIf="commentForm.get('comment')?.errors?.['required'] && commentForm.get('comment')?.touched"
+          class="error-message"
+        >
+          {{ "comment_required" | translate }}
+        </div>
+      </div>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="commentForm.invalid || isSubmitting"
+      >
+        {{
+          isSubmitting
+            ? ("sending" | translate)
+            : ("comment_action" | translate)
+        }}
+      </button>
+    </form>
+  </div>
+
+  <div *ngIf="!isLoggedIn" class="login-prompt">
+    <p>
+      {{ "login_to_comment" | translate }}
+      <a routerLink="/login">{{ "login" | translate }}</a
+      >.
+    </p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div *ngIf="success" class="alert alert-success">
+    {{ success }}
+  </div>
+
+  <div class="comments-list">
+    <div *ngIf="comments.length === 0" class="no-comments">
+      <p>{{ "no_comments_yet" | translate }}</p>
+    </div>
+
+    <div *ngFor="let comment of comments" class="comment-item">
+      <div class="comment-header">
+        <div class="comment-author">
+          <img
+            [src]="'https://ui-avatars.com/api/?name=' + comment.username"
+            [alt]="'user_avatar_alt' | translate"
+            class="author-avatar"
+          />
+          <span class="author-name">{{ comment.username }}</span>
+        </div>
+        <div class="comment-date">
+          {{ comment.createdAt | date : "dd.MM.yyyy HH:mm" }}
+        </div>
+      </div>
+      <div class="comment-content">
+        {{ comment.comment }}
+      </div>
+      <div *ngIf="canDelete(comment)" class="comment-actions">
+        <button (click)="deleteComment(comment.id)" class="btn-delete">
+          {{ "delete_comment" | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -52,7 +52,7 @@ export class UserService {
   }
 
   // Kullanıcı hesabını sil
-  deleteAccount(credentials: { email: string, password: string }): Observable<any> {
+  deleteAccount(credentials: { email: string, password: string | undefined }): Observable<any> {
     return this.http.post(`${this.apiUrl}/delete-account`, credentials).pipe(
       catchError(this.handleError)
     );

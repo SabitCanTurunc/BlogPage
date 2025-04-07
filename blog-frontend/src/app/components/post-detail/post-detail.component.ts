@@ -5,11 +5,12 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { PostResponseDto } from '../../models/post-response.dto';
 import { CommentComponent } from '../comment/comment.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-post-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, CommentComponent],
+  imports: [CommonModule, FormsModule, RouterModule, CommentComponent, TranslatePipe],
   templateUrl: './post-detail.component.html',
   styleUrl: './post-detail.component.css'
 })
@@ -42,7 +43,7 @@ export class PostDetailComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'Blog yazısı yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+        this.error = 'post_load_error';
         this.loading = false;
       }
     });

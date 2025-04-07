@@ -1,56 +1,56 @@
 <div class="create-post-container">
   <div class="create-post-content">
     <div class="create-post-header">
-      <h1 class="create-post-title">{{ isEditMode ? 'Blog Yazısını Düzenle' : 'Yeni Blog Yazısı Oluştur' }}</h1>
-      <p class="create-post-subtitle">Düşüncelerinizi ve bilgilerinizi paylaşın</p>
+      <h1 class="create-post-title">{{ isEditMode ? ('create_post_edit_title' | translate) : ('create_post_new_title' | translate) }}</h1>
+      <p class="create-post-subtitle">{{ 'create_post_subtitle' | translate }}</p>
     </div>
     
     <div class="create-post-body">
       <div *ngIf="!isLoggedIn" class="alert-warning">
-        Lütfen önce giriş yapın.
+        {{ 'create_post_login_required' | translate }}
       </div>
       
       <form *ngIf="isLoggedIn" [formGroup]="postForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
-          <label for="title" class="form-label">Başlık</label>
+          <label for="title" class="form-label">{{ 'create_post_title' | translate }}</label>
           <input 
             type="text" 
             id="title" 
             class="form-control" 
             formControlName="title" 
-            placeholder="Blog yazınızın başlığını girin">
+            [placeholder]="'create_post_title_placeholder' | translate">
           <div class="invalid-feedback" *ngIf="postForm.get('title')?.errors?.['required'] && postForm.get('title')?.touched">
-            Başlık alanı zorunludur
+            {{ 'create_post_title_required' | translate }}
           </div>
         </div>
 
         <div class="form-group">
-          <label for="categoryId" class="form-label">Kategori</label>
+          <label for="categoryId" class="form-label">{{ 'create_post_category' | translate }}</label>
           <select id="categoryId" class="form-select" formControlName="categoryId">
-            <option value="">Kategori seçin</option>
+            <option value="">{{ 'create_post_select_category' | translate }}</option>
             <option *ngFor="let category of categories" [value]="category.id">
               {{category.name}}
             </option>
           </select>
           <div class="invalid-feedback" *ngIf="postForm.get('categoryId')?.errors?.['required'] && postForm.get('categoryId')?.touched">
-            Kategori seçimi zorunludur
+            {{ 'create_post_category_required' | translate }}
           </div>
         </div>
 
         <div class="form-group">
-          <label for="content" class="form-label">İçerik</label>
+          <label for="content" class="form-label">{{ 'create_post_content' | translate }}</label>
           <textarea 
             id="content" 
             class="form-control" 
             formControlName="content" 
-            placeholder="Blog yazınızın içeriğini girin"></textarea>
+            [placeholder]="'create_post_content_placeholder' | translate"></textarea>
           <div class="invalid-feedback" *ngIf="postForm.get('content')?.errors?.['required'] && postForm.get('content')?.touched">
-            İçerik alanı zorunludur
+            {{ 'create_post_content_required' | translate }}
           </div>
         </div>
 
         <div class="form-group">
-          <label for="imageUpload" class="form-label">Resim Yükle</label>
+          <label for="imageUpload" class="form-label">{{ 'create_post_upload_image' | translate }}</label>
           <div class="file-upload-container">
             <input 
               type="file" 
@@ -64,15 +64,15 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
               </svg>
-              <span>Resim Seç</span>
+              <span>{{ 'create_post_select_image' | translate }}</span>
             </div>
             <div class="file-upload-info">
-              <small>En fazla 5 resim, her biri 20MB'dan küçük olmalıdır.</small>
+              <small>{{ 'create_post_image_upload_info' | translate }}</small>
             </div>
           </div>
           <div class="image-preview-container" *ngIf="uploadedImages.length > 0">
             <div *ngFor="let image of uploadedImages" class="image-preview">
-              <img [src]="image.url" alt="Yüklenen resim">
+              <img [src]="image.url" [alt]="'create_post_uploaded_image' | translate">
               <button type="button" class="remove-image" (click)="removeImage(image)">×</button>
             </div>
           </div>
@@ -80,7 +80,7 @@
             <div class="spinner">
               <div class="spinner-inner"></div>
             </div>
-            <span>Resim yükleniyor...</span>
+            <span>{{ 'create_post_uploading' | translate }}</span>
           </div>
           <div class="invalid-feedback" *ngIf="imageUploadError">
             {{ imageUploadError }}
@@ -88,9 +88,9 @@
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn-cancel" (click)="cancel()">İptal</button>
+          <button type="button" class="btn-cancel" (click)="cancel()">{{ 'create_post_cancel' | translate }}</button>
           <button type="submit" class="btn-submit" [disabled]="!postForm.valid || isSubmitting">
-            {{ isSubmitting ? 'Gönderiliyor...' : (isEditMode ? 'Güncelle' : 'Gönder') }}
+            {{ isSubmitting ? ('create_post_submitting' | translate) : (isEditMode ? ('create_post_update' | translate) : ('create_post_submit' | translate)) }}
           </button>
         </div>
       </form>

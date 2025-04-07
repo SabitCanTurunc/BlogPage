@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { UserResponseDto } from '../../models/user-response.dto';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslatePipe],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
@@ -20,14 +22,23 @@ export class HeaderComponent implements OnInit {
   isDropdownOpen: boolean = false;
   isMenuOpen: boolean = false;
   userProfile: UserResponseDto | null = null;
+  currentLanguage: string = 'tr';
   
   constructor(
     private authService: AuthService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private translationService: TranslationService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
   
   ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.translationService.currentLang$.subscribe(lang => {
+        this.currentLanguage = lang;
+      });
+    }
+
     this.authService.currentUser$.subscribe(user => {
       this.isLoggedIn = !!user;
       if (user) {
@@ -73,12 +84,16 @@ export class HeaderComponent implements OnInit {
   }
   
   logoutAndCloseAll(): void {
-    localStorage.clear();
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.clear();
+    }
     this.closeDropdown();
     this.closeMenu();
     this.authService.logout();
     this.router.navigate(['/']);
-    window.location.reload();
+    if (isPlatformBrowser(this.platformId)) {
+      window.location.reload();
+    }
   }
 
   getDisplayName(): string {
@@ -86,5 +101,17 @@ export class HeaderComponent implements OnInit {
       return `${this.userProfile.name} ${this.userProfile.surname}`;
     }
     return this.userEmail;
+  }
+
+  toggleLanguage(): void {
+    const newLang = this.currentLanguage === 'tr' ? 'en' : 'tr';
+    this.translationService.setLanguage(newLang);
+  }
+
+  toggleLanguageAndReload(): void {
+    this.toggleLanguage();
+    if (isPlatformBrowser(this.platformId)) {
+      window.location.reload();
+    }
   }
 }

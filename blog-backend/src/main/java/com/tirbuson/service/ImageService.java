@@ -48,7 +48,7 @@ public class ImageService extends BaseService<Image,Integer, ImageRepository> {
         return responseDto;
     }
 
-    public void deleteImageFromCloudinary(String imageUrl) {
+    public void     deleteImageFromCloudinary(String imageUrl) {
         try {
             String publicId = imageUrl.substring(imageUrl.lastIndexOf("/") + 1, imageUrl.lastIndexOf("."));
             cloudinary.uploader().destroy("blog/" + publicId, ObjectUtils.emptyMap());

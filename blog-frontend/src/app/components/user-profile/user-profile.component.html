@@ -7,14 +7,14 @@
             <div class="profile-avatar">
               <img
                 [src]="userProfileImage || 'https://ui-avatars.com/api/?name=' + getDisplayedEmail()"
-                alt="Profil"
+                [alt]="'profile' | translate"
                 class="avatar"
               />
               <div *ngIf="isOwnProfile" class="avatar-upload">
                 <input
                   type="file"
                   #fileInput
-                  (change)="onFileSelected($event)"
+                  (change)="onImageSelected($event)"
                   accept="image/*"
                   class="file-input"
                   style="display: none"
@@ -24,7 +24,7 @@
                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                   </svg>
                   <div *ngIf="isUploadingImage" class="spinner-border spinner-border-sm" role="status">
-                    <span class="visually-hidden">Yükleniyor...</span>
+                    <span class="visually-hidden">{{ 'loading' | translate }}</span>
                   </div>
                 </button>
               </div>
@@ -37,7 +37,7 @@
                 {{ getDisplayedEmail() }}
               </span>
             </h2>
-            <p class="profile-role">{{ isAdmin ? "Yönetici" : "Kullanıcı" }}</p>
+            <p class="profile-role">{{ isAdmin ? ('admin_role' | translate) : ('user_role' | translate) }}</p>
             <p class="profile-description" *ngIf="accountForm.get('description')?.value">
               {{ accountForm.get('description')?.value }}
             </p>
@@ -45,18 +45,18 @@
 
           <div class="profile-info">
             <div class="info-item">
-              <span class="info-label">Email:</span>
+              <span class="info-label">{{ 'email' | translate }}:</span>
               <span class="info-value">{{ accountForm.get('email')?.value }}</span>
             </div>
             <div class="info-item" *ngIf="accountForm.get('phoneNumber')?.value">
-              <span class="info-label">Telefon:</span>
+              <span class="info-label">{{ 'phone' | translate }}:</span>
               <span class="info-value">{{ accountForm.get('phoneNumber')?.value }}</span>
             </div>
             <div class="info-item" *ngIf="accountForm.get('gender')?.value">
-              <span class="info-label">Cinsiyet:</span>
+              <span class="info-label">{{ 'gender' | translate }}:</span>
               <span class="info-value">
-                {{ accountForm.get('gender')?.value === 'MALE' ? 'Erkek' : 
-                   accountForm.get('gender')?.value === 'FEMALE' ? 'Kadın' : 'Diğer' }}
+                {{ accountForm.get('gender')?.value === 'MALE' ? ('male' | translate) : 
+                   accountForm.get('gender')?.value === 'FEMALE' ? ('female' | translate) : ('other' | translate) }}
               </span>
             </div>
           </div>
@@ -64,31 +64,31 @@
           <div class="profile-stats">
             <div class="stat-item">
               <span class="stat-value">{{ userPosts.length }}</span>
-              <span class="stat-label">Yazı</span>
+              <span class="stat-label">{{ 'posts' | translate }}</span>
             </div>
           </div>
 
           <div class="profile-actions" *ngIf="isOwnProfile">
             <button class="btn btn-primary" (click)="activeTab = 'posts'">
-              Yazılarım
+              {{ 'my_posts' | translate }}
             </button>
             <button class="btn btn-secondary" (click)="activeTab = 'account'">
-              Hesap Ayarları
+              {{ 'account_settings' | translate }}
             </button>
             <button class="btn btn-secondary" (click)="activeTab = 'changePassword'">
-              Şifre Değiştir
+              {{ 'change_password' | translate }}
             </button>
-            <button class="btn btn-danger" (click)="confirmDeleteAccount()">
-              Hesabı Sil
+            <button class="btn btn-danger" (click)="deleteAccount()">
+              {{ 'delete_account' | translate }}
             </button>
             <button class="btn btn-outline" (click)="logout()">
-              Çıkış Yap
+              {{ 'logout' | translate }}
             </button>
           </div>
 
           <div class="profile-actions" *ngIf="!isOwnProfile">
             <a routerLink="/home" class="btn btn-outline">
-              Ana Sayfaya Dön
+              {{ 'back_to_home' | translate }}
             </a>
           </div>
         </div>
@@ -98,8 +98,8 @@
         <div class="profile-content">
           <!-- Yazılar Sekmesi -->
           <div *ngIf="activeTab === 'posts'" class="posts-tab">
-            <h3 *ngIf="isOwnProfile">Yazılarım</h3>
-            <h3 *ngIf="!isOwnProfile">{{ getDisplayedEmail() }} Kullanıcısının Yazıları</h3>
+            <h3 *ngIf="isOwnProfile">{{ 'my_posts' | translate }}</h3>
+            <h3 *ngIf="!isOwnProfile">{{ getDisplayedEmail() }} {{ 'user_posts' | translate }}</h3>
 
             <div class="search-container">
               <div class="search-box">
@@ -107,7 +107,7 @@
                   type="text" 
                   [(ngModel)]="searchQuery" 
                   (ngModelChange)="searchPosts()"
-                  placeholder="Yazılarda ara..."
+                  [placeholder]="'search_posts' | translate"
                   class="search-input">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                   <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
@@ -116,16 +116,16 @@
             </div>
 
             <div *ngIf="filteredPosts.length === 0" class="no-posts">
-              <p *ngIf="isOwnProfile">Henüz hiç yazı yazmadınız.</p>
-              <p *ngIf="!isOwnProfile">Bu kullanıcı henüz hiç yazı yazmamış.</p>
+              <p *ngIf="isOwnProfile">{{ 'no_posts_yet' | translate }}</p>
+              <p *ngIf="!isOwnProfile">{{ 'user_no_posts' | translate }}</p>
               <a *ngIf="isOwnProfile" routerLink="/create-post" class="btn btn-primary"
-                >Yeni Yazı Oluştur</a
+                >{{ 'create_new_post' | translate }}</a
               >
             </div>
 
             <div *ngIf="filteredPosts.length > 0" class="posts-list">
               <a *ngIf="isOwnProfile" routerLink="/create-post" class="btn btn-primary mb-4"
-                >Yeni Yazı Oluştur</a
+                >{{ 'create_new_post' | translate }}</a
               >
 
               <div *ngFor="let post of filteredPosts" class="post-item">
@@ -142,13 +142,13 @@
                 </div>
                 <div class="post-actions">
                   <a [routerLink]="['/post', post.id]" class="btn-view"
-                    >Görüntüle</a
+                    >{{ 'view' | translate }}</a
                   >
                   <a *ngIf="isOwnProfile" [routerLink]="['/edit-post', post.id]" class="btn-edit"
-                    >Düzenle</a
+                    >{{ 'edit' | translate }}</a
                   >
                   <button *ngIf="isOwnProfile" (click)="confirmDeletePost(post)" class="btn-delete">
-                    Sil
+                    {{ 'delete' | translate }}
                   </button>
                 </div>
               </div>
@@ -157,7 +157,7 @@
 
           <!-- Hesap Ayarları Sekmesi -->
           <div *ngIf="isOwnProfile && activeTab === 'account'" class="account-tab">
-            <h3>Hesap Ayarları</h3>
+            <h3>{{ 'account_settings' | translate }}</h3>
 
             <form
               [formGroup]="accountForm"
@@ -165,7 +165,7 @@
               class="account-form"
             >
               <div class="form-group">
-                <label for="username">Kullanıcı Adı</label>
+                <label for="username">{{ 'username' | translate }}</label>
                 <input
                   type="text"
                   id="username"
@@ -180,12 +180,12 @@
                   *ngIf="accountForm.get('username')?.errors?.['required'] && accountForm.get('username')?.touched"
                   class="error-message"
                 >
-                  Kullanıcı adı gereklidir
+                  {{ 'username_required' | translate }}
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="email">E-posta</label>
+                <label for="email">{{ 'email' | translate }}</label>
                 <input
                   type="email"
                   id="email"
@@ -194,12 +194,12 @@
                   [disabled]="true"
                 />
                 <small class="form-text text"
-                  >E-posta adresi değiştirilemez</small
+                  >{{ 'email_cannot_change' | translate }}</small
                 >
               </div>
 
               <div class="form-group">
-                <label for="name">Ad</label>
+                <label for="name">{{ 'name' | translate }}</label>
                 <input
                   type="text"
                   id="name"
@@ -209,7 +209,7 @@
               </div>
 
               <div class="form-group">
-                <label for="surname">Soyad</label>
+                <label for="surname">{{ 'surname' | translate }}</label>
                 <input
                   type="text"
                   id="surname"
@@ -219,7 +219,7 @@
               </div>
 
               <div class="form-group">
-                <label for="phoneNumber">Telefon Numarası</label>
+                <label for="phoneNumber">{{ 'phone' | translate }}</label>
                 <input
                   type="text"
                   id="phoneNumber"
@@ -229,17 +229,17 @@
               </div>
 
               <div class="form-group">
-                <label for="gender">Cinsiyet</label>
+                <label for="gender">{{ 'gender' | translate }}</label>
                 <select id="gender" formControlName="gender" class="form-control">
-                  <option value="">Seçiniz</option>
-                  <option value="MALE">Erkek</option>
-                  <option value="FEMALE">Kadın</option>
-                  <option value="OTHER">Diğer</option>
+                  <option value="">{{ 'select' | translate }}</option>
+                  <option value="MALE">{{ 'male' | translate }}</option>
+                  <option value="FEMALE">{{ 'female' | translate }}</option>
+                  <option value="OTHER">{{ 'other' | translate }}</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label for="description">Hakkımda</label>
+                <label for="description">{{ 'about_me' | translate }}</label>
                 <textarea
                   id="description"
                   formControlName="description"
@@ -259,20 +259,20 @@
               <button
                 type="submit"
                 class="btn btn-primary"
-                [disabled]="accountForm.invalid || isSubmitting"
+                [disabled]="!accountForm.valid || isUpdating"
               >
-                {{ isSubmitting ? "Güncelleniyor..." : "Hesap Bilgilerini Güncelle" }}
+                {{ isUpdating ? ('updating' | translate) : ('update_account_info' | translate) }}
               </button>
             </form>
           </div>
 
           <!-- Şifre Değiştirme Sekmesi -->
           <div *ngIf="isOwnProfile && activeTab === 'changePassword'" class="password-tab">
-            <h3>Şifre Değiştir</h3>
+            <h3>{{ 'change_password_title' | translate }}</h3>
 
             <!-- Adım 1: Doğrulama Kodu Talep Et -->
             <div *ngIf="passwordChangeStep === 1">
-              <p class="text">Güvenliğiniz için, şifre değiştirme işlemi sırasında e-posta doğrulaması gereklidir.</p>
+              <p class="text">{{ 'change_password_security_info' | translate }}</p>
               
               <form (ngSubmit)="requestPasswordResetCode()" class="password-form">
                 <div *ngIf="passwordResetError" class="alert alert-danger">
@@ -288,7 +288,7 @@
                   class="btn btn-primary"
                   [disabled]="isRequestingCode"
                 >
-                  {{ isRequestingCode ? "Kod Gönderiliyor..." : "Doğrulama Kodu İste" }}
+                  {{ isRequestingCode ? ('sending_code' | translate) : ('request_code' | translate) }}
                 </button>
               </form>
             </div>
@@ -301,7 +301,7 @@
                 class="password-form"
               >
                 <div class="form-group">
-                  <label for="verificationCode">Doğrulama Kodu</label>
+                  <label for="verificationCode">{{ 'verification_code' | translate }}</label>
                   <input
                     type="text"
                     id="verificationCode"
@@ -311,24 +311,24 @@
                       passwordForm.get('verificationCode')?.invalid &&
                       passwordForm.get('verificationCode')?.touched
                     "
-                    placeholder="Doğrulama kodunu giriniz"
+                    [placeholder]="'verification_code_placeholder' | translate"
                   />
                   <div
                     *ngIf="passwordForm.get('verificationCode')?.errors?.['required'] && passwordForm.get('verificationCode')?.touched"
                     class="error-message"
                   >
-                    Doğrulama kodu gereklidir
+                    {{ 'verification_code_required' | translate }}
                   </div>
                   <div
                     *ngIf="passwordForm.get('verificationCode')?.errors?.['minlength'] && passwordForm.get('verificationCode')?.touched"
                     class="error-message"
                   >
-                    Doğrulama kodu en az 6 karakter olmalıdır
+                    {{ 'verification_code_minlength' | translate }}
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label for="newPassword">Yeni Şifre</label>
+                  <label for="newPassword">{{ 'new_password' | translate }}</label>
                   <input
                     type="password"
                     id="newPassword"
@@ -338,24 +338,24 @@
                       passwordForm.get('newPassword')?.invalid &&
                       passwordForm.get('newPassword')?.touched
                     "
-                    placeholder="Yeni şifrenizi giriniz"
+                    [placeholder]="'new_password_placeholder' | translate"
                   />
                   <div
                     *ngIf="passwordForm.get('newPassword')?.errors?.['required'] && passwordForm.get('newPassword')?.touched"
                     class="error-message"
                   >
-                    Yeni şifre gereklidir
+                    {{ 'new_password_required' | translate }}
                   </div>
                   <div
                     *ngIf="passwordForm.get('newPassword')?.errors?.['minlength'] && passwordForm.get('newPassword')?.touched"
                     class="error-message"
                   >
-                    Şifre en az 6 karakter olmalıdır
+                    {{ 'new_password_minlength' | translate }}
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label for="confirmPassword">Şifre Tekrar</label>
+                  <label for="confirmPassword">{{ 'confirm_new_password' | translate }}</label>
                   <input
                     type="password"
                     id="confirmPassword"
@@ -365,19 +365,19 @@
                       passwordForm.get('confirmPassword')?.invalid &&
                       passwordForm.get('confirmPassword')?.touched || passwordForm.errors?.['passwordMismatch']
                     "
-                    placeholder="Yeni şifrenizi tekrar giriniz"
+                    [placeholder]="'confirm_new_password_placeholder' | translate"
                   />
                   <div
                     *ngIf="passwordForm.get('confirmPassword')?.errors?.['required'] && passwordForm.get('confirmPassword')?.touched"
                     class="error-message"
                   >
-                    Şifre tekrarı gereklidir
+                    {{ 'confirm_new_password_required' | translate }}
                   </div>
                   <div
                     *ngIf="passwordForm.errors?.['passwordMismatch']"
                     class="error-message"
                   >
-                    Şifreler eşleşmiyor
+                    {{ 'password_mismatch' | translate }}
                   </div>
                 </div>
 
@@ -395,7 +395,7 @@
                     class="btn btn-primary"
                     [disabled]="passwordForm.invalid || isSubmittingPassword"
                   >
-                    {{ isSubmittingPassword ? "Güncelleniyor..." : "Şifremi Değiştir" }}
+                    {{ isSubmittingPassword ? ('updating_password' | translate) : ('update_password' | translate) }}
                   </button>
                   
                   <button
@@ -404,7 +404,7 @@
                     (click)="resendPasswordResetCode()"
                     [disabled]="isResendingCode"
                   >
-                    {{ isResendingCode ? "Kod Gönderiliyor..." : "Yeni Kod İste" }}
+                    {{ isResendingCode ? ('resending_code' | translate) : ('resend_code' | translate) }}
                   </button>
                 </div>
               </form>
