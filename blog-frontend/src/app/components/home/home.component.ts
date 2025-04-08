@@ -347,4 +347,41 @@ export class HomeComponent implements OnInit {
       img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
     }
   }
+
+  scrollToTop(): void {
+    // Tüm olası scroll containerları kontrol et
+    if (typeof window !== 'undefined') {
+      // 1. Window scroll - smooth özelliği ile
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      
+      // 2. Document scroll - smooth özelliği ile
+      document.documentElement.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      
+      document.body.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      
+      // 3. Tüm scroll containerları bul ve scroll yap - smooth özelliği ile
+      setTimeout(() => {
+        const scrollContainers = document.querySelectorAll('.scrollable, .posts-section, .sidebar, .main-content');
+        scrollContainers.forEach(container => {
+          if (container instanceof HTMLElement) {
+            container.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+          }
+        });
+      }, 100);
+      
+      console.log('Scroll to top çalıştırıldı - smooth özelliği ile');
+    }
+  }
 }
