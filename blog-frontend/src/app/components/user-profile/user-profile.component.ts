@@ -6,6 +6,7 @@ import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { PostService } from '../../services/post.service';
 import { ImageService } from '../../services/image.service';
+import { HighlightService } from '../../services/highlight.service';
 import { PostResponseDto } from '../../models/post-response.dto';
 import { Subscription } from 'rxjs';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -51,6 +52,12 @@ export class UserProfileComponent implements OnInit {
   // Hesap silme formu
   deleteAccountForm: FormGroup;
   
+  // Highlight özellikleri
+  highlightedPosts: number[] = []; // Öne çıkarılmış post ID'leri
+  dailyHighlightCount: number = 0; // Günlük öne çıkarılan post sayısı
+  isHighlighting: boolean = false; // Öne çıkarma işlemi devam ediyor mu?
+  highlightingPostId: number | null = null; // Hangi post öne çıkarılıyor?
+  
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -58,7 +65,8 @@ export class UserProfileComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private highlightService: HighlightService // Yeni Highlight servisi
   ) {
     // Hesap formu
     this.accountForm = this.fb.group({
@@ -106,6 +114,11 @@ export class UserProfileComponent implements OnInit {
         this.loadUserProfile();
       }
     });
+    
+    // Kendi profili görüntüleniyorsa highlight'ları yükle
+    if (this.isOwnProfile) {
+      this.loadHighlights();
+    }
   }
   
   loadUserPosts(email: string): void {
@@ -639,5 +652,237 @@ export class UserProfileComponent implements OnInit {
         });
       }
     });
+  }
+  
+  /**
+   * Kullanıcının öne çıkardığı postları yükler
+   */
+  loadHighlights(): void {
+    if (!this.isOwnProfile) return;
+    
+    this.highlightService.getDailyHighlights().subscribe({
+      next: (highlights) => {
+        // Günlük highlight sayısını güncelle
+        this.dailyHighlightCount = highlights.length;
+        
+        // Öne çıkarılmış post ID'lerini topla
+        const highlightedPostIds = highlights.map((highlight: any) => highlight.postId);
+        
+        // Tüm highlight'ları da yükle
+        this.highlightService.getUserHighlights().subscribe({
+          next: (allHighlights) => {
+            this.highlightedPosts = allHighlights.map((highlight: any) => highlight.postId);
+          },
+          error: (err) => {
+            // Hata mesajı kaldırıldı
+          }
+        });
+      },
+      error: (err) => {
+        // Hata mesajı kaldırıldı
+      }
+    });
+  }
+  
+  /**
+   * Bir postu öne çıkarır
+   * @param postId Öne çıkarılacak post ID'si
+   */
+  highlightPost(postId: number): void {
+    if (!this.isOwnProfile || this.isHighlighting) return;
+    
+    // Günlük limit kontrolü
+    if (this.dailyHighlightCount >= 2) {
+      Swal.fire({
+        title: this.translationService.getTranslation('error'),
+        text: this.translationService.getTranslation('daily_highlight_limit_reached'),
+        icon: 'error',
+        background: '#1a1a2e',
+        color: '#ffffff',
+        customClass: {
+          popup: 'modern-swal-popup',
+          title: 'modern-swal-title',
+          htmlContainer: 'modern-swal-content'
+        }
+      });
+      return;
+    }
+    
+    this.isHighlighting = true;
+    this.highlightingPostId = postId;
+    
+    this.highlightService.highlightPost(postId).subscribe({
+      next: (response) => {
+        // Başarılı highlight işlemi
+        this.highlightedPosts.push(postId);
+        this.dailyHighlightCount++;
+        
+        Swal.fire({
+          title: this.translationService.getTranslation('success'),
+          text: this.translationService.getTranslation('post_highlighted_success'),
+          icon: 'success',
+          timer: 1500,
+          background: '#1a1a2e',
+          color: '#ffffff',
+          showConfirmButton: false,
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content'
+          }
+        });
+      },
+      error: (err) => {
+        // Hata mesajı kaldırıldı
+        
+        Swal.fire({
+          title: this.translationService.getTranslation('error'),
+          text: err.message || this.translationService.getTranslation('post_highlight_error'),
+          icon: 'error',
+          background: '#1a1a2e',
+          color: '#ffffff',
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content'
+          }
+        });
+      },
+      complete: () => {
+        this.isHighlighting = false;
+        this.highlightingPostId = null;
+      }
+    });
+  }
+  
+  /**
+   * Bir postun öne çıkarılıp çıkarılmadığını kontrol eder
+   * @param postId Kontrol edilecek post ID'si
+   * @returns Öne çıkarılmış mı?
+   */
+  isHighlighted(postId: number): boolean {
+    return this.highlightedPosts.includes(postId);
+  }
+  
+  /**
+   * Postun öne çıkarma durumunu tersine çevirir
+   * @param postId Post ID
+   */
+  toggleHighlight(postId: number): void {
+    if (!this.isOwnProfile || this.isHighlighting) return;
+    
+    // İşlemi görsel olarak başlat
+    this.isHighlighting = true;
+    this.highlightingPostId = postId;
+    
+    if (this.isHighlighted(postId)) {
+      // Öne çıkarmayı iptal et
+      this.removeHighlight(postId);
+    } else {
+      // Öne çıkar
+      this.highlightPost(postId);
+    }
+  }
+  
+  /**
+   * Bir postun öne çıkarmasını kaldırır
+   * @param postId Öne çıkarması kaldırılacak post ID'si
+   */
+  removeHighlight(postId: number): void {
+    if (!this.isOwnProfile || this.isHighlighting === false || this.highlightingPostId !== postId) return;
+    
+    // Silme işlemi için son kontrol modal'ı ekleyelim
+    const makeDeleteRequest = () => {
+      this.highlightService.removePostHighlight(postId).subscribe({
+        next: () => {
+          // Diziden postId'yi kaldır
+          this.highlightedPosts = this.highlightedPosts.filter(id => id !== postId);
+          
+          // Günlük sayıyı güncelle
+          if (this.dailyHighlightCount > 0) {
+            this.dailyHighlightCount--;
+          }
+          
+          Swal.fire({
+            title: this.translationService.getTranslation('success'),
+            text: this.translationService.getTranslation('highlight_removed_success') || 'Öne çıkarma başarıyla kaldırıldı',
+            icon: 'success',
+            timer: 1500,
+            background: '#1a1a2e',
+            color: '#ffffff',
+            showConfirmButton: false,
+            customClass: {
+              popup: 'modern-swal-popup',
+              title: 'modern-swal-title',
+              htmlContainer: 'modern-swal-content'
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Unhighlight hatası:', err);
+          
+          // Hata detaylarını konsola yazdır (geliştirme için)
+          if (err.error) {
+            console.error('Hata detayları:', err.error);
+          }
+          
+          let errorMessage = err.message || this.translationService.getTranslation('highlight_remove_error') || 'Öne çıkarma kaldırılırken bir hata oluştu';
+          
+          Swal.fire({
+            title: this.translationService.getTranslation('error'),
+            text: errorMessage,
+            icon: 'error',
+            background: '#1a1a2e',
+            color: '#ffffff',
+            showConfirmButton: true,
+            confirmButtonText: 'Tekrar Dene',
+            showCancelButton: true,
+            cancelButtonText: 'Vazgeç',
+            customClass: {
+              popup: 'modern-swal-popup',
+              title: 'modern-swal-title',
+              htmlContainer: 'modern-swal-content'
+            }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Kullanıcı tekrar denemek istedi, işlemi yeniden başlatalım
+              makeDeleteRequest();
+            }
+          });
+          
+          // Hata sonrasında sayfayı yenilemeyi teklif et
+          if (err.message && err.message.includes('bulunamadı')) {
+            setTimeout(() => {
+              Swal.fire({
+                title: 'Sayfa Yenilensin mi?',
+                text: 'En güncel verileri görmek için sayfayı yenilemek isteyebilirsiniz.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sayfayı Yenile',
+                cancelButtonText: 'Vazgeç',
+                background: '#1a1a2e',
+                color: '#ffffff',
+                customClass: {
+                  popup: 'modern-swal-popup',
+                  title: 'modern-swal-title',
+                  htmlContainer: 'modern-swal-content'
+                }
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.reload();
+                }
+              });
+            }, 1500);
+          }
+        },
+        complete: () => {
+          this.isHighlighting = false;
+          this.highlightingPostId = null;
+        }
+      });
+    };
+    
+    // Fonksiyonu çağıralım
+    makeDeleteRequest();
   }
 } 

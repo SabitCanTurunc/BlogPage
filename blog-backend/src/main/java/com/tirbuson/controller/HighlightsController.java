@@ -24,6 +24,15 @@ public class HighlightsController extends BaseController<HighlightsService, High
         this.highlightsService = service;
     }
 
+    /**
+     * Tüm öne çıkan içerikleri getiren public endpoint
+     * Bu endpoint herhangi bir yetkilendirme gerektirmez
+     */
+    @GetMapping("/public")
+    public ResponseEntity<List<HighlightResponseDto>> getPublicHighlights() {
+        return ResponseEntity.ok(highlightsService.getAllActiveHighlights());
+    }
+
     @PostMapping("/with-user")
     public ResponseEntity<HighlightResponseDto> createWithUser(
             @RequestAttribute("userId") Integer userId,
@@ -43,7 +52,7 @@ public class HighlightsController extends BaseController<HighlightsService, High
         return ResponseEntity.ok(highlightsService.getDailyHighlights(userId));
     }
 
-    @DeleteMapping("/{highlightId}")
+    @DeleteMapping("/custom-delete/{highlightId}")
     public ResponseEntity<Void> deleteHighlight(
             @RequestAttribute("userId") Integer userId,
             @PathVariable Integer highlightId) {

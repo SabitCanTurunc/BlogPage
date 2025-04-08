@@ -25,4 +25,8 @@ public interface HighlightsRepository extends BaseRepository<Highlights, Integer
     // Süresi dolmuş olanları listele
     @Query("SELECT h FROM Highlights h WHERE h.expiresAt <= :now AND h.isActive = true")
     List<Highlights> findExpiredHighlights(@Param("now") LocalDateTime now);
+    
+    // Tüm aktif ve süresi dolmamış highlight'ları getir
+    @Query("SELECT h FROM Highlights h WHERE h.isActive = true AND h.expiresAt > :now AND h.highlightDate > :since ORDER BY h.highlightDate DESC")
+    List<Highlights> findAllActiveHighlights(@Param("now") LocalDateTime now, @Param("since") LocalDateTime since);
 }

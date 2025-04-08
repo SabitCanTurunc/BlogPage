@@ -15,6 +15,7 @@ import { UserService } from '../../services/user.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LocalDatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import { StoryHighlightsComponent } from '../story-highlights/story-highlights.component';
 
 interface Author {
   email: string;
@@ -25,7 +26,7 @@ interface Author {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, TranslatePipe, LocalDatePipe],
+  imports: [CommonModule, FormsModule, RouterModule, TranslatePipe, LocalDatePipe, StoryHighlightsComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -342,10 +343,9 @@ export class HomeComponent implements OnInit {
 
   handleImageError(event: Event) {
     const img = event.target as HTMLImageElement;
-    if (img) {
-      const name = img.alt || img.getAttribute('data-email') || 'User';
-      img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
-    }
+    console.log('Home component: Resim yüklenemedi. URL:', img.src);
+    img.src = 'assets/images/default-post.jpg';
+    img.onerror = null; // Sonsuz döngüyü önle
   }
 
   scrollToTop(): void {

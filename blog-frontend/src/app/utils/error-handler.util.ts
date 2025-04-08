@@ -129,6 +129,15 @@ export class ErrorHandlerUtil {
       'Unauthorized': 'Yetkisiz erişim',
       'Forbidden': 'Erişim engellendi',
       
+      // Highlight ile ilgili hatalar
+      'Post highlight not found': 'Öne çıkarılan içerik bulunamadı. Sayfayı yenileyip tekrar deneyiniz.',
+      'HIGHLIGHT_NOT_FOUND': 'Öne çıkarılan içerik bulunamadı',
+      'NOT_HIGHLIGHT_OWNER': 'Bu öne çıkarılan içeriği kaldırma yetkiniz yok',
+      'HIGHLIGHT_ALREADY_EXISTS': 'Bu içerik zaten öne çıkarılmış',
+      'DAILY_HIGHLIGHT_LIMIT_EXCEEDED': 'Günlük öne çıkarma limitine ulaştınız',
+      'highlight not found': 'Öne çıkarma bulunamadı',
+      'daily highlight limit': 'Günlük öne çıkarma limiti',
+      
       // E-posta doğrulama ile ilgili
       'Email already verified': 'E-posta adresi zaten doğrulanmış',
       'Verification code is incorrect': 'Doğrulama kodu hatalı',

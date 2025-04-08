@@ -383,34 +383,92 @@ h3::after {
 .post-actions {
   display: flex;
   gap: 0.75rem;
+  align-items: center;
 }
 
-.btn-view, .btn-edit, .btn-delete {
-  background: none;
-  border: none;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.btn-view, .btn-edit, .btn-delete, .btn-highlight, .btn-highlighted {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   text-decoration: none;
+  cursor: pointer;
+  background: rgba(30, 30, 60, 0.5);
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .btn-view {
-  color: #ffffff;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  color: #00ffaa;
+}
+
+.btn-view:hover {
+  background: rgba(0, 255, 170, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 255, 170, 0.3);
 }
 
 .btn-edit {
   color: #5000ff;
-  text-shadow: 0 0 5px rgba(80, 0, 255, 0.8);
+}
+
+.btn-edit:hover {
+  background: rgba(80, 0, 255, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(80, 0, 255, 0.3);
 }
 
 .btn-delete {
   color: #ff00e6;
-  text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
 }
 
-.btn-view:hover, .btn-edit:hover, .btn-delete:hover {
-  text-decoration: underline;
+.btn-delete:hover {
+  background: rgba(255, 0, 230, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(255, 0, 230, 0.3);
+}
+
+.btn-highlight {
+  color: #FFC107;
+}
+
+.btn-highlight:hover {
+  background: rgba(255, 193, 7, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+}
+
+.btn-highlighted {
+  color: #FFC107;
+  background: rgba(255, 193, 7, 0.2);
+  animation: pulse-gold 2s infinite;
+  cursor: pointer;
+}
+
+.btn-highlighted svg {
+  filter: drop-shadow(0 0 3px rgba(255, 193, 7, 0.8));
+}
+
+.btn-highlighted:hover:not(:disabled) {
+  background: rgba(255, 193, 7, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(255, 193, 7, 0.5);
+}
+
+@keyframes pulse-gold {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+  }
 }
 
 .account-form {

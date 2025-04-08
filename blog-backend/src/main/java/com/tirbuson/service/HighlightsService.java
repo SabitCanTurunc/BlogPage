@@ -155,4 +155,22 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
                 .map(highlightMapper::convertToDto)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Tüm aktif öne çıkarılmış içerikleri getirir
+     * Bu metot tüm kullanıcılar için erişilebilir
+     * @return Aktif öne çıkarılmış içeriklerin listesi
+     */
+    public List<HighlightResponseDto> getAllActiveHighlights() {
+        // Son 7 günde oluşturulan ve aktif olan highlight'ları getir
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime sevenDaysAgo = now.minusDays(7);
+        
+        // Özel sorgu ile aktif highlight'ları getir
+        List<Highlights> activeHighlights = highlightsRepository.findAllActiveHighlights(now, sevenDaysAgo);
+        
+        return activeHighlights.stream()
+                .map(highlightMapper::convertToDto)
+                .collect(Collectors.toList());
+    }
 }

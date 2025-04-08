@@ -14,6 +14,7 @@ public class HighlightResponseDto extends BaseDto {
     private Integer postId;
     private String postTitle;
     private String postContent;
+    private String postImageUrl;
     private Integer userId;
     private String userName;
     private String userEmail;

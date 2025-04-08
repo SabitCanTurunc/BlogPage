@@ -28,6 +28,12 @@ public class HighlightMapper implements BaseMapper<Highlights, HighlightResponse
                 content = content.substring(0, 100) + "...";
             }
             dto.setPostContent(content);
+            
+            // Post resimlerini ekle - resim varsa ilk resmin URL'sini kullan
+            if (entity.getPost().getImages() != null && !entity.getPost().getImages().isEmpty()) {
+                Image firstImage = entity.getPost().getImages().iterator().next();
+                dto.setPostImageUrl(firstImage != null ? firstImage.getUrl() : null);
+            }
         }
         
         if (entity.getUser() != null) {
