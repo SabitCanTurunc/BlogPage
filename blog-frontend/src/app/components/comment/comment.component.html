@@ -54,16 +54,23 @@
 
     <div *ngFor="let comment of comments" class="comment-item">
       <div class="comment-header">
-        <div class="comment-author">
+        <div class="comment-author" (click)="navigateToUserProfile(comment.userEmail)" style="cursor: pointer;">
           <img
-            [src]="'https://ui-avatars.com/api/?name=' + comment.username"
+            [src]="comment.userProfileImage || 'https://ui-avatars.com/api/?name=' + comment.userEmail"
             [alt]="'user_avatar_alt' | translate"
             class="author-avatar"
           />
-          <span class="author-name">{{ comment.username }}</span>
+          <span class="author-name">
+            <span *ngIf="comment.userName && comment.userSurname">
+              {{ comment.userName }} {{ comment.userSurname }}
+            </span>
+            <span *ngIf="!(comment.userName && comment.userSurname)">
+              {{ comment.username || comment.userEmail }}
+            </span>
+          </span>
         </div>
         <div class="comment-date">
-          {{ comment.createdAt | localDate : "dd.MM.yyyy HH:mm" }}
+          {{ comment.createdAt ? (comment.createdAt | localDate : "dd.MM.yyyy HH:mm") : "" }}
         </div>
       </div>
       <div class="comment-content">

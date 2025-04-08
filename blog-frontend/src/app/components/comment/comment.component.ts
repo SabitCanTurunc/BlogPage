@@ -1,17 +1,21 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router';
 import { CommentService } from '../../services/comment.service';
 import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 import { Comment } from '../../models/comment.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LocalDatePipe } from '../../pipes/translate.pipe';
+import { forkJoin, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-comment',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslatePipe, LocalDatePipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, TranslatePipe, LocalDatePipe],
   templateUrl: './comment.component.html',
   styleUrl: './comment.component.css'
 })
@@ -29,7 +33,9 @@ export class CommentComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private commentService: CommentService,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService,
+    private router: Router
   ) {
     this.commentForm = this.fb.group({
       comment: ['', [Validators.required]]
@@ -57,10 +63,32 @@ export class CommentComponent implements OnInit {
     this.commentService.getCommentsByPostId(this.postId).subscribe({
       next: (comments) => {
         this.comments = comments;
+        this.enrichCommentsWithUserInfo();
       },
       error: (err) => {
         this.error = 'Yorumlar yüklenirken bir hata oluştu.';
       }
+    });
+  }
+
+  enrichCommentsWithUserInfo(): void {
+    // Eğer yorum yoksa işlem yapma
+    if (!this.comments.length) return;
+
+    // Her yorum için kullanıcı bilgilerini al
+    this.comments.forEach((comment, index) => {
+      this.userService.getUserProfileByEmail(comment.userEmail)
+        .pipe(catchError(() => of(null)))
+        .subscribe(userData => {
+          if (userData) {
+            this.comments[index] = {
+              ...comment,
+              userName: userData.name,
+              userSurname: userData.surname,
+              userProfileImage: userData.profileImageUrl
+            };
+          }
+        });
     });
   }
   
@@ -80,15 +108,25 @@ export class CommentComponent implements OnInit {
       
       this.commentService.createComment(commentData).subscribe({
         next: (response) => {
-          this.comments.unshift(response);
-          this.commentForm.reset();
-          this.success = 'Yorumunuz başarıyla eklendi.';
-          this.isSubmitting = false;
-          
-          // 3 saniye sonra başarı mesajını kaldır
-          setTimeout(() => {
-            this.success = '';
-          }, 3000);
+          // Yeni yorum eklendiğinde kullanıcı bilgilerini de ekle
+          this.userService.getUserProfile().subscribe(userData => {
+            const enrichedComment: Comment = {
+              ...response,
+              userName: userData.name,
+              userSurname: userData.surname,
+              userProfileImage: userData.profileImageUrl
+            };
+            
+            this.comments.unshift(enrichedComment);
+            this.commentForm.reset();
+            this.success = 'Yorumunuz başarıyla eklendi.';
+            this.isSubmitting = false;
+            
+            // 3 saniye sonra başarı mesajını kaldır
+            setTimeout(() => {
+              this.success = '';
+            }, 3000);
+          });
         },
         error: (err) => {
           if (err.error?.customException?.message) {
@@ -165,5 +203,9 @@ export class CommentComponent implements OnInit {
         });
       }
     });
+  }
+
+  navigateToUserProfile(email: string): void {
+    this.router.navigate(['/user', email]);
   }
 }

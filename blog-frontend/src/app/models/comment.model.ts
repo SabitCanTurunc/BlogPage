@@ -7,4 +7,7 @@ export interface Comment {
     userId?: number;
     createdAt?: Date;
     updatedAt?: Date;
+    userProfileImage?: string;
+    userName?: string;
+    userSurname?: string;
 } 
