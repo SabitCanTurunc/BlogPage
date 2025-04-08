@@ -111,16 +111,21 @@
   align-items: center;
   gap: 1rem;
   margin-top: 1.5rem;
+  position: relative;
+  z-index: 1;
   transition: all 0.3s;
   padding: 0.75rem 1.5rem;
   background: rgba(45, 0, 247, 0.1);
   border-radius: 50px;
   border: 1px solid rgba(255, 0, 136, 0.2);
   display: inline-flex;
+}
+
+.author-clickable {
   cursor: pointer;
 }
 
-.post-author:hover {
+.author-clickable:hover {
   background: rgba(255, 0, 136, 0.2);
   transform: translateY(-5px);
   box-shadow: 0 0 20px rgba(255, 0, 136, 0.5);
@@ -135,7 +140,7 @@
   transition: all 0.3s;
 }
 
-.post-author:hover .author-avatar {
+.author-clickable:hover .author-avatar {
   transform: scale(1.1);
   border-color: #2d00f7;
   box-shadow: 0 0 20px rgba(45, 0, 247, 0.8);
@@ -150,7 +155,7 @@
   transition: all 0.3s;
 }
 
-.post-author:hover .author-name {
+.author-clickable:hover .author-name {
   color: #ff0088;
   text-shadow: 0 0 10px rgba(255, 0, 136, 0.8);
 }

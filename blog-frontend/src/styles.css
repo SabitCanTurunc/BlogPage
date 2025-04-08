@@ -9,6 +9,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  caret-color: transparent; /* Varsayılan olarak imleci gizle */
 }
 
 html, body {
@@ -224,4 +225,15 @@ app-root {
 
 .modern-swal-input::placeholder {
   color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Sadece metin girişi yapılabilen alanlarda imleci göster */
+input, textarea, [contenteditable="true"] {
+  caret-color: #ff00e6; /* Metin girişi yapılabilen alanlarda imleci göster */
+}
+
+/* Butonlar ve diğer tıklanabilir öğelerde imleci gizle */
+button, a, .btn, .nav-link, .dropdown-item, .logo a {
+  caret-color: transparent !important;
+  user-select: none;
 }

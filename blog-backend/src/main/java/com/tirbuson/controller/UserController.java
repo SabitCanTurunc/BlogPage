@@ -116,4 +116,21 @@ public class UserController extends BaseController<UserService,User,Integer, Use
         UserResponseDto userResponseDto = userMapper.convertToDto(user);
         return ResponseEntity.ok(userResponseDto);
     }
+
+    @DeleteMapping("/delete-profile-image")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, Object>> deleteProfileImage() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        User user = userService.findByEmail(email);
+        
+        if (user.getProfileImage() != null) {
+            imageService.deleteById(user.getProfileImage().getId());
+            user.setProfileImage(null);
+            userService.update(user);
+            return ResponseEntity.ok(Map.of("message", "Profil fotoğrafı başarıyla silindi", "success", true));
+        }
+        
+        return ResponseEntity.ok(Map.of("message", "Profil fotoğrafı bulunamadı", "success", false));
+    }
 }

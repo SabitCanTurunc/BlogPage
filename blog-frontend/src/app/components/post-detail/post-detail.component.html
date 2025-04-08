@@ -42,16 +42,16 @@
       <h1 class="post-title">{{ post.title }}</h1>
 
       <div
-        class="post-author"
-        [routerLink]="['/user', post.userEmail]"
-        style="cursor: pointer"
+        class="post-author author-clickable"
+        (click)="navigateToAuthorProfile(post.userEmail)"
       >
         <img
-          [src]="'https://ui-avatars.com/api/?name=' + post.userEmail"
-          [alt]="'author' | translate"
+          [src]="author?.profileImageUrl || 'https://ui-avatars.com/api/?name=' + post.userEmail"
+          [alt]="author?.name || post.userEmail"
           class="author-avatar"
+          (error)="handleImageError($event)"
         />
-        <span class="author-name">{{ post.userEmail }}</span>
+        <span class="author-name">{{ author?.name || post.userEmail }}</span>
       </div>
     </div>
 

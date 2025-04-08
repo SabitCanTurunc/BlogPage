@@ -251,7 +251,19 @@ export class UserProfileComponent implements OnInit {
   updateAccount() {
     if (this.accountForm.valid) {
       this.isUpdating = true;
-      this.userService.updateUserProfile(this.accountForm.value).subscribe({
+      
+      // Form verisini hazırla
+      const formData = {
+        email: this.userEmail, // Mevcut kullanıcının email'ini ekle
+        username: this.accountForm.get('username')?.value,
+        name: this.accountForm.get('name')?.value,
+        surname: this.accountForm.get('surname')?.value,
+        phoneNumber: this.accountForm.get('phoneNumber')?.value,
+        gender: this.accountForm.get('gender')?.value,
+        description: this.accountForm.get('description')?.value
+      };
+
+      this.userService.updateUserProfile(formData).subscribe({
         next: (response) => {
           this.isUpdating = false;
           Swal.fire({
@@ -263,9 +275,10 @@ export class UserProfileComponent implements OnInit {
         },
         error: (error: HttpErrorResponse) => {
           this.isUpdating = false;
+          const errorMessage = error.error?.customException?.message || error.error?.message || this.translationService.getTranslation('account_update_error');
           Swal.fire({
             title: this.translationService.getTranslation('error'),
-            text: this.translationService.getTranslation('account_update_error'),
+            text: errorMessage,
             icon: 'error',
             confirmButtonText: 'OK'
           });
@@ -304,14 +317,21 @@ export class UserProfileComponent implements OnInit {
       this.passwordResetError = '';
       this.passwordResetSuccess = '';
 
-      this.userService.updatePassword(this.passwordForm.value).subscribe({
-        next: () => {
+      const verificationCode = this.passwordForm.get('verificationCode')?.value;
+      const newPassword = this.passwordForm.get('newPassword')?.value;
+
+      this.authService.resetPassword(this.userEmail, verificationCode, newPassword).subscribe({
+        next: (response) => {
           this.passwordResetSuccess = this.translationService.getTranslation('password_update_success');
           this.isSubmittingPassword = false;
           this.passwordChangeStep = 1;
+          this.passwordForm.reset();
         },
         error: (error) => {
-          this.passwordResetError = this.translationService.getTranslation('password_update_error');
+          const errorMessage = error.error?.customException?.message || 
+                               error.error?.message || 
+                               this.translationService.getTranslation('password_update_error');
+          this.passwordResetError = errorMessage;
           this.isSubmittingPassword = false;
         },
       });
@@ -473,51 +493,149 @@ export class UserProfileComponent implements OnInit {
     );
   }
 
-  onImageSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
+  // Profil resmi yükleme
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      
+      // Dosya boyutu kontrolü (5MB)
       if (file.size > 5 * 1024 * 1024) {
         Swal.fire({
           title: this.translationService.getTranslation('error'),
           text: this.translationService.getTranslation('image_size_error'),
           icon: 'error',
-          confirmButtonText: 'OK'
+          background: '#1a1a2e',
+          color: '#ffffff',
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content'
+          }
         });
         return;
       }
-
-      if (!file.type.startsWith('image/')) {
+      
+      // Dosya tipi kontrolü
+      if (!file.type.match('image.*')) {
         Swal.fire({
           title: this.translationService.getTranslation('error'),
           text: this.translationService.getTranslation('image_type_error'),
           icon: 'error',
-          confirmButtonText: 'OK'
+          background: '#1a1a2e',
+          color: '#ffffff',
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content'
+          }
         });
         return;
       }
-
-      const formData = new FormData();
-      formData.append('file', file);
-
+      
+      this.isUploadingImage = true;
+      
       this.userService.uploadProfileImage(file).subscribe({
         next: (response) => {
-          this.userProfileImage = response.profileImageUrl || null;
-          Swal.fire({
-            title: this.translationService.getTranslation('success'),
-            text: this.translationService.getTranslation('image_upload_success'),
-            icon: 'success',
-            confirmButtonText: 'OK'
-          });
+          this.isUploadingImage = false;
+          if (response && response.profileImageUrl) {
+            this.userProfileImage = response.profileImageUrl;
+            
+            Swal.fire({
+              title: this.translationService.getTranslation('success'),
+              text: this.translationService.getTranslation('profile_image_updated'),
+              icon: 'success',
+              background: '#1a1a2e',
+              color: '#ffffff',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
+            });
+          }
         },
-        error: (error: HttpErrorResponse) => {
+        error: (err: any) => {
+          this.isUploadingImage = false;
+          const errorMessage = err.error?.customException?.message || err.error?.message || this.translationService.getTranslation('profile_image_error');
+          
           Swal.fire({
             title: this.translationService.getTranslation('error'),
-            text: this.translationService.getTranslation('image_upload_error'),
+            text: errorMessage,
             icon: 'error',
-            confirmButtonText: 'OK'
+            background: '#1a1a2e',
+            color: '#ffffff',
+            customClass: {
+              popup: 'modern-swal-popup',
+              title: 'modern-swal-title',
+              htmlContainer: 'modern-swal-content'
+            }
           });
         }
       });
     }
+  }
+  
+  // Profil resmini silme
+  deleteProfileImage(): void {
+    // Silme işlemi için onay sor
+    Swal.fire({
+      title: this.translationService.getTranslation('delete_profile_image_title'),
+      text: this.translationService.getTranslation('delete_profile_image_text'),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: this.translationService.getTranslation('yes_delete'),
+      cancelButtonText: this.translationService.getTranslation('cancel'),
+      background: '#1a1a2e',
+      color: '#ffffff',
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title',
+        htmlContainer: 'modern-swal-content',
+        confirmButton: 'modern-swal-confirm',
+        cancelButton: 'modern-swal-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isUploadingImage = true;
+        
+        this.userService.deleteProfileImage().subscribe({
+          next: () => {
+            this.isUploadingImage = false;
+            this.userProfileImage = null;
+            
+            Swal.fire({
+              title: this.translationService.getTranslation('success'),
+              text: this.translationService.getTranslation('profile_image_deleted'),
+              icon: 'success',
+              background: '#1a1a2e',
+              color: '#ffffff',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
+            });
+          },
+          error: (err: any) => {
+            this.isUploadingImage = false;
+            const errorMessage = err.error?.customException?.message || err.error?.message || this.translationService.getTranslation('profile_image_delete_error');
+            
+            Swal.fire({
+              title: this.translationService.getTranslation('error'),
+              text: errorMessage,
+              icon: 'error',
+              background: '#1a1a2e',
+              color: '#ffffff',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
+            });
+          }
+        });
+      }
+    });
   }
 } 

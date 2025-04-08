@@ -75,6 +75,14 @@ export class UserService {
       );
   }
 
+  // Profil resmini silme
+  deleteProfileImage(): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/delete-profile-image`)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   // Başka bir kullanıcının profilini getir
   getUserProfileByEmail(email: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/profile/${email}`).pipe(

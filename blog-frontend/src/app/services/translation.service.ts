@@ -216,7 +216,12 @@ export class TranslationService {
       'no_comments_yet': 'Henüz yorum yapılmamış. İlk yorumu siz yapın!',
       'user_avatar_alt': 'Kullanıcı',
       'delete_comment': 'Sil',
-      'user': 'Kullanıcı'
+      'user': 'Kullanıcı',
+      'delete_profile_image_title': 'Profil Fotoğrafını Sil',
+      'delete_profile_image_text': 'Profil fotoğrafınızı silmek istediğinizden emin misiniz?',
+      'yes_delete': 'Evet, Sil',
+      'profile_image_deleted': 'Profil fotoğrafı başarıyla silindi',
+      'profile_image_delete_error': 'Profil fotoğrafı silinirken bir hata oluştu'
     },
     en: {
       'home': 'Home',
@@ -416,7 +421,12 @@ export class TranslationService {
       'no_comments_yet': 'No comments yet. Be the first to comment!',
       'user_avatar_alt': 'User',
       'delete_comment': 'Delete',
-      'user': 'User'
+      'user': 'User',
+      'delete_profile_image_title': 'Delete Profile Picture',
+      'delete_profile_image_text': 'Are you sure you want to delete your profile picture?',
+      'yes_delete': 'Yes, Delete',
+      'profile_image_deleted': 'Profile picture successfully deleted',
+      'profile_image_delete_error': 'An error occurred while deleting the profile picture'
     }
   };
 

@@ -1,5 +1,6 @@
 package com.tirbuson.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,6 +28,8 @@ public class SecurityConfiguration {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    @Value("${FRONTEND_URL}")
+    private String frontendUrl;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -37,6 +40,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/user/update-password", "/user/update-profile").permitAll()
                         .requestMatchers("/user/profile").authenticated()
                         .requestMatchers("/user/profile/{email}").permitAll()
+                        .requestMatchers("/user/delete-profile-image").authenticated()
                         .requestMatchers(HttpMethod.GET, "/post/**", "/category/**", "/comment/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/post/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/post/**").hasAnyRole("USER", "ADMIN")
@@ -60,7 +64,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of(frontendUrl));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
         configuration.setExposedHeaders(List.of("Authorization"));
