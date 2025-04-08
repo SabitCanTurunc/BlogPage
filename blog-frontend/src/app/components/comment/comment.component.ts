@@ -23,9 +23,12 @@ export class CommentComponent implements OnInit {
   @Input() postId!: number;
   
   commentForm: FormGroup;
+  editCommentForm: FormGroup;
   comments: Comment[] = [];
   isLoggedIn: boolean = false;
   isSubmitting: boolean = false;
+  isEditing: boolean = false;
+  editingCommentId: number | null = null;
   error: string = '';
   success: string = '';
   currentUserEmail: string = '';
@@ -38,6 +41,10 @@ export class CommentComponent implements OnInit {
     private router: Router
   ) {
     this.commentForm = this.fb.group({
+      comment: ['', [Validators.required]]
+    });
+    
+    this.editCommentForm = this.fb.group({
       comment: ['', [Validators.required]]
     });
   }
@@ -140,8 +147,116 @@ export class CommentComponent implements OnInit {
     }
   }
   
+  canEdit(comment: Comment): boolean {
+    return this.isLoggedIn && (this.currentUserEmail === comment.userEmail || this.authService.isAdmin());
+  }
+  
   canDelete(comment: Comment): boolean {
     return this.isLoggedIn && (this.currentUserEmail === comment.userEmail || this.authService.isAdmin());
+  }
+  
+  startEditComment(comment: Comment): void {
+    this.isEditing = true;
+    this.editingCommentId = comment.id || null;
+    this.editCommentForm.patchValue({
+      comment: comment.comment
+    });
+  }
+  
+  cancelEditComment(): void {
+    this.isEditing = false;
+    this.editingCommentId = null;
+    this.editCommentForm.reset();
+  }
+  
+  submitEditComment(): void {
+    if (this.editCommentForm.valid && this.editingCommentId) {
+      // Düzenlenen yorumu bul
+      const originalComment = this.comments.find(c => c.id === this.editingCommentId);
+      
+      if (!originalComment) {
+        Swal.fire({
+          title: 'Hata',
+          text: 'Düzenlenmek istenen yorum bulunamadı',
+          icon: 'error',
+          background: '#1a1a2e',
+          color: '#ffffff',
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content'
+          }
+        });
+        return;
+      }
+      
+      const commentData: Comment = {
+        comment: this.editCommentForm.get('comment')?.value.trim(),
+        postId: this.postId,
+        userEmail: originalComment.userEmail, // Orijinal yazarın email'ini kullan
+        username: originalComment.username || '', // Orijinal yazarın kullanıcı adını koru
+        id: this.editingCommentId
+      };
+      
+      this.commentService.updateComment(this.editingCommentId, commentData).subscribe({
+        next: (updatedComment) => {
+          // Güncellenmiş yorumu comments dizisinde bul ve güncelle
+          const index = this.comments.findIndex(c => c.id === this.editingCommentId);
+          if (index !== -1) {
+            // Mevcut kullanıcı bilgilerini koru
+            const existingComment = this.comments[index];
+            this.comments[index] = {
+              ...updatedComment,
+              userName: existingComment.userName,
+              userSurname: existingComment.userSurname,
+              userProfileImage: existingComment.userProfileImage,
+              userEmail: existingComment.userEmail // Orijinal yazarın email'ini koru
+            };
+          }
+          
+          this.cancelEditComment();
+          
+          Swal.fire({
+            title: 'Başarılı',
+            text: this.authService.isAdmin() ? 'Yorum başarıyla düzenlendi' : 'Yorumunuz başarıyla güncellendi',
+            icon: 'success',
+            background: '#1a1a2e',
+            color: '#ffffff',
+            timer: 3000,
+            showConfirmButton: false,
+            customClass: {
+              popup: 'modern-swal-popup',
+              title: 'modern-swal-title',
+              htmlContainer: 'modern-swal-content'
+            }
+          });
+        },
+        error: (err) => {
+          let errorMessage = 'Yorum güncellenirken bir hata oluştu';
+          
+          if (err.error?.customException?.message) {
+            errorMessage = err.error.customException.message;
+          } else if (err.status === 403) {
+            errorMessage = 'Bu yorumu düzenleme yetkiniz bulunmamaktadır';
+          } else if (err.status === 404) {
+            errorMessage = 'Düzenlenmek istenen yorum bulunamadı';
+          }
+          
+          Swal.fire({
+            title: 'Hata',
+            text: errorMessage,
+            icon: 'error',
+            background: '#1a1a2e',
+            color: '#ffffff',
+            customClass: {
+              popup: 'modern-swal-popup',
+              title: 'modern-swal-title',
+              htmlContainer: 'modern-swal-content'
+            }
+          });
+        }
+      });
+    }
   }
   
   deleteComment(commentId?: number): void {
@@ -204,7 +319,7 @@ export class CommentComponent implements OnInit {
       }
     });
   }
-
+  
   navigateToUserProfile(email: string): void {
     this.router.navigate(['/user', email]);
   }

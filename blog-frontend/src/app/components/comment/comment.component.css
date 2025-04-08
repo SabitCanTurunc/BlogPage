@@ -250,36 +250,9 @@ h3::after {
 }
 
 .comment-actions {
-  margin-top: 1rem;
   display: flex;
   justify-content: flex-end;
-}
-
-.btn-delete {
-  background: rgba(220, 53, 69, 0.2);
-  color: #ff3b30;
-  border: 1px solid rgba(220, 53, 69, 0.3);
-  border-radius: 50px;
-  padding: 0.4rem 1rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: "Poppins", sans-serif;
-  box-shadow: 0 0 10px rgba(220, 53, 69, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.btn-delete::before {
-  content: "🗑️";
-  font-size: 0.9rem;
-}
-
-.btn-delete:hover {
-  background: rgba(220, 53, 69, 0.3);
-  box-shadow: 0 0 15px rgba(220, 53, 69, 0.2);
-  transform: translateY(-2px);
+  margin-top: 10px;
 }
 
 @media (max-width: 576px) {
@@ -296,9 +269,106 @@ h3::after {
   .comment-actions {
     margin-top: 0.5rem;
   }
+}
 
-  .btn-delete {
-    padding: 0.3rem 0.8rem;
-    font-size: 0.8rem;
-  }
+.comment-edit-form {
+  margin: 1rem 0;
+}
+
+.comment-edit-form .form-control {
+  background: rgba(26, 26, 46, 0.8);
+  border: 1px solid rgba(45, 0, 247, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: #fff;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.comment-edit-form .form-control:focus {
+  border-color: rgba(255, 0, 136, 0.5);
+  box-shadow: 0 0 10px rgba(255, 0, 136, 0.3);
+  outline: none;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-save, .btn-cancel {
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-save {
+  background: linear-gradient(45deg, #2d00f7, #6a00f4);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(45, 0, 247, 0.3);
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(45, 0, 247, 0.5);
+}
+
+.btn-cancel {
+  background: rgba(26, 26, 46, 0.8);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Simge butonları için stiller */
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  margin-left: 10px;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-edit {
+  background: rgba(45, 0, 247, 0.1);
+  color: #2d00f7;
+  border: 1px solid rgba(45, 0, 247, 0.3);
+  box-shadow: 0 0 10px rgba(45, 0, 247, 0.2);
+}
+
+.btn-edit:hover {
+  background: rgba(45, 0, 247, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(45, 0, 247, 0.4);
+}
+
+.btn-delete {
+  background: rgba(255, 0, 136, 0.1);
+  color: #ff0088;
+  border: 1px solid rgba(255, 0, 136, 0.3);
+  box-shadow: 0 0 10px rgba(255, 0, 136, 0.2);
+}
+
+.btn-delete:hover {
+  background: rgba(255, 0, 136, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(255, 0, 136, 0.4);
 }
