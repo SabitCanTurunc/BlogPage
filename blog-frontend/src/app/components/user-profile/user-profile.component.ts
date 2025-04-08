@@ -1,21 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { PostService } from '../../services/post.service';
-import { UserService } from '../../services/user.service';
+import { ImageService } from '../../services/image.service';
 import { PostResponseDto } from '../../models/post-response.dto';
-import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
+import { Subscription } from 'rxjs';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { LocalDatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import Swal from 'sweetalert2';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, TranslatePipe],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, TranslatePipe, LocalDatePipe],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
 })

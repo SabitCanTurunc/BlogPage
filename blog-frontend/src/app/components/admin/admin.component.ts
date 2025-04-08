@@ -15,11 +15,12 @@ import { ToastrService } from 'ngx-toastr';
 import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { LocalDatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslatePipe, LocalDatePipe],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })

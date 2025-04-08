@@ -8,13 +8,14 @@ import { PostResponseDto } from '../../models/post-response.dto';
 import { UserResponseDto } from '../../models/user-response.dto';
 import { CommentComponent } from '../comment/comment.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { LocalDatePipe } from '../../pipes/translate.pipe';
 import { forkJoin } from 'rxjs';
 import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-post-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, CommentComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterModule, CommentComponent, TranslatePipe, LocalDatePipe],
   templateUrl: './post-detail.component.html',
   styleUrl: './post-detail.component.css'
 })

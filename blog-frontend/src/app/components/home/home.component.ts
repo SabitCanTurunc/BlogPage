@@ -13,6 +13,7 @@ import { catchError, of } from 'rxjs';
 import { ErrorHandlerUtil } from '../../utils/error-handler.util';
 import { UserService } from '../../services/user.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { LocalDatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 
 interface Author {
@@ -24,7 +25,7 @@ interface Author {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterModule, TranslatePipe, LocalDatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

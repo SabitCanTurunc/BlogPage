@@ -63,7 +63,7 @@
           <span class="author-name">{{ comment.username }}</span>
         </div>
         <div class="comment-date">
-          {{ comment.createdAt | date : "dd.MM.yyyy HH:mm" }}
+          {{ comment.createdAt | localDate : "dd.MM.yyyy HH:mm" }}
         </div>
       </div>
       <div class="comment-content">

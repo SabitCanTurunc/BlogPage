@@ -1,17 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 import { CommentService } from '../../services/comment.service';
 import { AuthService } from '../../services/auth.service';
 import { Comment } from '../../models/comment.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { LocalDatePipe } from '../../pipes/translate.pipe';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-comment',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslatePipe, LocalDatePipe],
   templateUrl: './comment.component.html',
   styleUrl: './comment.component.css'
 })

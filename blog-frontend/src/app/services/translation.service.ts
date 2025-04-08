@@ -221,7 +221,40 @@ export class TranslationService {
       'delete_profile_image_text': 'Profil fotoğrafınızı silmek istediğinizden emin misiniz?',
       'yes_delete': 'Evet, Sil',
       'profile_image_deleted': 'Profil fotoğrafı başarıyla silindi',
-      'profile_image_delete_error': 'Profil fotoğrafı silinirken bir hata oluştu'
+      'profile_image_delete_error': 'Profil fotoğrafı silinirken bir hata oluştu',
+      'date_month_january': 'Ocak',
+      'date_month_february': 'Şubat',
+      'date_month_march': 'Mart',
+      'date_month_april': 'Nisan',
+      'date_month_may': 'Mayıs',
+      'date_month_june': 'Haziran',
+      'date_month_july': 'Temmuz',
+      'date_month_august': 'Ağustos',
+      'date_month_september': 'Eylül',
+      'date_month_october': 'Ekim',
+      'date_month_november': 'Kasım',
+      'date_month_december': 'Aralık',
+      'date_day_monday': 'Pazartesi',
+      'date_day_tuesday': 'Salı',
+      'date_day_wednesday': 'Çarşamba',
+      'date_day_thursday': 'Perşembe',
+      'date_day_friday': 'Cuma',
+      'date_day_saturday': 'Cumartesi',
+      'date_day_sunday': 'Pazar',
+      'date_day_short_monday': 'Pt',
+      'date_day_short_tuesday': 'Sa',
+      'date_day_short_wednesday': 'Ça',
+      'date_day_short_thursday': 'Pe',
+      'date_day_short_friday': 'Cu',
+      'date_day_short_saturday': 'Ct',
+      'date_day_short_sunday': 'Pa',
+      'date_today': 'Bugün',
+      'date_yesterday': 'Dün',
+      'date_tomorrow': 'Yarın',
+      'date_format_short': 'dd.MM.yyyy',
+      'date_format_medium': 'dd MMM yyyy',
+      'date_format_long': 'd MMMM yyyy',
+      'date_format_full': 'd MMMM yyyy EEEE',
     },
     en: {
       'home': 'Home',
@@ -426,7 +459,40 @@ export class TranslationService {
       'delete_profile_image_text': 'Are you sure you want to delete your profile picture?',
       'yes_delete': 'Yes, Delete',
       'profile_image_deleted': 'Profile picture successfully deleted',
-      'profile_image_delete_error': 'An error occurred while deleting the profile picture'
+      'profile_image_delete_error': 'An error occurred while deleting the profile picture',
+      'date_month_january': 'January',
+      'date_month_february': 'February',
+      'date_month_march': 'March',
+      'date_month_april': 'April',
+      'date_month_may': 'May',
+      'date_month_june': 'June',
+      'date_month_july': 'July',
+      'date_month_august': 'August',
+      'date_month_september': 'September',
+      'date_month_october': 'October',
+      'date_month_november': 'November',
+      'date_month_december': 'December',
+      'date_day_monday': 'Monday',
+      'date_day_tuesday': 'Tuesday',
+      'date_day_wednesday': 'Wednesday',
+      'date_day_thursday': 'Thursday',
+      'date_day_friday': 'Friday',
+      'date_day_saturday': 'Saturday',
+      'date_day_sunday': 'Sunday',
+      'date_day_short_monday': 'Mon',
+      'date_day_short_tuesday': 'Tue',
+      'date_day_short_wednesday': 'Wed',
+      'date_day_short_thursday': 'Thu',
+      'date_day_short_friday': 'Fri',
+      'date_day_short_saturday': 'Sat',
+      'date_day_short_sunday': 'Sun',
+      'date_today': 'Today',
+      'date_yesterday': 'Yesterday',
+      'date_tomorrow': 'Tomorrow',
+      'date_format_short': 'MM/dd/yyyy',
+      'date_format_medium': 'MMM d, yyyy',
+      'date_format_long': 'MMMM d, yyyy',
+      'date_format_full': 'EEEE, MMMM d, yyyy',
     }
   };
 
@@ -461,5 +527,9 @@ export class TranslationService {
     }
 
     return value;
+  }
+
+  getCurrentLang(): string {
+    return this.currentLang.value;
   }
 } 

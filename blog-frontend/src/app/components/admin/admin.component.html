@@ -169,7 +169,7 @@
                     (input)="onCategoryNameChange(category.id, $event)"
                     class="form-input">
                 </td>
-                <td>{{ category.createdAt | date:'medium' }}</td>
+                <td>{{ category.createdAt | localDate:'medium' }}</td>
                 <td>
                   <button 
                     (click)="deleteCategory(category.id)"
@@ -217,7 +217,7 @@
                 <td>{{ post.title }}</td>
                 <td>{{ post.userEmail }}</td>
                 <td>{{ post.categoryName }}</td>
-                <td>{{ post.createdAt ? (post.createdAt | date:'dd.MM.yyyy HH:mm') : ('admin_no_date' | translate) }}</td>
+                <td>{{ post.createdAt ? (post.createdAt | localDate:'dd.MM.yyyy HH:mm') : ('admin_no_date' | translate) }}</td>
                 <td>
                   <div class="action-buttons">
                     <button 
