@@ -135,13 +135,34 @@
 }
 
 .hero-subtitle {
-  color: #fff;
   font-size: 1.5rem;
-  opacity: 0.9;
-  margin-bottom: 2.5rem;
-  line-height: 1.6;
-  font-family: "Poppins", sans-serif;
-  text-shadow: 0 0 10px rgba(45, 0, 247, 0.5);
+  margin-bottom: 2rem;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: flowColors 3s linear infinite;
+  background: linear-gradient(90deg, 
+    #2d00f7, 
+    #6a00ff, 
+    #9d00ff, 
+    #2d00f7
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+@keyframes flowColors {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
 }
 
 .hero-buttons {

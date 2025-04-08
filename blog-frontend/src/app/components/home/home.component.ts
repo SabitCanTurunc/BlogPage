@@ -203,6 +203,36 @@ export class HomeComponent implements OnInit {
     this.subscriptions.push(categoriesSub, popularAuthorsSub, recentPostsSub);
   }
   
+  // İlk yükleme veya kategori değişimi
+  loadPosts(isInitialLoad: boolean = false) {
+    this.loading = true;
+    this.error = '';
+    this.currentPage = 0;
+    
+    // Sayfalı veri getirme
+    const sub = this.postService.getPagedPosts(this.currentPage, this.pageSize, this.selectedCategory || undefined).subscribe({
+      next: (response) => {
+        this.posts = response.posts || [];
+        this.filteredPosts = [...this.posts];
+        this.totalPages = response.totalPages || 1;
+        this.loading = false;
+        
+        // Kullanıcı bilgilerini ekle
+        this.enrichPostsWithUserInfo(this.posts);
+        
+        // UI'ı güncelle
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = this.translationService.getTranslation('posts_load_error');
+        this.cdr.markForCheck();
+      }
+    });
+    
+    this.subscriptions.push(sub);
+  }
+  
   // Daha fazla yazı yüklemek için buton metodu
   loadMorePosts() {
     // Sayfa sınırlarını kontrol et
@@ -218,6 +248,9 @@ export class HomeComponent implements OnInit {
       .subscribe({
         next: (response: any) => {
           const newPosts = response.posts || [];
+          
+          // Kullanıcı bilgilerini ekle
+          this.enrichPostsWithUserInfo(newPosts);
           
           // Mevcut postlara ekle
           this.posts = [...this.posts, ...newPosts];
@@ -237,28 +270,26 @@ export class HomeComponent implements OnInit {
       
     this.subscriptions.push(sub);
   }
-
-  // İlk yükleme veya kategori değişimi
-  loadPosts(isInitialLoad: boolean = false) {
-    this.loading = true;
-    this.error = '';
-    this.currentPage = 0;
-    
-    // Sayfalı veri getirme
-    const sub = this.postService.getPagedPosts(this.currentPage, this.pageSize, this.selectedCategory || undefined).subscribe({
-      next: (response) => {
-        this.posts = response.posts || [];
-        this.filteredPosts = response.posts || [];
-        this.totalPages = response.totalPages || 0;
-        this.loading = false;
-      },
-      error: (error) => {
-        this.error = ErrorHandlerUtil.handleError(error, 'Blog yazıları yüklenirken bir hata oluştu');
-        this.loading = false;
-      }
+  
+  // Postlara kullanıcı bilgilerini ekle
+  enrichPostsWithUserInfo(posts: PostResponseDto[]) {
+    posts.forEach(post => {
+      // Her post için kullanıcı bilgilerini al
+      this.userService.getUserProfileByEmail(post.userEmail).subscribe({
+        next: (userProfile) => {
+          post.userName = userProfile.name;
+          post.userSurname = userProfile.surname;
+          post.userProfileImage = userProfile.profileImageUrl;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          // Hata durumunda varsayılan değerleri kullan
+          post.userName = undefined;
+          post.userSurname = undefined;
+          post.userProfileImage = undefined;
+        }
+      });
     });
-    
-    this.subscriptions.push(sub);
   }
 
   filterByCategory(category: string | null) {

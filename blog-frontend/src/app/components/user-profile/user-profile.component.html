@@ -108,7 +108,15 @@
           <!-- Yazılar Sekmesi -->
           <div *ngIf="activeTab === 'posts'" class="posts-tab">
             <h3 *ngIf="isOwnProfile">{{ 'my_posts' | translate }}</h3>
-            <h3 *ngIf="!isOwnProfile">{{ getDisplayedEmail() }} {{ 'user_posts' | translate }}</h3>
+            <h3 *ngIf="!isOwnProfile">
+              <span *ngIf="accountForm.get('name')?.value && accountForm.get('surname')?.value">
+                {{ accountForm.get('name')?.value }} {{ accountForm.get('surname')?.value }}
+              </span>
+              <span *ngIf="!(accountForm.get('name')?.value && accountForm.get('surname')?.value)">
+                {{ getDisplayedEmail() }}
+              </span>
+              {{ 'user_posts' | translate }}
+            </h3>
 
             <div class="search-container">
               <div class="search-box">

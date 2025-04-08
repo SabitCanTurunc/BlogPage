@@ -129,8 +129,15 @@
             
             <div class="post-footer">
               <a [routerLink]="['/user', post.userEmail]" class="post-author">
-                <img [src]="'https://ui-avatars.com/api/?name=' + post.userEmail" alt="Yazar" class="author-avatar">
-                <span class="author-name">{{ post.userEmail }}</span>
+                <img [src]="post.userProfileImage || 'https://ui-avatars.com/api/?name=' + post.userEmail" alt="Yazar" class="author-avatar">
+                <span class="author-name">
+                  <span *ngIf="post.userName && post.userSurname">
+                    {{ post.userName }} {{ post.userSurname }}
+                  </span>
+                  <span *ngIf="!(post.userName && post.userSurname)">
+                    {{ post.userEmail }}
+                  </span>
+                </span>
               </a>
               
               <a [routerLink]="['/post', post.id]" class="read-more">
