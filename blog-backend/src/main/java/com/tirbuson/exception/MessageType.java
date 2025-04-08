@@ -11,6 +11,7 @@ public enum MessageType {
     POST_NOT_FOUND("1003", "Makale bulunamadı"),
     COMMENT_NOT_FOUND("1004", "Yorum bulunamadı"),
     CATEGORY_NOT_FOUND("1005", "Kategori bulunamadı"),
+    HIGHLIGHT_NOT_FOUND("1006", "Highlight bulunamadı"),
 
     // 2xxx - Geçersiz İstek / Validasyon Hataları (400)
     INVALID_REQUEST("2001", "Geçersiz istek formatı"),
@@ -23,6 +24,8 @@ public enum MessageType {
     INVALID_USERNAME_FORMAT("2008", "Kullanıcı adı en az 3, en fazla 20 karakter olmalı ve özel karakter içermemelidir"),
     PASSWORD_MISMATCH("2009", "Girdiğiniz şifreler eşleşmiyor"),
     MISSING_REQUIRED_FIELD("2010", "Lütfen tüm zorunlu alanları doldurun"),
+    DAILY_HIGHLIGHT_LIMIT_EXCEEDED("2011", "Günlük highlight limitine ulaştınız (2 post)"),
+    HIGHLIGHT_ALREADY_EXISTS("2012", "Bu post zaten highlight edilmiş"),
 
     // 3xxx - Yetkilendirme Hataları (401)
     INVALID_CREDENTIALS("3001", "E-posta adresi veya şifre hatalı"),
@@ -35,6 +38,7 @@ public enum MessageType {
     ACCOUNT_LOCKED("4002", "Hesabınız kilitlendi. Lütfen daha sonra tekrar deneyin veya destek ekibiyle iletişime geçin"),
     ACCOUNT_DISABLED("4003", "Hesabınız devre dışı bırakıldı"),
     INVALID_ROLE("4004", "Bu işlemi gerçekleştirmek için gerekli role sahip değilsiniz"),
+    NOT_HIGHLIGHT_OWNER("4005", "Bu highlight'i silme yetkiniz yok"),
 
     // 5xxx - Çakışma Hataları (409)
     EMAIL_ALREADY_EXISTS("5001", "Bu e-posta adresi zaten kayıtlı"),

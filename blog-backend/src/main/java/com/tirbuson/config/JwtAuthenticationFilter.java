@@ -1,5 +1,6 @@
 package com.tirbuson.config;
 
+import com.tirbuson.model.User;
 import com.tirbuson.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -63,6 +64,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    
+                    // Kullanıcı ID'sini request attribute olarak ekle
+                    if (userDetails instanceof User) {
+                        User user = (User) userDetails;
+                        request.setAttribute("userId", user.getId());
+                    }
                 }
             }
             filterChain.doFilter(request, response);
