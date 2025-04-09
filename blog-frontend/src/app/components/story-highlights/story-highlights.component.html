@@ -1,6 +1,7 @@
 <div class="stories-container">
   <div class="stories-header">
     <h4>{{ 'highlights' | translate }}</h4>
+    <hr class="stories-divider">
   </div>
 
   <!-- Yükleniyor göstergesi -->
@@ -19,7 +20,7 @@
   <div *ngIf="!isLoading && !error" class="stories-wrapper">
     <div class="stories-list">
       <!-- Kullanıcı Avatarları - Öne Çıkan İçerikleri Olan Kullanıcılar -->
-      <div *ngFor="let user of userHighlights" class="story-item" (click)="showUserHighlights(user)" [title]="user.userName">
+      <div *ngFor="let user of userHighlights" class="story-item" (click)="openStory(user)" [title]="user.userName">
         <div class="story-avatar" [ngClass]="{'seen': areAllHighlightsSeen(user)}">
           <!-- Kullanıcı profil resmi dışarıda görünecek -->
           <img 
@@ -47,9 +48,8 @@
   </div>
   
   <!-- Öne Çıkan İçerikler Dialog'u -->
-  <div *ngIf="showDialog && selectedUser" class="story-dialog-backdrop" (click)="closeDialog()">
+  <div class="story-dialog-backdrop" *ngIf="showDialog && selectedUser" (click)="closeDialog()">
     <div class="story-dialog" (click)="$event.stopPropagation()">
-      <!-- Dialog Header - Kullanıcı Bilgileri -->
       <div class="dialog-header">
         <div class="user-info">
           <img [src]="selectedUser.userProfileImage" 
@@ -58,68 +58,82 @@
                (error)="selectedUser.userProfileImage = 'assets/images/default-avatar.jpg'"
                loading="lazy">
           <div class="user-details">
-            <span class="user-name">{{ selectedUser.userName }}</span>
-            <span class="post-time">{{ selectedUser.highlights[selectedHighlightIndex].title }}</span>
+            <span class="user-name">{{selectedUser.userName}}</span>
+            <span class="post-time">{{selectedUser.highlights[selectedHighlightIndex].title}}</span>
           </div>
         </div>
         <button class="close-btn" (click)="closeDialog()">×</button>
       </div>
-      
-      <!-- Dialog Content - İçerik Görünümü -->
-      <div class="dialog-content">
-        <!-- Timeline Göstergesi -->
+      <div class="dialog-content" 
+           (touchstart)="handleTouchStart($event)" 
+           (touchend)="handleTouchEnd($event)"
+           (touchmove)="$event.preventDefault()">
         <div class="timeline-container">
-          <div *ngFor="let highlight of selectedUser.highlights; let i = index" 
-               class="timeline-item" 
-               [class.active]="i === selectedHighlightIndex">
+          <div class="timeline-item" *ngFor="let highlight of selectedUser.highlights; let i = index" 
+               [class.active]="i === selectedHighlightIndex"
+               [class.viewed]="i < selectedHighlightIndex">
+          </div>
+        </div>
+        <div class="post-content" *ngIf="selectedUser.highlights.length > 0 && selectedHighlightIndex < selectedUser.highlights.length">
+          <img *ngIf="selectedUser.highlights[selectedHighlightIndex].coverImage" 
+               [src]="selectedUser.highlights[selectedHighlightIndex].coverImage" 
+               [alt]="selectedUser.highlights[selectedHighlightIndex].title"
+               class="post-image"
+               (error)="handlePostImageError(selectedHighlightIndex)"
+               loading="lazy">
+          <div class="no-image-placeholder" *ngIf="!selectedUser.highlights[selectedHighlightIndex].coverImage">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <span>Görsel Yok</span>
+          </div>
+          <h3 class="post-title">{{selectedUser.highlights[selectedHighlightIndex].title}}</h3>
+          <button class="view-btn" (click)="viewHighlight(selectedUser.highlights[selectedHighlightIndex])">
+            {{ 'view' | translate }}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+          
+          <!-- Mobil cihazlar için kaydırma ipucu -->
+          <div class="swipe-hint" *ngIf="isMobile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span>Kaydırarak diğer kullanıcılara geç</span>
           </div>
         </div>
         
-        <!-- Post İçeriği -->
-        <div class="post-content" *ngIf="selectedUser.highlights.length > 0 && selectedHighlightIndex < selectedUser.highlights.length">
-          <!-- Post resmi için hata kontrolü -->
-          <div *ngIf="!selectedUser.highlights[selectedHighlightIndex].coverImage" class="no-image-placeholder">
-            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-              <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.577.076L.939 11.3a.5.5 0 0 0-.121.307v.5a.5.5 0 0 0 .121.307l3.464 3.464h9.592a.5.5 0 0 0 .5-.5V3.5a.5.5 0 0 0-.5-.5h-13z"/>
+        <!-- Navigasyon Butonları -->
+        <div class="navigation-buttons">
+          <button class="nav-btn prev-btn" *ngIf="selectedHighlightIndex > 0" (click)="prevHighlight()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
-            <span>{{ 'no_image_available' | translate }}</span>
-          </div>
-          
-          <!-- Post resmi varsa göster -->
-          <img *ngIf="selectedUser.highlights[selectedHighlightIndex].coverImage"
-            [src]="selectedUser.highlights[selectedHighlightIndex].coverImage" 
-            [alt]="selectedUser.highlights[selectedHighlightIndex].title"
-            class="post-image"
-            (click)="viewHighlight(selectedUser.highlights[selectedHighlightIndex])"
-            (error)="handlePostImageError(selectedHighlightIndex)"
-            loading="lazy">
-            
-          <div class="post-title">
-            {{ selectedUser.highlights[selectedHighlightIndex].title }}
-          </div>
-          
-          <button class="view-btn" (click)="viewHighlight(selectedUser.highlights[selectedHighlightIndex])" [title]="'view_post' | translate">
-            Devamını Oku
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+          </button>
+          <button class="nav-btn next-btn" *ngIf="selectedUser.highlights.length > 0 && selectedHighlightIndex < selectedUser.highlights.length - 1" (click)="nextHighlight()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
           </button>
         </div>
-        
-        <!-- Önceki / Sonraki Butonları -->
-        <button *ngIf="selectedHighlightIndex > 0" 
-                class="nav-btn prev-btn" 
-                (click)="prevHighlight()">
-          &#10094;
-        </button>
-        
-        <button *ngIf="selectedUser.highlights.length > 0 && selectedHighlightIndex < selectedUser.highlights.length - 1" 
-                class="nav-btn next-btn" 
-                (click)="nextHighlight()">
-          &#10095;
-        </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Kullanıcılar Arası Navigasyon -->
+  <div class="user-navigation" *ngIf="showDialog && selectedUser">
+    <div class="user-nav-prev" *ngIf="getPreviousUser()" (click)="navigateToUser('prev')">
+      <img [src]="getPreviousUser()?.userProfileImage" [alt]="getPreviousUser()?.userName" class="user-nav-avatar">
+      <span class="user-nav-name">{{getPreviousUser()?.userName}}</span>
+    </div>
+    <div class="user-nav-next" *ngIf="getNextUser()" (click)="navigateToUser('next')">
+      <img [src]="getNextUser()?.userProfileImage" [alt]="getNextUser()?.userName" class="user-nav-avatar">
+      <span class="user-nav-name">{{getNextUser()?.userName}}</span>
     </div>
   </div>
 </div> 

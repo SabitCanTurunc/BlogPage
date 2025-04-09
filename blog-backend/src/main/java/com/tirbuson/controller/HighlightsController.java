@@ -24,10 +24,6 @@ public class HighlightsController extends BaseController<HighlightsService, High
         this.highlightsService = service;
     }
 
-    /**
-     * Tüm öne çıkan içerikleri getiren public endpoint
-     * Bu endpoint herhangi bir yetkilendirme gerektirmez
-     */
     @GetMapping("/public")
     public ResponseEntity<List<HighlightResponseDto>> getPublicHighlights() {
         return ResponseEntity.ok(highlightsService.getAllActiveHighlights());

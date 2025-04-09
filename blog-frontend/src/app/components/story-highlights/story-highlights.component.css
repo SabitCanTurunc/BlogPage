@@ -191,6 +191,7 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: 20px;
 }
 
 .story-dialog {
@@ -198,13 +199,14 @@
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
-  max-height: 80vh;
+  max-height: 90vh;
   overflow: hidden;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   position: relative;
   animation: zoomIn 0.3s ease-out;
+  margin: auto;
 }
 
 @keyframes zoomIn {
@@ -281,6 +283,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  max-height: calc(90vh - 60px);
 }
 
 .timeline-container {
@@ -299,6 +302,31 @@
 }
 
 .timeline-item.active {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.timeline-item.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #ff0088;
+  transform: translateX(-100%);
+  animation: progress-animation 5s linear forwards;
+}
+
+@keyframes progress-animation {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.timeline-item.viewed {
   background-color: #ff0088;
 }
 
@@ -309,23 +337,16 @@
   align-items: center;
   justify-content: center;
   padding: 15px;
-  overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .post-image {
   max-width: 100%;
-  max-height: 50vh;
-  object-fit: cover;
+  max-height: 60vh;
+  object-fit: contain;
   border-radius: 8px;
   margin-bottom: 15px;
-  cursor: pointer;
-  transition: transform 0.2s;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.post-image:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
 .post-title {
@@ -370,10 +391,21 @@
   transform: translateX(4px);
 }
 
-.nav-btn {
+.navigation-buttons {
   position: absolute;
   top: 50%;
+  left: 0;
+  right: 0;
   transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.nav-btn {
+  position: relative;
   background-color: rgba(0, 0, 0, 0.5);
   color: #fff;
   border: none;
@@ -385,20 +417,32 @@
   justify-content: center;
   cursor: pointer;
   font-size: 18px;
-  transition: background-color 0.2s;
-  z-index: 2;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  backdrop-filter: blur(5px);
 }
 
 .nav-btn:hover {
   background-color: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
 }
 
 .prev-btn {
+  position: absolute;
   left: 10px;
 }
 
 .next-btn {
+  position: absolute;
   right: 10px;
+}
+
+.prev-btn:hover {
+  transform: scale(1.1);
+}
+
+.next-btn:hover {
+  transform: scale(1.1);
 }
 
 /* Mobil Uyumluluk */
@@ -419,6 +463,14 @@
     width: 35px;
     height: 35px;
   }
+  
+  .prev-btn {
+    left: 5px;
+  }
+  
+  .next-btn {
+    right: 5px;
+  }
 }
 
 .no-image-placeholder {
@@ -437,4 +489,241 @@
 .no-image-placeholder svg {
   margin-bottom: 15px;
   opacity: 0.7;
+}
+
+.stories-divider {
+  margin: 1rem 0;
+  border: none;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    rgba(255, 0, 230, 0.8),
+    rgba(80, 0, 255, 0.8),
+    rgba(255, 0, 230, 0.8)
+  );
+  box-shadow: 0 0 15px rgba(255, 0, 230, 0.4);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stories-divider::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent,
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+  filter: brightness(1.5);
+}
+
+@keyframes shimmer {
+  100% {
+    left: 100%;
+  }
+}
+
+.preview-dialogs {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1001;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.preview-dialog {
+  width: 120px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.preview-dialog:hover {
+  transform: scale(1.05);
+}
+
+.preview-dialog img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.preview-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.preview-username {
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.prev-preview {
+  transform: translateX(-20px);
+}
+
+.next-preview {
+  transform: translateX(20px);
+}
+
+.user-navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1001;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.user-nav-prev,
+.user-nav-next {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  opacity: 0.7;
+}
+
+.user-nav-prev:hover,
+.user-nav-next:hover {
+  transform: scale(1.05);
+  opacity: 1;
+}
+
+.user-nav-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-nav-name {
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-nav-prev {
+  left: calc(50% - 400px);
+  transform: translateX(-20px);
+}
+
+.user-nav-next {
+  right: calc(50% - 400px);
+  transform: translateX(20px);
+}
+
+.user-nav-prev:hover {
+  transform: translateX(-10px) scale(1.05);
+}
+
+.user-nav-next:hover {
+  transform: translateX(10px) scale(1.05);
+}
+
+/* Mobil uyumluluk için */
+@media (max-width: 768px) {
+  .user-nav-prev,
+  .user-nav-next {
+    display: none; /* Küçük ekranlarda kullanıcı navigasyonunu gizle */
+  }
+
+  .story-dialog {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .dialog-content {
+    max-height: calc(95vh - 60px);
+    touch-action: pan-x; /* Yatay kaydırma için dokunma hareketini etkinleştir */
+    -webkit-overflow-scrolling: touch; /* iOS için daha iyi kaydırma deneyimi */
+    overflow-x: hidden; /* Yatay kaydırmayı engelle */
+    overflow-y: auto; /* Dikey kaydırmaya izin ver */
+    position: relative; /* Pozisyonu relative yap */
+    user-select: none; /* Metin seçimini engelle */
+    -webkit-user-select: none; /* Safari için metin seçimini engelle */
+  }
+  
+  .post-image {
+    max-height: 50vh;
+    pointer-events: none; /* Resim üzerindeki dokunma olaylarını engelle */
+  }
+  
+  .post-content {
+    touch-action: pan-x; /* Yatay kaydırma için dokunma hareketini etkinleştir */
+    -webkit-overflow-scrolling: touch; /* iOS için daha iyi kaydırma deneyimi */
+  }
+}
+
+/* Mobil cihazlar için kaydırma ipucu */
+.swipe-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  animation: fadeInOut 2s infinite;
+}
+
+.swipe-hint svg {
+  margin-bottom: 5px;
+  opacity: 0.7;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.3;
+  }
 } 

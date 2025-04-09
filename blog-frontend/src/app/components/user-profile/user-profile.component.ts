@@ -665,21 +665,31 @@ export class UserProfileComponent implements OnInit {
         // Günlük highlight sayısını güncelle
         this.dailyHighlightCount = highlights.length;
         
-        // Öne çıkarılmış post ID'lerini topla
+        // Öne çıkarılmış post ID'lerini topla ve diziye ekle
         const highlightedPostIds = highlights.map((highlight: any) => highlight.postId);
+        this.highlightedPosts = highlightedPostIds;
         
         // Tüm highlight'ları da yükle
         this.highlightService.getUserHighlights().subscribe({
           next: (allHighlights) => {
-            this.highlightedPosts = allHighlights.map((highlight: any) => highlight.postId);
+            // Tüm highlight'ları diziye ekle (var olanları koruyarak)
+            const allHighlightIds = allHighlights.map((highlight: any) => highlight.postId);
+            this.highlightedPosts = [...new Set([...this.highlightedPosts, ...allHighlightIds])];
+            console.log('Yüklenen highlight\'lar:', this.highlightedPosts);
           },
           error: (err) => {
-            // Hata mesajı kaldırıldı
+            console.error('Highlight yükleme hatası:', err);
+          },
+          complete: () => {
+            console.log('Highlight yükleme tamamlandı');
           }
         });
       },
       error: (err) => {
-        // Hata mesajı kaldırıldı
+        console.error('Günlük highlight yükleme hatası:', err);
+      },
+      complete: () => {
+        console.log('Günlük highlight yükleme tamamlandı');
       }
     });
   }
@@ -689,10 +699,22 @@ export class UserProfileComponent implements OnInit {
    * @param postId Öne çıkarılacak post ID'si
    */
   highlightPost(postId: number): void {
-    if (!this.isOwnProfile || this.isHighlighting) return;
+    if (!this.isOwnProfile) {
+      console.log('Kendi profilinizde değilsiniz');
+      this.isHighlighting = false;
+      this.highlightingPostId = null;
+      return;
+    }
+    
+    // İşlem zaten devam ediyorsa ve farklı bir post işleniyorsa
+    if (this.isHighlighting && this.highlightingPostId !== postId) {
+      console.log('Farklı bir post için öne çıkarma işlemi devam ediyor');
+      return;
+    }
     
     // Günlük limit kontrolü
     if (this.dailyHighlightCount >= 2) {
+      console.log('Günlük öne çıkarma limiti aşıldı:', this.dailyHighlightCount);
       Swal.fire({
         title: this.translationService.getTranslation('error'),
         text: this.translationService.getTranslation('daily_highlight_limit_reached'),
@@ -705,17 +727,26 @@ export class UserProfileComponent implements OnInit {
           htmlContainer: 'modern-swal-content'
         }
       });
+      // Limit aşıldıysa isHighlighting'i sıfırla
+      this.isHighlighting = false;
+      this.highlightingPostId = null;
       return;
     }
     
     this.isHighlighting = true;
     this.highlightingPostId = postId;
     
+    console.log(`Post ${postId} öne çıkarılıyor...`);
+    
     this.highlightService.highlightPost(postId).subscribe({
       next: (response) => {
         // Başarılı highlight işlemi
-        this.highlightedPosts.push(postId);
-        this.dailyHighlightCount++;
+        if (!this.highlightedPosts.includes(postId)) {
+          this.highlightedPosts.push(postId);
+          this.dailyHighlightCount++;
+        }
+        
+        console.log(`Post ${postId} başarıyla öne çıkarıldı. Güncel highlight sayısı: ${this.dailyHighlightCount}`);
         
         Swal.fire({
           title: this.translationService.getTranslation('success'),
@@ -733,7 +764,7 @@ export class UserProfileComponent implements OnInit {
         });
       },
       error: (err) => {
-        // Hata mesajı kaldırıldı
+        console.error(`Post ${postId} öne çıkarılırken hata oluştu:`, err);
         
         Swal.fire({
           title: this.translationService.getTranslation('error'),
@@ -749,6 +780,7 @@ export class UserProfileComponent implements OnInit {
         });
       },
       complete: () => {
+        console.log('Öne çıkarma işlemi tamamlandı');
         this.isHighlighting = false;
         this.highlightingPostId = null;
       }
@@ -761,6 +793,10 @@ export class UserProfileComponent implements OnInit {
    * @returns Öne çıkarılmış mı?
    */
   isHighlighted(postId: number): boolean {
+    // Daha güvenilir kontrol
+    if (!this.highlightedPosts || this.highlightedPosts.length === 0) {
+      return false;
+    }
     return this.highlightedPosts.includes(postId);
   }
   
@@ -769,13 +805,34 @@ export class UserProfileComponent implements OnInit {
    * @param postId Post ID
    */
   toggleHighlight(postId: number): void {
-    if (!this.isOwnProfile || this.isHighlighting) return;
+    if (!this.isOwnProfile) {
+      console.log('Kendi profilinizde değilsiniz');
+      return;
+    }
+    
+    // İşlem zaten devam ediyorsa ve farklı bir post işleniyorsa
+    if (this.isHighlighting && this.highlightingPostId !== postId) {
+      console.log('Farklı bir post için öne çıkarma işlemi devam ediyor');
+      return;
+    }
+    
+    // Aynı post için işlem devam ediyorsa, işlemi sıfırla
+    if (this.isHighlighting && this.highlightingPostId === postId) {
+      console.log('Aynı post için öne çıkarma işlemi devam ediyor, işlem sıfırlanıyor');
+      this.isHighlighting = false;
+      this.highlightingPostId = null;
+      return;
+    }
     
     // İşlemi görsel olarak başlat
     this.isHighlighting = true;
     this.highlightingPostId = postId;
     
-    if (this.isHighlighted(postId)) {
+    // Öne çıkarılmış mı kontrol et
+    const isCurrentlyHighlighted = this.isHighlighted(postId);
+    console.log(`Post ${postId} öne çıkarılmış mı: ${isCurrentlyHighlighted}`);
+    
+    if (isCurrentlyHighlighted) {
       // Öne çıkarmayı iptal et
       this.removeHighlight(postId);
     } else {
@@ -789,7 +846,20 @@ export class UserProfileComponent implements OnInit {
    * @param postId Öne çıkarması kaldırılacak post ID'si
    */
   removeHighlight(postId: number): void {
-    if (!this.isOwnProfile || this.isHighlighting === false || this.highlightingPostId !== postId) return;
+    if (!this.isOwnProfile) {
+      console.log('Kendi profilinizde değilsiniz');
+      this.isHighlighting = false;
+      this.highlightingPostId = null;
+      return;
+    }
+    
+    // İşlem zaten devam ediyorsa ve farklı bir post işleniyorsa
+    if (this.isHighlighting && this.highlightingPostId !== postId) {
+      console.log('Farklı bir post için öne çıkarma işlemi devam ediyor');
+      return;
+    }
+    
+    console.log(`Post ${postId} öne çıkarması kaldırılıyor...`);
     
     // Silme işlemi için son kontrol modal'ı ekleyelim
     const makeDeleteRequest = () => {
@@ -802,6 +872,8 @@ export class UserProfileComponent implements OnInit {
           if (this.dailyHighlightCount > 0) {
             this.dailyHighlightCount--;
           }
+          
+          console.log(`Post ${postId} öne çıkarması başarıyla kaldırıldı. Güncel highlight sayısı: ${this.dailyHighlightCount}`);
           
           Swal.fire({
             title: this.translationService.getTranslation('success'),
@@ -819,34 +891,18 @@ export class UserProfileComponent implements OnInit {
           });
         },
         error: (err) => {
-          console.error('Unhighlight hatası:', err);
-          
-          // Hata detaylarını konsola yazdır (geliştirme için)
-          if (err.error) {
-            console.error('Hata detayları:', err.error);
-          }
-          
-          let errorMessage = err.message || this.translationService.getTranslation('highlight_remove_error') || 'Öne çıkarma kaldırılırken bir hata oluştu';
+          console.error(`Post ${postId} öne çıkarması kaldırılırken hata oluştu:`, err);
           
           Swal.fire({
             title: this.translationService.getTranslation('error'),
-            text: errorMessage,
+            text: err.message || this.translationService.getTranslation('highlight_remove_error') || 'Öne çıkarma kaldırılırken bir hata oluştu',
             icon: 'error',
             background: '#1a1a2e',
             color: '#ffffff',
-            showConfirmButton: true,
-            confirmButtonText: 'Tekrar Dene',
-            showCancelButton: true,
-            cancelButtonText: 'Vazgeç',
             customClass: {
               popup: 'modern-swal-popup',
               title: 'modern-swal-title',
               htmlContainer: 'modern-swal-content'
-            }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // Kullanıcı tekrar denemek istedi, işlemi yeniden başlatalım
-              makeDeleteRequest();
             }
           });
           
@@ -876,6 +932,7 @@ export class UserProfileComponent implements OnInit {
           }
         },
         complete: () => {
+          console.log('Öne çıkarma kaldırma işlemi tamamlandı');
           this.isHighlighting = false;
           this.highlightingPostId = null;
         }
