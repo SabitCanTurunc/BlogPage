@@ -808,13 +808,19 @@ label {
   }
 
   .post-actions {
-    flex-direction: column;
-    align-items: stretch;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
   }
 
-  .post-actions button {
-    width: 100%;
-    margin: 0.2rem 0;
+  .btn-view, .btn-edit, .btn-delete, .btn-highlight, .btn-highlighted {
+    width: 32px;
+    height: 32px;
+    padding: 0.3rem;
+    margin: 0;
   }
 
   .tab-buttons {
