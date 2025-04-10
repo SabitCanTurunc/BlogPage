@@ -41,7 +41,6 @@ public class PostController extends BaseController<PostService, Post,Integer, Po
         return posts;
     }
     
-    // Sayfalama ile postları getiren endpoint
     @GetMapping("/paged")
     public ResponseEntity<Map<String, Object>> getPagedPosts(
             @RequestParam(defaultValue = "0") int page,
@@ -79,7 +78,6 @@ public class PostController extends BaseController<PostService, Post,Integer, Po
         }
     }
     
-    // Tüm kategorileri getiren endpoint
     @GetMapping("/categories")
     public ResponseEntity<List<String>> getAllCategories() {
         try {

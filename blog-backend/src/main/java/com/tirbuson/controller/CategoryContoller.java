@@ -27,14 +27,12 @@ public class CategoryContoller extends BaseController<CategoryService, Category,
         this.service = service;
     }
 
-    // Kategori güncelleme özel endpoint
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponseDto> update(@PathVariable Integer id, @RequestBody CategoryRequestDto reqDto) {
         Category entity = mapper.convertToEntity(reqDto);
         entity.setId(id);
         
-        // Servis metodunu çağır
         Category updatedEntity = service.update(entity);
         
         CategoryResponseDto dto = mapper.convertToDto(updatedEntity);

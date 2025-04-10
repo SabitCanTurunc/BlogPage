@@ -1,6 +1,7 @@
 package com.tirbuson.dto.response;
 
 import com.tirbuson.dto.BaseDto;
+import com.tirbuson.model.Post;
 import com.tirbuson.model.enums.Gender;
 import com.tirbuson.model.enums.Role;
 import lombok.AllArgsConstructor;
