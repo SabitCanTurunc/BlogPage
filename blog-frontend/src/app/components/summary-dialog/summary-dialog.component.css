@@ -1,0 +1,228 @@
+.dialog-container {
+  background-color: rgba(26, 26, 46, 0.8);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(255, 0, 136, 0.3);
+  border: 1px solid rgba(255, 0, 136, 0.3);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  animation: zoomIn 0.3s ease-out;
+  margin: auto;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.dialog-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ff0088, #2d00f7);
+  z-index: 1;
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid rgba(45, 0, 247, 0.3);
+  background: linear-gradient(
+    135deg,
+    rgba(15, 15, 30, 0.7) 0%,
+    rgba(26, 26, 46, 0.7) 100%
+  );
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.icon-container {
+  background-color: rgba(45, 0, 247, 0.2);
+  border-radius: 50%;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  box-shadow: 0 0 10px rgba(45, 0, 247, 0.3);
+}
+
+.post-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  color: white;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 0 5px rgba(255, 0, 136, 0.5);
+}
+
+.post-title {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  transform: rotate(90deg);
+  color: #ff0088;
+  text-shadow: 0 0 10px rgba(255, 0, 136, 0.7);
+}
+
+.dialog-content {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(90vh - 60px);
+  padding: 15px;
+  background: rgba(15, 15, 26, 0.8);
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 0;
+  gap: 16px;
+  height: 100%;
+}
+
+.loading-text {
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.post-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #ff0088 rgba(10, 10, 26, 0.8);
+}
+
+.post-content::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.post-content::-webkit-scrollbar-track {
+  background: rgba(10, 10, 26, 0.8);
+  border-radius: 4px;
+}
+
+.post-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #ff0088, #2d00f7);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.ai-badge {
+  display: flex;
+  align-items: center;
+  background: rgba(45, 0, 247, 0.2);
+  padding: 8px 12px;
+  border-radius: 20px;
+  margin-bottom: 15px;
+  align-self: flex-start;
+  border: 1px solid rgba(45, 0, 247, 0.3);
+  box-shadow: 0 0 10px rgba(45, 0, 247, 0.2);
+}
+
+.ai-badge mat-icon {
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
+  margin-right: 5px;
+  color: #ff0088;
+}
+
+.ai-badge span {
+  font-size: 0.8rem;
+  color: #ff0088;
+  text-shadow: 0 0 5px rgba(255, 0, 136, 0.5);
+}
+
+.summary-content {
+  background: rgba(26, 26, 46, 0.5);
+  border-radius: 8px;
+  padding: 16px;
+  animation: fadeIn 0.3s ease-in-out;
+  margin-top: 10px;
+  box-shadow: 0 0 15px rgba(80, 0, 255, 0.2);
+  border: 1px solid rgba(80, 0, 255, 0.2);
+}
+
+.summary-text {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 576px) {
+  .dialog-container {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
+  
+  .post-content {
+    padding: 10px;
+  }
+} 

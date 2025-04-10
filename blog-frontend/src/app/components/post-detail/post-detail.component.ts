@@ -11,11 +11,26 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LocalDatePipe } from '../../pipes/translate.pipe';
 import { forkJoin } from 'rxjs';
 import { catchError, of } from 'rxjs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { SummaryDialogComponent } from '../summary-dialog/summary-dialog.component';
+import { SummaryService } from '../../services/summary.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-post-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, CommentComponent, TranslatePipe, LocalDatePipe],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    RouterModule, 
+    CommentComponent, 
+    TranslatePipe, 
+    LocalDatePipe,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule
+  ],
   templateUrl: './post-detail.component.html',
   styleUrl: './post-detail.component.css'
 })
@@ -29,7 +44,9 @@ export class PostDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private postService: PostService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog,
+    private summaryService: SummaryService
   ) {}
 
   ngOnInit() {
@@ -102,5 +119,41 @@ export class PostDetailComponent implements OnInit {
     if (img) {
       img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(this.post?.userEmail || '')}`;
     }
+  }
+
+  openSummaryDialog(): void {
+    if (!this.post || !this.post.id) {
+      return;
+    }
+    
+    const dialogRef = this.dialog.open(SummaryDialogComponent, {
+      maxWidth: '95vw',
+      width: '600px',
+      panelClass: ['custom-dialog-container', 'animate-dialog'],
+      data: { 
+        summary: '', 
+        loading: true,
+        postTitle: this.post.title,
+        postImage: this.post.images && this.post.images.length > 0 ? this.post.images[0] : null,
+        images: this.post.images || []
+      },
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false,
+      hasBackdrop: true
+    });
+    
+    this.summaryService.getSummaryByPostId(this.post.id).subscribe({
+      next: (response) => {
+        dialogRef.componentInstance.data.summary = response.summary;
+        dialogRef.componentInstance.data.loading = false;
+        dialogRef.componentInstance.loading = false;
+      },
+      error: (error) => {
+        dialogRef.componentInstance.data.summary = 'Özet yüklenirken bir hata oluştu.';
+        dialogRef.componentInstance.data.loading = false;
+        dialogRef.componentInstance.loading = false;
+      }
+    });
   }
 }

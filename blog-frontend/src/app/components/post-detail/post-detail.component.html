@@ -41,21 +41,28 @@
 
       <h1 class="post-title">{{ post.title }}</h1>
 
-      <div
-        class="post-author author-clickable"
-        (click)="navigateToAuthorProfile(post.userEmail)"
-      >
-        <img
-          [src]="author?.profileImageUrl || 'https://ui-avatars.com/api/?name=' + post.userEmail"
-          [alt]="author?.name || post.userEmail"
-          class="author-avatar"
-          (error)="handleImageError($event)"
-        />
-        <span class="author-name">{{ author?.name || post.userEmail }}</span>
+      <div class="author-action-row">
+        <div
+          class="post-author author-clickable"
+          (click)="navigateToAuthorProfile(post.userEmail)"
+        >
+          <img
+            [src]="author?.profileImageUrl || 'https://ui-avatars.com/api/?name=' + post.userEmail"
+            [alt]="author?.name || post.userEmail"
+            class="author-avatar"
+            (error)="handleImageError($event)"
+          />
+          <span class="author-name">{{ author?.name || post.userEmail }}</span>
+        </div>
       </div>
     </div>
 
     <div class="post-body">
+      <button mat-raised-button class="summarize-button floating-button" (click)="openSummaryDialog()">
+        <mat-icon>auto_awesome_summary</mat-icon>
+        <span>{{ 'summarize_post' | translate }}</span>
+      </button>
+      
       <pre class="post-content">{{ post.content }}</pre>
 
       <div *ngIf="post.images && post.images.length > 0" class="post-images">
