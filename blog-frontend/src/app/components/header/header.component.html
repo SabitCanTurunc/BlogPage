@@ -59,7 +59,7 @@
         <a routerLink="/signup" class="btn-signup" (click)="closeMenu()">{{ 'signup' | translate }}</a>
       </div>
       <div *ngIf="isLoggedIn" class="user-dropdown">
-        <button class="dropdown-toggle" (click)="toggleDropdown()">
+        <button class="dropdown-toggle" (click)="toggleDropdown($event)">
           <img [src]="userProfile?.profileImageUrl || 'https://ui-avatars.com/api/?name=' + userEmail" alt="Kullanıcı" class="user-avatar">
           <span class="user-email">{{ getDisplayName() }}</span>
         </button>
