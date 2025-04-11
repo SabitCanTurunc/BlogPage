@@ -12,7 +12,6 @@ import com.tirbuson.repository.SummaryRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -42,6 +41,7 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
         try {
             Post post = postService.findById(postId);
             String content = post.getContent();
+            String title = post.getTitle();
             
             // Ana JSON düğümünü oluştur
             ObjectNode requestBody = objectMapper.createObjectNode();
@@ -54,7 +54,7 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
             // Parts dizisi
             ArrayNode parts = objectMapper.createArrayNode();
             ObjectNode part = objectMapper.createObjectNode();
-            part.put("text", content);
+            part.put("text", title + "\n\n" + content);
             parts.add(part);
             
             contentItem.set("parts", parts);
@@ -64,7 +64,11 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
             ObjectNode systemInstruction = objectMapper.createObjectNode();
             ArrayNode instructionParts = objectMapper.createArrayNode();
             ObjectNode instructionPart = objectMapper.createObjectNode();
-            instructionPart.put("text", "Verilen metni özetle. Ana noktaları ve önemli bilgileri açık ve anlaşılır bir şekilde vurgula. Fazla detaydan kaçınarak yalnızca en temel bilgileri sun. Metnin bağlamını ve tonunu göz önünde bulundur, ancak gereksiz tekrarları ve ayrıntıları hariç tut. Türkçe dilinde net ve sade bir özet oluştur.");
+            instructionPart.put("text", "Verilen metni özetle. Ana noktaları ve önemli bilgileri açık ve anlaşılır bir şekilde vurgula. " +
+                    "Fazla detaydan kaçınarak yalnızca en temel bilgileri sun. Metnin bağlamını ve tonunu göz önünde bulundur, " +
+                    "ancak gereksiz tekrarları ve ayrıntıları hariç tut. Satır boşlukları ve paragraflara dikkat et. " +
+                    "Markdown formatı kullanma, düz metin olarak yanıt ver. Asterisk (*), alt tire (_) gibi özel karakterleri olduğu gibi bırak. " +
+                    "Türkçe dilinde net ve sade bir özet oluştur.");
             instructionParts.add(instructionPart);
             systemInstruction.set("parts", instructionParts);
             
@@ -80,22 +84,17 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
             return objectMapper.writeValueAsString(requestBody);
             
         } catch (Exception e) {
-            System.err.println("JSON oluşturma hatası: " + e.getMessage());
             throw new BaseException(MessageType.GENERAL_EXCEPTION + "JSON oluşturma hatası: " + e.getMessage());
         }
     }
 
-    public Summary findByPostId(Integer postId) throws IOException, InterruptedException {
+    public Summary findByPostId(Integer postId) {
         Summary summary = repository.findByPostId(postId);
 
         if (summary == null) {
             try {
                 HttpClient client = HttpClient.newHttpClient();
                 String requestBody = createInputText(postId);
-                
-                // Debug için
-                System.out.println("API İsteği URL: " + URL);
-                System.out.println("API Anahtarı uzunluğu: " + (apiKey != null ? apiKey.length() : 0));
                 
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(URL + apiKey))
@@ -104,39 +103,34 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
                         .build();
 
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                System.out.println("API Yanıt Durum Kodu: " + response.statusCode());
-
-                if (response.statusCode() == 200) {
-                    JsonNode rootNode = objectMapper.readTree(response.body());
-
-                    String summarizedText;
-                    try {
-                        summarizedText = rootNode.path("candidates").get(0)
-                                .path("content").path("parts").get(0).path("text").asText();
-                    } catch (Exception e) {
-                        System.err.println("API yanıtı parse hatası: " + e.getMessage());
-                        System.err.println("API yanıtı: " + response.body());
-                        throw new BaseException(MessageType.EXTERNAL_SERVICE_ERROR + "API yanıtı parse hatası: " + e.getMessage());
-                    }
-
-                    Summary createdSummary = new Summary();
-                    Post post = postService.findById(postId);
-                    createdSummary.setPost(post);
-                    createdSummary.setSummary(summarizedText);
-                    repository.save(createdSummary);
-
-                    return createdSummary;
-                } else {
-                    System.err.println("API Hata Yanıtı: " + response.body());
+                
+                if (response.statusCode() != 200) {
                     throw new BaseException(MessageType.EXTERNAL_SERVICE_ERROR + 
                         "GeminiAI API hatası (HTTP " + response.statusCode() + "): " + response.body());
                 }
-            } catch (BaseException e) {
-                // Zaten oluşturulmuş istisnayı tekrar fırlat
-                throw e;
+                
+                JsonNode rootNode = objectMapper.readTree(response.body());
+                String summarizedText;
+                
+                try {
+                    summarizedText = rootNode.path("candidates").get(0)
+                            .path("content").path("parts").get(0).path("text").asText();
+                } catch (Exception e) {
+                    throw new BaseException(MessageType.EXTERNAL_SERVICE_ERROR + "API yanıtı parse hatası: " + e.getMessage());
+                }
+
+                Post post = postService.findById(postId);
+                Summary createdSummary = new Summary();
+                createdSummary.setPost(post);
+                createdSummary.setSummary(summarizedText);
+                repository.save(createdSummary);
+
+                return createdSummary;
+                
             } catch (Exception e) {
-                System.err.println("Beklenmeyen hata: " + e.getMessage());
-                e.printStackTrace();
+                if (e instanceof BaseException) {
+                    throw (BaseException) e;
+                }
                 throw new BaseException(MessageType.EXTERNAL_SERVICE_ERROR + "GeminiAI API hatası: " + e.getMessage());
             }
         }
