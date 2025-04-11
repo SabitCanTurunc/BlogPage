@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 import { SummaryService } from '../../services/summary.service';
+
+interface SummaryResponse {
+  summary: string;
+}
 
 export interface SummaryDialogData {
   postTitle: string;
@@ -29,43 +33,56 @@ export interface SummaryDialogData {
   templateUrl: './summary-dialog.component.html',
   styleUrls: ['./summary-dialog.component.css']
 })
-export class SummaryDialogComponent implements OnInit {
+export class SummaryDialogComponent implements OnInit, OnDestroy {
   loading = false;
+  displayedSummary = '';
+  currentIndex = 0;
+  private typewriterInterval: any;
   isClosing = false;
 
   constructor(
     public dialogRef: MatDialogRef<SummaryDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: SummaryDialogData,
-    private translationService: TranslationService,
     private summaryService: SummaryService
   ) {
-    this.loading = data.loading || false;
-    
-    // Dialog dışına tıklandığında kapanma animasyonunu tetikle
-    this.dialogRef.backdropClick().subscribe(() => {
-      this.closeDialog();
-    });
-
-    // ESC tuşuna basıldığında kapanma animasyonunu tetikle
-    this.dialogRef.keydownEvents().subscribe(event => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        this.closeDialog();
-      }
-    });
+    this.loading = this.data.loading || false;
   }
 
   ngOnInit(): void {
-    // Additional initialization logic if needed
+    if (this.data.summary) {
+      this.startTypewriterEffect();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.typewriterInterval) {
+      clearInterval(this.typewriterInterval);
+    }
+  }
+
+  startTypewriterEffect(): void {
+    this.displayedSummary = '';
+    this.currentIndex = 0;
+    
+    if (this.typewriterInterval) {
+      clearInterval(this.typewriterInterval);
+    }
+
+    this.typewriterInterval = setInterval(() => {
+      if (this.currentIndex < this.data.summary.length) {
+        this.displayedSummary += this.data.summary[this.currentIndex];
+        this.currentIndex++;
+      } else {
+        clearInterval(this.typewriterInterval);
+      }
+    }, 30);
   }
 
   closeDialog(): void {
-    if (!this.isClosing) {
-      this.isClosing = true;
-      setTimeout(() => {
-        this.dialogRef.close();
-      }, 300);
-    }
+    this.isClosing = true;
+    setTimeout(() => {
+      this.dialogRef.close();
+    }, 300);
   }
 
   handleImageError(event: any): void {
@@ -77,14 +94,21 @@ export class SummaryDialogComponent implements OnInit {
 
   regenerateSummary(): void {
     this.loading = true;
+    this.displayedSummary = '';
+    this.currentIndex = 0;
+    
+    if (this.typewriterInterval) {
+      clearInterval(this.typewriterInterval);
+    }
+
     this.summaryService.regenerateSummary(this.data.postId).subscribe({
-      next: (response) => {
+      next: (response: SummaryResponse) => {
         this.data.summary = response.summary;
         this.loading = false;
-        this.dialogRef.close(this.data);
+        this.startTypewriterEffect();
       },
-      error: (error) => {
-        console.error('Özet yeniden oluşturulurken hata oluştu:', error);
+      error: (error: Error) => {
+        console.error('Özet oluşturma hatası:', error);
         this.loading = false;
       }
     });

@@ -116,13 +116,10 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
                 }
 
                 Post post = postService.findById(postId);
-                Summary createdSummary = new Summary();
-                createdSummary.setPost(post);
-                createdSummary.setSummary(summarizedText);
-                repository.save(createdSummary);
-
-                return createdSummary;
-                
+                summary = new Summary(); // Yeni summary nesnesi oluştur
+                summary.setPost(post);
+                summary.setSummary(summarizedText);
+                repository.save(summary);
             } catch (Exception e) {
                 if (e instanceof BaseException) {
                     throw (BaseException) e;

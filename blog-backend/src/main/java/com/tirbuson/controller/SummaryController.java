@@ -29,7 +29,7 @@ public class SummaryController extends BaseController<SummaryService,Summary,Int
     @PreAuthorize("isAuthenticated()")
     public SummaryResponseDto getByPostId(@PathVariable Integer postId) {
         Summary summary = summaryService.findByPostId(postId);
-        return summaryMapper.convertToDto(summary);
+            return summaryMapper.convertToDto(summary);
     }
 
     @PostMapping("/regenerate/{postId}")

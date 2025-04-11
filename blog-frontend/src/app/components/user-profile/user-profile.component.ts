@@ -412,10 +412,24 @@ export class UserProfileComponent implements OnInit {
             });
           },
           error: (err) => {
+            let errorMessage = this.translationService.getTranslation('post_delete_error');
+            if (err.status === 409) {
+              errorMessage = this.translationService.getTranslation('post_delete_constraint_error') + 
+                           ' ' + this.translationService.getTranslation('please_delete_related_data_first');
+            } else if (err.status === 0) {
+              errorMessage = this.translationService.getTranslation('server_connection_error');
+            }
             Swal.fire({
               title: this.translationService.getTranslation('error'),
-              text: this.translationService.getTranslation('post_delete_error'),
+              text: errorMessage,
               icon: 'error',
+              background: '#1a1a2e',
+              color: '#ffffff',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
             });
           }
         });

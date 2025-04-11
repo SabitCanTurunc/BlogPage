@@ -57,17 +57,30 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
             throw new BaseException(MessageType.DAILY_HIGHLIGHT_LIMIT_EXCEEDED);
         }
 
-        // Post zaten highlight edilmiş mi kontrolü
-        if (highlightsRepository.findByUserOrderByHighlightDateDesc(user, now).stream()
-                .anyMatch(h -> h.getPost().getId().equals(requestDto.getPostId()) && h.isActive())) {
-            throw new BaseException(MessageType.HIGHLIGHT_ALREADY_EXISTS);
+        // Post'un daha önce highlight edilip edilmediğini kontrol et
+        Highlights existingHighlight = highlightsRepository.findByUserAndPost(user, post)
+                .orElse(null);
+
+        if (existingHighlight != null) {
+            // Eğer pasif ise aktif hale getir
+            if (!existingHighlight.isActive()) {
+                existingHighlight.setActive(true);
+                existingHighlight.setSeen(false);
+                existingHighlight.setHighlightDate(now);
+                Highlights updatedHighlight = highlightsRepository.save(existingHighlight);
+                return highlightMapper.convertToDto(updatedHighlight);
+            } else {
+                throw new BaseException(MessageType.HIGHLIGHT_ALREADY_EXISTS);
+            }
         }
 
+        // Yeni highlight oluştur
         Highlights highlight = new Highlights();
         highlight.setUser(user);
         highlight.setPost(post);
         highlight.setSeen(false);
         highlight.setActive(true);
+        highlight.setHighlightDate(now);
         
         Highlights savedHighlight = highlightsRepository.save(highlight);
         return highlightMapper.convertToDto(savedHighlight);

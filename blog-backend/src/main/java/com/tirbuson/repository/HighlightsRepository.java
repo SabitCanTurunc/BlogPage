@@ -1,6 +1,7 @@
 package com.tirbuson.repository;
 
 import com.tirbuson.model.Highlights;
+import com.tirbuson.model.Post;
 import com.tirbuson.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface HighlightsRepository extends BaseRepository<Highlights, Integer> {
@@ -29,4 +31,8 @@ public interface HighlightsRepository extends BaseRepository<Highlights, Integer
     // Tüm aktif ve süresi dolmamış highlight'ları getir
     @Query("SELECT h FROM Highlights h WHERE h.isActive = true AND h.expiresAt > :now AND h.highlightDate > :since ORDER BY h.highlightDate DESC")
     List<Highlights> findAllActiveHighlights(@Param("now") LocalDateTime now, @Param("since") LocalDateTime since);
+
+    // Kullanıcı ve post'a göre highlight'ı bul
+    @Query("SELECT h FROM Highlights h WHERE h.user = :user AND h.post = :post ORDER BY h.highlightDate DESC")
+    Optional<Highlights> findByUserAndPost(@Param("user") User user, @Param("post") Post post);
 }

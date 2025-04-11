@@ -146,9 +146,16 @@ export class PostDetailComponent implements OnInit {
     
     this.summaryService.getSummaryByPostId(this.post.id).subscribe({
       next: (response) => {
-        dialogRef.componentInstance.data.summary = response.summary;
-        dialogRef.componentInstance.data.loading = false;
-        dialogRef.componentInstance.loading = false;
+        if (response && response.summary) {
+          dialogRef.componentInstance.data.summary = response.summary;
+          dialogRef.componentInstance.data.loading = false;
+          dialogRef.componentInstance.loading = false;
+          dialogRef.componentInstance.startTypewriterEffect();
+        } else {
+          console.error('Özet bulunamadı');
+          dialogRef.componentInstance.data.loading = false;
+          dialogRef.componentInstance.loading = false;
+        }
       },
       error: (error) => {
         console.error('Özet yüklenirken hata oluştu:', error);
@@ -159,7 +166,6 @@ export class PostDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Dialog kapatıldığında yeni özeti göster
         this.openSummaryDialog();
       }
     });

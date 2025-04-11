@@ -25,7 +25,7 @@
       </div>
       
       <div class="summary-content">
-        <pre class="summary-text">{{ data.summary }}</pre>
+        <pre class="summary-text">{{ displayedSummary }}<span class="cursor" [class.blink]="currentIndex < data.summary.length"></span></pre>
       </div>
 
       <div class="dialog-actions">
