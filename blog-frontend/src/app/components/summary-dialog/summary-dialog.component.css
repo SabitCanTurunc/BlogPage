@@ -206,6 +206,13 @@
   line-height: 1.6;
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.9);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: inherit;
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: 100%;
 }
 
 @keyframes fadeIn {

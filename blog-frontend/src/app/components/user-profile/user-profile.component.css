@@ -454,9 +454,38 @@ h3::after {
 }
 
 .btn-highlighted:hover:not(:disabled) {
-  background: rgba(255, 193, 7, 0.3);
-  transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(255, 193, 7, 0.5);
+  background: rgba(255, 217, 0, 0.5);
+  box-shadow: 0 0 15px rgba(255, 217, 0, 0.8);
+  transform: translateY(-2px);
+}
+
+/* Highlight butonları için devre dışı durumu */
+.highlight-disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  position: relative;
+}
+
+.highlight-disabled:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.highlight-disabled svg {
+  opacity: 0.6;
+}
+
+.highlight-disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: inherit !important;
 }
 
 @keyframes pulse-gold {

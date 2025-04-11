@@ -824,13 +824,31 @@ export class UserProfileComponent implements OnInit {
       return;
     }
     
-    // İşlemi görsel olarak başlat
-    this.isHighlighting = true;
-    this.highlightingPostId = postId;
-    
     // Öne çıkarılmış mı kontrol et
     const isCurrentlyHighlighted = this.isHighlighted(postId);
     console.log(`Post ${postId} öne çıkarılmış mı: ${isCurrentlyHighlighted}`);
+    
+    // Öne çıkarılmamış ve günlük limit dolmuşsa uyarı göster
+    if (!isCurrentlyHighlighted && this.dailyHighlightCount >= 2) {
+      console.log('Günlük öne çıkarma limiti aşıldı:', this.dailyHighlightCount);
+      Swal.fire({
+        title: this.translationService.getTranslation('error'),
+        text: this.translationService.getTranslation('daily_highlight_limit_reached'),
+        icon: 'error',
+        background: '#1a1a2e',
+        color: '#ffffff',
+        customClass: {
+          popup: 'modern-swal-popup',
+          title: 'modern-swal-title',
+          htmlContainer: 'modern-swal-content'
+        }
+      });
+      return;
+    }
+    
+    // İşlemi görsel olarak başlat
+    this.isHighlighting = true;
+    this.highlightingPostId = postId;
     
     if (isCurrentlyHighlighted) {
       // Öne çıkarmayı iptal et
