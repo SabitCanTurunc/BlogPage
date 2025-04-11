@@ -14,6 +14,7 @@
   margin: auto;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
 }
 
 .dialog-container::before {
@@ -36,6 +37,21 @@
     transform: scale(1);
     opacity: 1;
   }
+}
+
+@keyframes zoomOut {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}
+
+.dialog-container.closing {
+  animation: zoomOut 0.3s ease-in;
 }
 
 .dialog-header {
@@ -232,4 +248,43 @@
   .post-content {
     padding: 10px;
   }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding: 0.5rem;
+}
+
+.regenerate-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #2196f3;
+  background-color: rgba(33, 150, 243, 0.1);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 5%;
+  transition: all 0.2s;
+}
+
+.regenerate-btn:hover {
+  background-color: rgba(33, 150, 243, 0.2);
+  transform: translateY(-1px);
+}
+
+.regenerate-btn:active {
+  transform: translateY(0);
+}
+
+.regenerate-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.regenerate-btn mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
 } 

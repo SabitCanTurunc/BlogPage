@@ -14,4 +14,8 @@ export class SummaryService {
   getSummaryByPostId(postId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/getByPostId/${postId}`);
   }
+
+  regenerateSummary(postId: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/regenerate/${postId}`, {});
+  }
 } 

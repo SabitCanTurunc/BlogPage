@@ -134,6 +134,7 @@ export class PostDetailComponent implements OnInit {
         summary: '', 
         loading: true,
         postTitle: this.post.title,
+        postId: this.post.id,
         postImage: this.post.images && this.post.images.length > 0 ? this.post.images[0] : null,
         images: this.post.images || []
       },
@@ -150,9 +151,16 @@ export class PostDetailComponent implements OnInit {
         dialogRef.componentInstance.loading = false;
       },
       error: (error) => {
-        dialogRef.componentInstance.data.summary = 'Özet yüklenirken bir hata oluştu.';
+        console.error('Özet yüklenirken hata oluştu:', error);
         dialogRef.componentInstance.data.loading = false;
         dialogRef.componentInstance.loading = false;
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Dialog kapatıldığında yeni özeti göster
+        this.openSummaryDialog();
       }
     });
   }

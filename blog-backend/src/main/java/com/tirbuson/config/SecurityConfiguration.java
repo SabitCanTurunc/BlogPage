@@ -57,6 +57,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/highlights/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/highlights/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/summary/getByPostId/{postId}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/summary/regenerate/{postId}").permitAll()
+
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

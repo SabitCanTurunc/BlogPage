@@ -1,4 +1,4 @@
-<div class="dialog-container">
+<div class="dialog-container" [class.closing]="isClosing">
   <div class="dialog-header">
     <div class="user-info">
       <div class="icon-container">
@@ -26,6 +26,13 @@
       
       <div class="summary-content">
         <pre class="summary-text">{{ data.summary }}</pre>
+      </div>
+
+      <div class="dialog-actions">
+        <button mat-raised-button class="regenerate-btn" (click)="regenerateSummary()" [disabled]="loading">
+          <mat-icon>refresh</mat-icon>
+          <span>{{ 'regenerate_summary' | translate }}</span>
+        </button>
       </div>
     </div>
   </div>
