@@ -56,6 +56,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/highlights/user/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/highlights/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/highlights/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/summary/getByPostId/{postId}").permitAll()
+
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
