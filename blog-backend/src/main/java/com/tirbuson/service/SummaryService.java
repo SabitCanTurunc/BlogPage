@@ -11,12 +11,19 @@ import com.tirbuson.model.Summary;
 import com.tirbuson.repository.SummaryRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+    
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class SummaryService extends BaseService<Summary, Integer, SummaryRepository> {
@@ -24,7 +31,7 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
     @Value("${GEMINI_API_KEY}")
     private String apiKey;
 
-    private static final String URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=";
+    private static final String URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:streamGenerateContent?key=";
 
     private final SummaryRepository repository;
     private final PostService postService;
@@ -127,7 +134,7 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
                 throw new BaseException(MessageType.EXTERNAL_SERVICE_ERROR + "GeminiAI API hatası: " + e.getMessage());
             }
         }
-        return summary;
+            return summary;
     }
 
     public Summary regenerateSummary(Integer postId) {
@@ -179,4 +186,66 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
             throw new BaseException(MessageType.EXTERNAL_SERVICE_ERROR + "GeminiAI API hatası: " + e.getMessage());
         }
     }
+
+
+    public StreamingResponseBody streamChatWithAi(String question) throws BaseException {
+        return outputStream -> {
+            try {
+                HttpClient client = HttpClient.newHttpClient();
+                String requestBody = String.format("""
+                    {
+                        "contents": [{
+                            "role": "user",
+                            "parts": [{
+                                "text": "%s"
+                            }]
+                        }]
+                    }
+                    """, question);
+
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(URL + apiKey + "&alt=sse"))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                        .build();
+
+                HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+                
+                if (response.statusCode() != 200) {
+                    String errorMessage = new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
+                    throw new BaseException("Gemini API Hatası: " + errorMessage);
+                }
+
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.body()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.startsWith("data:")) {
+                            String jsonStr = line.substring(5).trim();
+                            if (jsonStr.isEmpty() || jsonStr.equals("[DONE]")) {
+                                continue;
+                            }
+                            
+                            JsonNode rootNode = objectMapper.readTree(jsonStr);
+                            JsonNode textNode = rootNode.path("candidates").path(0)
+                                    .path("content").path("parts").path(0).path("text");
+                            
+                            if (!textNode.isMissingNode()) {
+                                String text = textNode.asText();
+                                writeAndFlush(outputStream, "data: " + text + "\n\n");
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new BaseException("Gemini API ile iletişim hatası: " + e.getMessage());
+            }
+        };
+    }
+
+    private void writeAndFlush(OutputStream outputStream, String text) throws IOException {
+        outputStream.write(text.getBytes(StandardCharsets.UTF_8));
+        outputStream.flush();
+    }
+
+
 }

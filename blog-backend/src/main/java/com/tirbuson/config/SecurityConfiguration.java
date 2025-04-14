@@ -58,6 +58,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/highlights/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/summary/getByPostId/{postId}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/summary/regenerate/{postId}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/summary/chat").permitAll()
+
 
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
