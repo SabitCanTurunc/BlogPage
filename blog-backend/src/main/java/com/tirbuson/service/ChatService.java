@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tirbuson.dto.chat.ChatMessage;
 import com.tirbuson.dto.chat.Part;
 import com.tirbuson.exception.BaseException;
+import com.tirbuson.exception.MessageType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -99,7 +100,10 @@ public class ChatService {
 
     ArrayList<ChatMessage> chatMessages = new ArrayList<>();
 
-    public StreamingResponseBody streamChatWithGeminAi(String question) throws BaseException {
+    public StreamingResponseBody streamChatWithGeminAi(String question){
+        return streamChatWithGeminAi(question,null);
+    }
+    public StreamingResponseBody streamChatWithGeminAi(String question,String instruction) throws BaseException {
         
         return outputStream -> {
             try {
@@ -107,6 +111,11 @@ public class ChatService {
                 ArrayList<Part> userParts = new ArrayList<>();
                 ChatMessage aiMessage = new ChatMessage();
                 ChatMessage userMessage = new ChatMessage();
+
+                // Soru kontrolü
+                if (question == null || question.trim().isEmpty()) {
+                    throw new BaseException(MessageType.MISSING_REQUIRED_FIELD, "Soru içeriği boş olamaz");
+                }
 
                 Part userPart = new Part();
                 userPart.setText(question);
@@ -117,11 +126,34 @@ public class ChatService {
                 chatMessages.add(userMessage);
                 
                 HttpClient client = HttpClient.newHttpClient();
-                String requestBody = String.format("""
-                        {
-                            "contents": %s
-                        }
-                        """, objectMapper.writeValueAsString(chatMessages));
+                
+                // JSON oluşturma
+                String requestBody;
+                
+                // Instruction null veya boş ise system instruction kısmını eklemeden oluştur
+                if (instruction == null || instruction.trim().isEmpty()) {
+                    requestBody = String.format("""
+                            {
+                                "contents": %s
+                            }
+                            """, objectMapper.writeValueAsString(chatMessages));
+                } else {
+                    // Çift tırnakları kaçış karakterleriyle birlikte ekle
+                    String safeInstruction = instruction.replace("\"", "\\\"");
+                    
+                    requestBody = String.format("""
+                            {
+                                "contents": %s,
+                                "systemInstruction": {
+                                      "parts": [
+                                        {
+                                            "text": "%s"
+                                        }
+                                      ]
+                                    }
+                            }
+                            """, objectMapper.writeValueAsString(chatMessages), safeInstruction);
+                }
 
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(URL + GEMINI_API_KEY + "&alt=sse"))
@@ -133,7 +165,7 @@ public class ChatService {
 
                 if (response.statusCode() != 200) {
                     String errorMessage = new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
-                    throw new BaseException("Gemini API Hatası: " + errorMessage);
+                    throw new BaseException(MessageType.EXTERNAL_SERVICE_ERROR, "Gemini API Hatası: " + errorMessage);
                 }
 
                 //stream yapısı
