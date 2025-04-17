@@ -42,28 +42,5 @@ public class SummaryController extends BaseController<SummaryService,Summary,Int
         return summaryMapper.convertToDto(summary);
     }
 
-    @PostMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<StreamingResponseBody> chatWithAI(@RequestBody Map<String, String> request) {
-        String question = request.get("question");
-        if (question == null || question.isBlank()) {
-            return ResponseEntity.badRequest().build();
-        }
 
-        try {
-            StreamingResponseBody stream = summaryService.streamChatWithAi(question);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.TEXT_EVENT_STREAM)
-                    .header("Cache-Control", "no-cache")
-                    .header("Connection", "keep-alive")
-                    .header("X-Accel-Buffering", "no")
-                    .body(stream);
-        } catch (BaseException e) {
-            if (e.getMessage().contains("EXTERNAL_SERVICE_ERROR")) {
-                return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
-            }
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 }

@@ -18,4 +18,12 @@ export class SummaryService {
   regenerateSummary(postId: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/regenerate/${postId}`, {});
   }
+
+  chatWithOpenAI(question: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/chat/openai`, { question }, { 
+      responseType: 'text',
+      observe: 'events',
+      reportProgress: true
+    });
+  }
 } 

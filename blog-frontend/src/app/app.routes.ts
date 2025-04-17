@@ -11,6 +11,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ContactComponent } from './components/contact/contact.component';
+import { ChatComponent } from './components/chat/chat.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -25,5 +26,6 @@ export const routes: Routes = [
     { path: 'profile', component: UserProfileComponent, canActivate: [AuthGuard] },
     { path: 'user/:email', component: UserProfileComponent }, 
     { path: 'contact', component: ContactComponent, title: 'İletişim - NeoWrite' },
+    { path: 'chat', component: ChatComponent },
     { path: '**', redirectTo: '' }
 ];

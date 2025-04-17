@@ -58,10 +58,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/highlights/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/summary/getByPostId/{postId}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/summary/regenerate/{postId}").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/summary/chat").permitAll()
-
-
-
+                        .requestMatchers(HttpMethod.POST, "/chat/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -75,7 +72,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontendUrl));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
         configuration.setExposedHeaders(List.of("Authorization"));
