@@ -26,7 +26,7 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
     private String GEMINI_API_KEY;
 
 
-    private static final String URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:streamGenerateContent?key=";
+    private static final String URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=";
 
     private final SummaryRepository repository;
     private final PostService postService;
@@ -91,8 +91,10 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
 
         if (summary == null) {
             try {
+                System.out.println("burda1");
                 HttpClient client = HttpClient.newHttpClient();
                 String requestBody = createInputText(postId);
+                System.out.println("burda2");
 
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(URL + GEMINI_API_KEY))
@@ -103,6 +105,8 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
                 if (response.statusCode() != 200) {
+                    System.out.println("burda3");
+
                     throw new BaseException(MessageType.EXTERNAL_SERVICE_ERROR +
                             "GeminiAI API hatası (HTTP " + response.statusCode() + "): " + response.body());
                 }
@@ -114,6 +118,8 @@ public class SummaryService extends BaseService<Summary, Integer, SummaryReposit
                     summarizedText = rootNode.path("candidates").get(0)
                             .path("content").path("parts").get(0).path("text").asText();
                 } catch (Exception e) {
+                    System.out.println("burda4");
+
                     throw new BaseException(MessageType.EXTERNAL_SERVICE_ERROR + "API yanıtı parse hatası: " + e.getMessage());
                 }
 

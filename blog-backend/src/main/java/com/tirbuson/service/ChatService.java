@@ -184,7 +184,7 @@ public class ChatService {
                             JsonNode textNode = rootNode.path("candidates").path(0)
                                     .path("content").path("parts").path(0).path("text");
 
-                            System.out.println("data: " + textNode.asText());
+//                            System.out.println("data: " + textNode.asText());
                             //chat
                             partText = partText + textNode.asText();
                             if (!textNode.isMissingNode()) {
