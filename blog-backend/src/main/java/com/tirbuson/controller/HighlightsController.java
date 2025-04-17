@@ -1,13 +1,12 @@
 package com.tirbuson.controller;
 
-import com.tirbuson.dto.HighlightRequestDto;
-import com.tirbuson.dto.HighlightResponseDto;
+import com.tirbuson.dto.request.HighlightRequestDto;
+import com.tirbuson.dto.response.HighlightResponseDto;
 import com.tirbuson.mapper.HighlightMapper;
 import com.tirbuson.model.Highlights;
 import com.tirbuson.repository.HighlightsRepository;
 import com.tirbuson.service.HighlightsService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

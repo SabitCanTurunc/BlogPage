@@ -1,7 +1,7 @@
 package com.tirbuson.mapper;
 
-import com.tirbuson.dto.HighlightRequestDto;
-import com.tirbuson.dto.HighlightResponseDto;
+import com.tirbuson.dto.request.HighlightRequestDto;
+import com.tirbuson.dto.response.HighlightResponseDto;
 import com.tirbuson.model.Highlights;
 import com.tirbuson.model.Image;
 import org.springframework.stereotype.Component;

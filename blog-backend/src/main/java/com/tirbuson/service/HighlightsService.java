@@ -1,7 +1,7 @@
 package com.tirbuson.service;
 
-import com.tirbuson.dto.HighlightRequestDto;
-import com.tirbuson.dto.HighlightResponseDto;
+import com.tirbuson.dto.request.HighlightRequestDto;
+import com.tirbuson.dto.response.HighlightResponseDto;
 import com.tirbuson.exception.BaseException;
 import com.tirbuson.exception.MessageType;
 import com.tirbuson.mapper.HighlightMapper;
@@ -11,7 +11,6 @@ import com.tirbuson.model.User;
 import com.tirbuson.repository.HighlightsRepository;
 import com.tirbuson.repository.PostRepository;
 import com.tirbuson.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
