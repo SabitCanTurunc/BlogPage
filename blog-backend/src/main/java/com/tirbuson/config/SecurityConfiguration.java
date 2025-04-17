@@ -59,7 +59,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/summary/getByPostId/{postId}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/summary/regenerate/{postId}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/chat/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/writer-ai/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/writer-ai/**").permitAll()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

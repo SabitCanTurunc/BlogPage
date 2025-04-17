@@ -9,6 +9,12 @@ import { ImageService } from '../../services/image.service';
 import { RouterModule } from '@angular/router';
 import { CategoryResponseDto } from '../../models/category-response.dto';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { WriterAiService } from '../../services/writer-ai.service';
+import { HttpEvent, HttpEventType, HttpResponse } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { TranslationService } from '../../services/translation.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 interface UploadedImage {
   url: string;
@@ -32,6 +38,10 @@ export class CreatePostComponent implements OnInit {
   uploadedImages: UploadedImage[] = [];
   imageUploadError: string = '';
   isImageUploading: boolean = false;
+  aiGeneratedContent: string = '';
+  isAiGenerating: boolean = false;
+  aiError: string = '';
+  showApplyButton: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -39,8 +49,11 @@ export class CreatePostComponent implements OnInit {
     private categoryService: CategoryService,
     private authService: AuthService,
     private imageService: ImageService,
+    private writerAiService: WriterAiService,
+    private translationService: TranslationService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private sanitizer: DomSanitizer
   ) {
     this.postForm = this.fb.group({
       title: ['', Validators.required],
@@ -59,6 +72,219 @@ export class CreatePostComponent implements OnInit {
         this.loadPostData(this.postId);
       }
     });
+  }
+
+  private processSSEResponse(text: string): string {
+    if (!text) return '';
+    
+    // Tüm veri satırlarını düzgün şekilde işle
+    let content = '';
+    
+    // 'data:' ile başlayan tüm satırları eşleştirecek regex
+    const dataRegex = /data:(.*?)(?=\ndata:|$)/gs;
+    let matches = [...text.matchAll(dataRegex)];
+    
+    // Her bir veri parçasını işle
+    if (matches && matches.length > 0) {
+      for (const match of matches) {
+        if (match[1]) {
+          // Veri içeriğini temizle ve ekle
+          let dataContent = match[1].trim();
+          // [DONE] etiketlerini kaldır
+          dataContent = dataContent.replace(/\[DONE\]/g, '');
+          
+          // Bir önceki içeriğe eklerken yeni satır karakteri ekle
+          if (content && dataContent) {
+            content += dataContent;
+          } else {
+            content += dataContent;
+          }
+        }
+      }
+    } else {
+      // Regex eşleşmezse eski yöntemi kullan
+      const lines = text.split('\n');
+      for (const line of lines) {
+        if (line.startsWith('data:')) {
+          let dataContent = line.substring(5).trim();
+          dataContent = dataContent.replace(/\[DONE\]/g, '');
+          content += dataContent;
+        }
+      }
+    }
+    
+    // Fazla boşlukları temizle ve içeriği düzenle
+    content = content
+      // Birden fazla ardışık boş satırı iki boş satırla değiştir
+      .replace(/\n{3,}/g, '\n\n')
+      // Sonda kalan fazla boşlukları temizle
+      .trim();
+    
+    return content;
+  }
+
+  generateWithAI() {
+    // Form değerlerini al ve güvenli şekilde temizle
+    const title = this.postForm.get('title')?.value ? this.postForm.get('title')?.value.trim() : '';
+    let categoryId = '';
+    
+    // Kategori değerini numeric olarak doğrula
+    const rawCategoryId = this.postForm.get('categoryId')?.value || '';
+    if (rawCategoryId && /^\d+$/.test(rawCategoryId.toString())) {
+      categoryId = rawCategoryId.toString();
+    }
+    
+    const content = this.postForm.get('content')?.value ? this.postForm.get('content')?.value.trim() : '';
+    
+    if (!title && !content && !categoryId) {
+      this.aiError = "Lütfen AI'ın yardımcı olabilmesi için en az bir alan doldurun.";
+      return;
+    }
+    
+    this.isAiGenerating = true;
+    this.aiGeneratedContent = '';
+    this.aiError = '';
+    this.showApplyButton = false;
+    
+    // Güvenli şekilde temizlenmiş değerlerle API çağrısı yap
+    this.writerAiService.generateContent(title, categoryId, content)
+      .pipe(
+        catchError(error => {
+          console.error('AI ile içerik oluşturma hatası:', error);
+          this.isAiGenerating = false;
+          this.aiError = error.message || 'İçerik oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.';
+          return throwError(() => error);
+        })
+      )
+      .subscribe({
+        next: (event: HttpEvent<any>) => {
+          if (event.type === HttpEventType.DownloadProgress) {
+            const progressEvent = event as any;
+            
+            if (progressEvent.partialText) {
+              const processedContent = this.processSSEResponse(progressEvent.partialText);
+              
+              if (processedContent) {
+                // Birleşik kelimeleri düzeltme işlemini SSE akışı sırasında da uygulayalım
+                const formattedContent = this.formatContent(processedContent);
+                this.aiGeneratedContent = formattedContent;
+              }
+            }
+          } 
+          else if (event.type === HttpEventType.Response) {
+            const response = event as HttpResponse<any>;
+            this.isAiGenerating = false;
+            
+            if (response.body) {
+              let responseText = '';
+              
+              if (typeof response.body === 'string') {
+                responseText = this.processSSEResponse(response.body);
+              } else {
+                responseText = JSON.stringify(response.body);
+              }
+              
+              if (responseText) {
+                // Son bir formatlama yap
+                this.aiGeneratedContent = this.formatContent(responseText);
+                this.showApplyButton = true;
+              }
+            }
+          }
+        },
+        error: (error) => {
+          console.error('AI içerik hatası:', error);
+          this.isAiGenerating = false;
+          this.aiError = error.message || 'İçerik oluşturulurken bir hata oluştu.';
+        },
+        complete: () => {
+          this.isAiGenerating = false;
+        }
+      });
+  }
+
+  // Birleşik kelimeleri ve formatlamayı düzeltmek için yardımcı metot
+  private formatContent(content: string): string {
+    if (!content) return '';
+    
+    let formattedContent = content;
+    
+    // Markdown başlıkları ve özel karakterleri düzenleme
+    formattedContent = formattedContent
+      // [DONE] etiketlerini temizle
+      .replace(/\[DONE\]/g, '')
+      // Fazla boş satırları azalt
+      .replace(/\n{3,}/g, '\n\n')
+      // Markdown sembollerini (*,**) temizle ama içeriği koru
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1');
+    
+    // Birleşik kelimeleri düzelt (küçük harften büyük harfe geçişlerde)
+    // Örnek: "merhaBa" -> "merha Ba"
+    formattedContent = formattedContent.replace(/([a-zışğüçöâîû])([A-ZİŞĞÜÇÖÂÎÛ])/g, '$1 $2');
+    
+    // Satır başlarındaki birleşik kelimeleri düzelt
+    // Her satırı ayrı ayrı işleyelim
+    const lines = formattedContent.split('\n');
+    const processedLines = lines.map(line => {
+      // Satır başında büyük harfle başlayan ve içinde büyük-küçük harf geçişi olan kelimeleri düzelt
+      return line.replace(/^([A-ZİŞĞÜÇÖ][a-zışğüçöâîû]*)([A-ZİŞĞÜÇÖ][a-zışğüçöâîû]*)/g, '$1 $2');
+    });
+    
+    // İşlenmiş satırları birleştir
+    formattedContent = processedLines.join('\n');
+    
+    return formattedContent;
+  }
+
+  applyAiContent() {
+    if (this.aiGeneratedContent) {
+      // Metni tam anlamıyla temizle ve düzenle
+      let formattedContent = this.aiGeneratedContent;
+      
+      // Markdown başlık sembollerini temizle ama satır sonlarını koru
+      formattedContent = formattedContent
+        // Markdown başlık işaretlerini (#) kaldırırken başlığı koru
+        .replace(/^(#+)\s*(.*?)$/gm, '$2')
+        // "Başlık:" tarzı etiketleri düzelt
+        .replace(/^(Baş[ıi]?l[ıi]?k\s*:)\s*(.*?)$/gim, '$2')
+        // Çift yıldızları (bold) kaldır
+        .replace(/\*\*/g, '')
+        // Tek yıldızları (italic) kaldır
+        .replace(/\*/g, '')
+        // Fazla boş satırları iki boş satıra düşür
+        .replace(/\n{3,}/g, '\n\n');
+      
+      // Satır sonlarına göre birleşik kelimeleri düzelt
+      const paragraphs = formattedContent.split('\n');
+      const processedParagraphs = [];
+      
+      for (const paragraph of paragraphs) {
+        // Birleşmiş kelimeleri arayıp ayır
+        // Örnek: "kurmakiçin" -> "kurmak için"
+        const processed = paragraph.replace(/([a-zışğüçöâîû])([A-ZİŞĞÜÇÖÂÎÛ])/g, '$1 $2');
+        processedParagraphs.push(processed);
+      }
+      
+      // Düzeltilmiş paragrafları birleştir
+      formattedContent = processedParagraphs.join('\n');
+      
+      // Metin içindeki büyük harf küçük harf geçişlerinde boşluk ekleyerek birleşik kelimeleri düzelt
+      formattedContent = formattedContent.replace(/([a-zışğüçöâîû])([A-ZİŞĞÜÇÖÂÎÛ])/g, '$1 $2');
+      
+      // Form değerlerini al
+      const currentContent = this.postForm.get('content')?.value || '';
+      
+      // Form alanına uygula - form kontrollerine değerleri doğru şekilde ata
+      this.postForm.get('content')?.setValue(formattedContent);
+      
+      // Form değişikliklerini tetikle
+      this.postForm.markAsDirty();
+      
+      // AI içeriğini temizle ve butonu gizle
+      this.aiGeneratedContent = '';
+      this.showApplyButton = false;
+    }
   }
 
   loadPostData(id: number) {
@@ -227,5 +453,25 @@ export class CreatePostComponent implements OnInit {
 
   cancel() {
     this.router.navigate(['/']);
+  }
+
+  /**
+   * Metni HTML içeriğine dönüştürür ve satır sonlarını <p> etiketleri ile değiştirir
+   * @param content Formatlama yapılacak içerik
+   * @returns Güvenli HTML içeriği
+   */
+  formatHtmlContent(content: string): SafeHtml {
+    if (!content) return '';
+    
+    // Satır sonlarını paragraf etiketlerine dönüştürme
+    const formattedContent = content
+      .replace(/\n{2,}/g, '</p><p>') // İki veya daha fazla yeni satırı paragraf bölmesi olarak işle
+      .replace(/\n/g, '<br>'); // Tek yeni satırları <br> ile değiştir
+    
+    // Son içeriği paragraf içine sarma
+    const htmlContent = `<p>${formattedContent}</p>`;
+    
+    // Güvenli HTML olarak dönme
+    return this.sanitizer.bypassSecurityTrustHtml(htmlContent);
   }
 } 

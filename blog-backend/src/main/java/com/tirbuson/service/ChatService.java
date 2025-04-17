@@ -127,10 +127,8 @@ public class ChatService {
                 
                 HttpClient client = HttpClient.newHttpClient();
                 
-                // JSON oluşturma
                 String requestBody;
                 
-                // Instruction null veya boş ise system instruction kısmını eklemeden oluştur
                 if (instruction == null || instruction.trim().isEmpty()) {
                     requestBody = String.format("""
                             {
@@ -186,6 +184,7 @@ public class ChatService {
                             JsonNode textNode = rootNode.path("candidates").path(0)
                                     .path("content").path("parts").path(0).path("text");
 
+                            System.out.println("data: " + textNode.asText());
                             //chat
                             partText = partText + textNode.asText();
                             if (!textNode.isMissingNode()) {

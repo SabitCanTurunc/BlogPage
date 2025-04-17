@@ -64,7 +64,6 @@ export class ChatComponent implements OnInit, AfterViewChecked, AfterViewInit {
     const lines = text.split('\n');
     for (const line of lines) {
       if (line.startsWith('data:')) {
-        // "data:" önekini kaldır ve içeriğe ekle
         content += line.substring(5).trim();
       }
     }

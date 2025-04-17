@@ -284,6 +284,12 @@ export class TranslationService {
       'close': 'Kapat',
       'summary_creating': 'Özet oluşturuluyor...',
       'regenerate_summary': 'Yeniden Oluştur',
+      'ai_complete': 'AI ile Tamamla',
+      'ai_generating': 'Yazı oluşturuluyor...',
+      'ai_generated_content': 'AI Tarafından Oluşturulan İçerik',
+      'ai_apply': 'Uygula',
+      'ai_error_empty_fields': 'Lütfen AI\'ın yardımcı olabilmesi için en az bir alan doldurun.',
+      'ai_error_generation': 'İçerik oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.',
     },
     en: {
       'home': 'Home',
@@ -545,6 +551,12 @@ export class TranslationService {
       'close': 'Close',
       'summary_creating': 'Creating summary...',
       'regenerate_summary': 'Regenerate',
+      'ai_complete': 'Complete with AI',
+      'ai_generating': 'Generating content...',
+      'ai_generated_content': 'AI Generated Content',
+      'ai_apply': 'Apply',
+      'ai_error_empty_fields': 'Please fill at least one field for AI to assist you.',
+      'ai_error_generation': 'An error occurred while generating content. Please try again.',
     }
   };
 
