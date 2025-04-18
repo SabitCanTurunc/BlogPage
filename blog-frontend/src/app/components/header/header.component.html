@@ -1,7 +1,7 @@
 <header class="app-header">
   <div class="header-container">
     <div class="logo">
-      <a routerLink="/"><img  src="assets/blogLogo.png" alt="NeoWrite" class="blog-logo">NeoWrite</a>
+      <a routerLink="/"><img  src="assets/blogLogo.png" alt="NeoWrite" class="blog-logo"><span class="logo-text">NeoWrite</span></a>
     </div>
     <button class="hamburger-menu" (click)="toggleMenu()" [class.active]="isMenuOpen">
       <span></span>
@@ -72,7 +72,7 @@
       </div>
       <div class="language-selector">
         <button class="btn-language" (click)="toggleLanguageAndReload()">
-          {{ currentLanguage === 'tr' ? '🇹🇷 TR' : '🇬🇧 EN' }}
+          {{ currentLanguage === 'tr' ? ' TR' : 'EN' }}
         </button>
       </div>
       <div *ngIf="!isLoggedIn" class="auth-buttons">
