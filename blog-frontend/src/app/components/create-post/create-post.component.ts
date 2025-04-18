@@ -124,6 +124,9 @@ export class CreatePostComponent implements OnInit {
   }
 
   generateWithAI() {
+    // Daha önce görüntülenen hataları temizle
+    this.submitError = '';
+    
     // Form değerlerini al ve güvenli şekilde temizle
     const title = this.postForm.get('title')?.value ? this.postForm.get('title')?.value.trim() : '';
     let categoryId = '';
@@ -134,10 +137,31 @@ export class CreatePostComponent implements OnInit {
       categoryId = rawCategoryId.toString();
     }
     
-    const content = this.postForm.get('content')?.value ? this.postForm.get('content')?.value.trim() : '';
+    // Content alanını kontrol etmeye gerek yok, AI ile oluşturulacak
     
-    if (!title && !content && !categoryId) {
-      this.aiError = "Lütfen AI'ın yardımcı olabilmesi için en az bir alan doldurun.";
+    // Başlık kontrolü
+    if (!title) {
+      this.aiError = this.translationService.getTranslation('create_post_title_required') || "AI ile içerik oluşturmak için lütfen başlık giriniz.";
+      this.postForm.get('title')?.markAsTouched();
+      
+      // Başlık alanına odaklan
+      setTimeout(() => {
+        document.getElementById('title')?.focus();
+        document.getElementById('title')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return;
+    }
+    
+    // Kategori kontrolü
+    if (!categoryId) {
+      this.aiError = this.translationService.getTranslation('create_post_category_required') || "AI ile içerik oluşturmak için lütfen kategori seçiniz.";
+      this.postForm.get('categoryId')?.markAsTouched();
+      
+      // Kategori alanına odaklan
+      setTimeout(() => {
+        document.getElementById('categoryId')?.focus();
+        document.getElementById('categoryId')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
       return;
     }
     
@@ -145,6 +169,14 @@ export class CreatePostComponent implements OnInit {
     this.aiGeneratedContent = '';
     this.aiError = '';
     this.showApplyButton = false;
+    
+    // Content boş olsa bile API çağrısı yapabiliriz, boş olması sorun değil
+    const content = this.postForm.get('content')?.value ? this.postForm.get('content')?.value.trim() : '';
+    
+    // İşlem başladığında content alanının touched durumunu sıfırla
+    // Bu, daha önce gösterilmiş validation hatalarını temizler
+    this.postForm.get('content')?.markAsPristine();
+    this.postForm.get('content')?.markAsUntouched();
     
     // Güvenli şekilde temizlenmiş değerlerle API çağrısı yap
     this.writerAiService.generateContent(title, categoryId, content)
@@ -196,6 +228,11 @@ export class CreatePostComponent implements OnInit {
           console.error('AI içerik hatası:', error);
           this.isAiGenerating = false;
           this.aiError = error.message || 'İçerik oluşturulurken bir hata oluştu.';
+          
+          // Hata durumunda butona odaklan
+          setTimeout(() => {
+            document.querySelector('.ai-generate-btn')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
         },
         complete: () => {
           this.isAiGenerating = false;
@@ -221,7 +258,7 @@ export class CreatePostComponent implements OnInit {
     
     // Birleşik kelimeleri düzelt (küçük harften büyük harfe geçişlerde)
     // Örnek: "merhaBa" -> "merha Ba"
-    formattedContent = formattedContent.replace(/([a-zışğüçöâîû])([A-ZİŞĞÜÇÖÂÎÛ])/g, '$1 $2');
+    formattedContent = formattedContent.replace(/([a-zışğüçöâîûû])([A-ZİŞĞÜÇÖÂÎÛ])/g, '$1 $2');
     
     // Satır başlarındaki birleşik kelimeleri düzelt
     // Her satırı ayrı ayrı işleyelim
@@ -272,18 +309,21 @@ export class CreatePostComponent implements OnInit {
       // Metin içindeki büyük harf küçük harf geçişlerinde boşluk ekleyerek birleşik kelimeleri düzelt
       formattedContent = formattedContent.replace(/([a-zışğüçöâîû])([A-ZİŞĞÜÇÖÂÎÛ])/g, '$1 $2');
       
-      // Form değerlerini al
-      const currentContent = this.postForm.get('content')?.value || '';
-      
       // Form alanına uygula - form kontrollerine değerleri doğru şekilde ata
       this.postForm.get('content')?.setValue(formattedContent);
       
-      // Form değişikliklerini tetikle
-      this.postForm.markAsDirty();
+      // Content kontrol durumunu güncelleyelim ve valid olarak işaretleyelim
+      this.postForm.get('content')?.markAsDirty();
+      this.postForm.get('content')?.updateValueAndValidity();
+      
+      // Hata oluşmaması için touched olarak işaretlemeyelim
+      // Böylece kullanıcı sonradan değiştirene kadar hata gösterilmez
+      this.postForm.get('content')?.markAsPristine();
       
       // AI içeriğini temizle ve butonu gizle
       this.aiGeneratedContent = '';
       this.showApplyButton = false;
+      this.aiError = '';
     }
   }
 
@@ -389,11 +429,57 @@ export class CreatePostComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.postForm.valid) {
+    // Form validasyonunu manuel olarak da kontrol edelim
+    const title = this.postForm.get('title')?.value ? this.postForm.get('title')?.value.trim() : '';
+    const categoryId = this.postForm.get('categoryId')?.value;
+    const content = this.postForm.get('content')?.value ? this.postForm.get('content')?.value.trim() : '';
+    
+    // Tüm hatalar temizlenir
+    this.submitError = '';
+    
+    // Başlık kontrolü
+    if (!title) {
+      this.submitError = this.translationService.getTranslation('create_post_title_required') || 'Lütfen bir başlık giriniz.';
+      this.postForm.get('title')?.markAsTouched();
+      // Başlık alanına odaklan
+      setTimeout(() => {
+        document.getElementById('title')?.focus();
+        document.getElementById('title')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return;
+    }
+    
+    // Kategori kontrolü
+    if (!categoryId) {
+      this.submitError = this.translationService.getTranslation('create_post_category_required') || 'Lütfen bir kategori seçiniz.';
+      this.postForm.get('categoryId')?.markAsTouched();
+      // Kategori seçimine odaklan
+      setTimeout(() => {
+        document.getElementById('categoryId')?.focus();
+        document.getElementById('categoryId')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return;
+    }
+    
+    // İçerik kontrolü
+    if (!content) {
+      this.submitError = this.translationService.getTranslation('create_post_content_required') || 'Lütfen içerik giriniz.';
+      this.postForm.get('content')?.markAsTouched();
+      // İçerik alanına odaklan
+      setTimeout(() => {
+        document.getElementById('content')?.focus();
+        document.getElementById('content')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return;
+    }
+    
+    // Form geçerliliğini elle kontrol et
+    // İçerik AI ile tamamlanmış olabileceği için işaret durumları karışabilir
+    if (title && categoryId && content) {
       const userEmail = this.authService.getUserEmail();
       
       if (!userEmail) {
-        this.submitError = 'Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın.';
+        this.submitError = this.translationService.getTranslation('login_required') || 'Kullanıcı oturumu bulunamadı. Lütfen tekrar giriş yapın.';
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);
@@ -401,9 +487,9 @@ export class CreatePostComponent implements OnInit {
       }
 
       const postData = {
-        title: this.postForm.get('title')?.value.trim(),
-        content: this.postForm.get('content')?.value.trim(),
-        categoryId: parseInt(this.postForm.get('categoryId')?.value),
+        title: title,
+        content: content,
+        categoryId: parseInt(categoryId),
         images: this.uploadedImages.map(img => img.url),
         userEmail: userEmail
       };
@@ -432,6 +518,26 @@ export class CreatePostComponent implements OnInit {
           }
         });
       }
+    } else {
+      // Form geçerli değilse, eksik kalan ilk alana odaklan
+      if (!title) {
+        document.getElementById('title')?.focus();
+        document.getElementById('title')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (!categoryId) {
+        document.getElementById('categoryId')?.focus();
+        document.getElementById('categoryId')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (!content) {
+        document.getElementById('content')?.focus();
+        document.getElementById('content')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      
+      // Tüm alanları dokunulmuş olarak işaretle
+      Object.keys(this.postForm.controls).forEach(field => {
+        const control = this.postForm.get(field);
+        control?.markAsTouched({ onlySelf: true });
+      });
+      
+      this.submitError = this.translationService.getTranslation('form_validation_error') || 'Lütfen formdaki eksik alanları doldurun.';
     }
   }
 
