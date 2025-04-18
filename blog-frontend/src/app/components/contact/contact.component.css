@@ -2,29 +2,29 @@
 
 .contact-section {
   min-height: 100vh;
-  background-color: #0f0f1a;
+  background-color: transparent;
   background-image: radial-gradient(
       circle at 10% 20%,
-      rgba(45, 0, 247, 0.15) 0%,
+      var(--primary-transparent) 0%,
       transparent 30%
     ),
     radial-gradient(
       circle at 90% 80%,
-      rgba(255, 0, 136, 0.15) 0%,
+      var(--secondary-transparent) 0%,
       transparent 30%
     );
   padding: 4rem 2rem;
-  color: #fff;
+  color: var(--text-color);
 }
 
 .contact-container {
   max-width: 900px;
   margin: 0 auto;
-  background: rgba(10, 10, 26, 0.6);
+  background: var(--card-bg);
   border-radius: 16px;
-  box-shadow: 0 0 20px rgba(80, 0, 255, 0.3);
+  box-shadow: 0 0 20px var(--shadow-color);
   padding: 2rem;
-  border: 1px solid rgba(255, 0, 230, 0.3);
+  border: 1px solid var(--border-color);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -40,42 +40,42 @@
   margin: 0 auto 2rem;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #ff00e6;
-  box-shadow: 0 0 25px rgba(255, 0, 136, 0.3);
+  border: 3px solid var(--primary-color);
+  box-shadow: 0 0 25px var(--primary-transparent);
 }
 
 .profile-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: drop-shadow(0 0 15px rgba(255, 0, 136, 0.7));
+  filter: drop-shadow(0 0 15px var(--primary-transparent));
   transition: all 0.3s ease;
 }
 
 .profile-image img:hover {
   transform: scale(1.05);
-  filter: drop-shadow(0 0 20px rgba(45, 0, 247, 0.8));
+  filter: drop-shadow(0 0 20px var(--secondary-transparent));
 }
 
 .profile-header h1 {
   font-size: 3.5rem;
   font-weight: 800;
   margin-bottom: 0.5rem;
-  background: linear-gradient(45deg, #ff0088, #2d00f7);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 15px rgba(255, 0, 136, 0.5);
+  text-shadow: 0 0 15px var(--primary-transparent);
   font-family: "Montserrat", sans-serif;
   letter-spacing: -1px;
 }
 
 .profile-header .title {
   font-size: 1.5rem;
-  color: #fff;
+  color: var(--text-color);
   margin: 0;
   opacity: 0.9;
   font-family: "Poppins", sans-serif;
-  text-shadow: 0 0 10px rgba(45, 0, 247, 0.5);
+  text-shadow: 0 0 10px var(--primary-transparent);
 }
 
 .profile-content {
@@ -85,7 +85,7 @@
 .bio {
   font-size: 1.2rem;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-color);
   max-width: 700px;
   margin: 0 auto 3rem;
   font-family: "Poppins", sans-serif;
@@ -106,13 +106,13 @@
   padding: 0.8rem 1.5rem;
   border-radius: 50px;
   text-decoration: none;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-color);
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   font-family: "Poppins", sans-serif;
-  box-shadow: 0 0 15px rgba(45, 0, 247, 0.3);
+  box-shadow: 0 0 15px var(--shadow-color);
 }
 
 .social-link i {
@@ -121,8 +121,8 @@
 
 .social-link:hover {
   transform: translateY(-3px);
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 20px rgba(255, 0, 136, 0.4);
+  background: var(--background-hover);
+  box-shadow: 0 0 20px var(--primary-transparent);
 }
 
 .social-link.github:hover {
@@ -141,8 +141,8 @@
 }
 
 .social-link.email:hover {
-  border-color: #ff00e6;
-  box-shadow: 0 5px 15px rgba(255, 0, 230, 0.3);
+  border-color: var(--primary-color);
+  box-shadow: 0 5px 15px var(--primary-transparent);
 }
 
 .skills {
@@ -152,9 +152,9 @@
 .skills h2 {
   font-size: 2rem;
   margin-bottom: 1.5rem;
-  color: #fff;
+  color: var(--text-color);
   font-family: "Montserrat", sans-serif;
-  text-shadow: 0 0 10px rgba(255, 0, 136, 0.5);
+  text-shadow: 0 0 10px var(--primary-transparent);
 }
 
 .skill-tags {
@@ -166,21 +166,21 @@
 
 .skill-tag {
   padding: 0.6rem 1.2rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--background-secondary);
   border-radius: 50px;
   font-size: 0.95rem;
-  color: #fff;
-  border: 1px solid rgba(255, 0, 230, 0.3);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
   font-family: "Poppins", sans-serif;
-  box-shadow: 0 0 10px rgba(45, 0, 247, 0.2);
+  box-shadow: 0 0 10px var(--shadow-color);
 }
 
 .skill-tag:hover {
-  background: rgba(255, 0, 136, 0.2);
-  border-color: #ff00e6;
+  background: var(--primary-transparent);
+  border-color: var(--primary-color);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(255, 0, 136, 0.3);
+  box-shadow: 0 5px 15px var(--primary-transparent);
 }
 
 @media (max-width: 768px) {

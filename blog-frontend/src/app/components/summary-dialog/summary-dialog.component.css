@@ -1,12 +1,12 @@
 .dialog-container {
-  background-color: rgba(26, 26, 46, 0.8);
+  background-color: var(--card-bg);
   border-radius: 16px;
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
   overflow: hidden;
-  box-shadow: 0 0 30px rgba(255, 0, 136, 0.3);
-  border: 1px solid rgba(255, 0, 136, 0.3);
+  box-shadow: 0 0 30px var(--shadow-color);
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -24,7 +24,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #ff0088, #2d00f7);
+  background: var(--gradient-primary);
   z-index: 1;
 }
 
@@ -59,12 +59,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid rgba(45, 0, 247, 0.3);
-  background: linear-gradient(
-    135deg,
-    rgba(15, 15, 30, 0.7) 0%,
-    rgba(26, 26, 46, 0.7) 100%
-  );
+  border-bottom: 1px solid var(--border-color);
+  background: var(--background-secondary);
 }
 
 .user-info {
@@ -73,21 +69,21 @@
 }
 
 .icon-container {
-  background-color: rgba(45, 0, 247, 0.2);
+  background-color: var(--primary-transparent);
   border-radius: 50%;
   padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 12px;
-  box-shadow: 0 0 10px rgba(45, 0, 247, 0.3);
+  box-shadow: 0 0 10px var(--primary-transparent);
 }
 
 .post-icon {
   font-size: 24px;
   width: 24px;
   height: 24px;
-  color: white;
+  color: var(--text-color);
 }
 
 .user-details {
@@ -98,19 +94,19 @@
 .user-name {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #fff;
-  text-shadow: 0 0 5px rgba(255, 0, 136, 0.5);
+  color: var(--text-color);
+  text-shadow: 0 0 5px var(--primary-transparent);
 }
 
 .post-title {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--text-color);
   font-size: 24px;
   cursor: pointer;
   width: 30px;
@@ -124,8 +120,8 @@
 
 .close-btn:hover {
   transform: rotate(90deg);
-  color: #ff0088;
-  text-shadow: 0 0 10px rgba(255, 0, 136, 0.7);
+  color: var(--primary-color);
+  text-shadow: 0 0 10px var(--primary-transparent);
 }
 
 .dialog-content {
@@ -136,7 +132,7 @@
   flex-direction: column;
   max-height: calc(90vh - 60px);
   padding: 15px;
-  background: rgba(15, 15, 26, 0.8);
+  background: var(--background-color);
 }
 
 .loading-container {
@@ -150,7 +146,7 @@
 }
 
 .loading-text {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   text-align: center;
 }
 
@@ -162,7 +158,7 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
-  scrollbar-color: #ff0088 rgba(10, 10, 26, 0.8);
+  scrollbar-color: var(--primary-color) var(--background-secondary);
 }
 
 .post-content::-webkit-scrollbar {
@@ -171,12 +167,12 @@
 }
 
 .post-content::-webkit-scrollbar-track {
-  background: rgba(10, 10, 26, 0.8);
+  background: var(--background-secondary);
   border-radius: 4px;
 }
 
 .post-content::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #ff0088, #2d00f7);
+  background: var(--gradient-primary);
   border-radius: 4px;
   transition: all 0.3s ease;
 }
@@ -184,13 +180,13 @@
 .ai-badge {
   display: flex;
   align-items: center;
-  background: rgba(45, 0, 247, 0.2);
+  background: var(--primary-transparent);
   padding: 8px 12px;
   border-radius: 20px;
   margin-bottom: 15px;
   align-self: flex-start;
-  border: 1px solid rgba(45, 0, 247, 0.3);
-  box-shadow: 0 0 10px rgba(45, 0, 247, 0.2);
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 0 10px var(--primary-transparent);
 }
 
 .ai-badge mat-icon {
@@ -198,30 +194,30 @@
   height: 16px;
   width: 16px;
   margin-right: 5px;
-  color: #ff0088;
+  color: var(--primary-color);
 }
 
 .ai-badge span {
   font-size: 0.8rem;
-  color: #ff0088;
-  text-shadow: 0 0 5px rgba(255, 0, 136, 0.5);
+  color: var(--primary-color);
+  text-shadow: 0 0 5px var(--primary-transparent);
 }
 
 .summary-content {
-  background: rgba(26, 26, 46, 0.5);
+  background: var(--background-secondary);
   border-radius: 8px;
   padding: 16px;
   animation: fadeIn 0.3s ease-in-out;
   margin-top: 10px;
-  box-shadow: 0 0 15px rgba(80, 0, 255, 0.2);
-  border: 1px solid rgba(80, 0, 255, 0.2);
+  box-shadow: 0 0 15px var(--shadow-color);
+  border: 1px solid var(--border-color);
 }
 
 .summary-text {
   margin: 0;
   line-height: 1.6;
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-color);
   white-space: pre-wrap;
   word-wrap: break-word;
   font-family: inherit;
@@ -253,29 +249,31 @@
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 1rem;
-  padding: 0.5rem;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-color);
 }
 
 .regenerate-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #2196f3;
-  background-color: rgba(33, 150, 243, 0.1);
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 5%;
-  transition: all 0.2s;
+  gap: 8px;
+  background-color: var(--secondary-transparent);
+  border: 1px solid var(--secondary-color);
+  color: var(--text-color);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .regenerate-btn:hover {
-  background-color: rgba(33, 150, 243, 0.2);
-  transform: translateY(-1px);
+  background-color: var(--secondary-color);
+  box-shadow: 0 2px 8px var(--secondary-transparent);
 }
 
 .regenerate-btn:active {
-  transform: translateY(0);
+  transform: translateY(1px);
 }
 
 .regenerate-btn[disabled] {
@@ -284,19 +282,19 @@
 }
 
 .regenerate-btn mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
+  font-size: 16px;
+  height: 16px;
+  width: 16px;
 }
 
 .cursor {
   display: inline-block;
-  width: 2px;
-  height: 20px;
-  background-color: #333;
-  margin-left: 2px;
-  vertical-align: middle;
+  width: 8px;
+  height: 16px;
+  background-color: var(--primary-color);
+  margin-left: 4px;
   animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
 }
 
 .cursor.blink {
@@ -304,10 +302,6 @@
 }
 
 @keyframes blink {
-  from, to {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
+  from, to { opacity: 1; }
+  50% { opacity: 0; }
 } 

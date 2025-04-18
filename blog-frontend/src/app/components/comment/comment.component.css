@@ -3,19 +3,19 @@
 .comments-section {
   margin-top: 3rem;
   padding-top: 2rem;
-  border-top: 2px solid #ff00e6;
+  border-top: 2px solid var(--primary-color);
   font-family: "Poppins", sans-serif;
 }
 
 h3 {
-  color: #ff00e6;
+  color: var(--primary-color);
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
   font-weight: 700;
   position: relative;
   padding-bottom: 0.5rem;
   font-family: "Orbitron", sans-serif;
-  text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
+  text-shadow: 0 0 10px var(--primary-transparent);
   letter-spacing: 1px;
 }
 
@@ -26,9 +26,9 @@ h3::after {
   left: 0;
   width: 50px;
   height: 3px;
-  background: linear-gradient(45deg, #5000ff, #ff00e6);
+  background: var(--gradient-primary);
   border-radius: 3px;
-  box-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
+  box-shadow: 0 0 10px var(--primary-transparent);
 }
 
 .comment-form {
@@ -38,31 +38,31 @@ h3::after {
 .form-control {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid rgba(255, 0, 230, 0.3);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
-  background: rgba(20, 20, 40, 0.6);
-  color: #ffffff;
+  background: var(--background-secondary);
+  color: var(--text-color);
   transition: all 0.3s ease;
   resize: vertical;
-  box-shadow: 0 0 10px rgba(80, 0, 255, 0.2);
+  box-shadow: 0 0 10px var(--shadow-color);
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #ff00e6;
-  box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 15px var(--primary-transparent);
 }
 
 .form-control::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
 }
 
 .error-message {
-  color: #ff00e6;
+  color: var(--error-color);
   font-size: 0.875rem;
   margin-top: 0.25rem;
-  text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
+  text-shadow: 0 0 5px var(--error-color-transparent);
 }
 
 .btn {
@@ -87,7 +87,7 @@ h3::after {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, #5000ff, #ff00e6);
+  background: var(--gradient-primary);
   opacity: 0;
   z-index: -1;
   transition: opacity 0.3s;
@@ -98,14 +98,14 @@ h3::after {
 }
 
 .btn-primary {
-  background: rgba(80, 0, 255, 0.2);
-  color: #ffffff;
-  border: 1px solid rgba(255, 0, 230, 0.3);
-  box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
+  background: var(--primary-transparent);
+  color: var(--text-color);
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 0 10px var(--primary-transparent);
 }
 
 .btn-primary:hover:not(:disabled) {
-  box-shadow: 0 0 15px rgba(255, 0, 230, 0.5);
+  box-shadow: 0 0 15px var(--primary-transparent);
   transform: translateY(-2px);
 }
 
@@ -115,27 +115,27 @@ h3::after {
 }
 
 .login-prompt {
-  background: rgba(20, 20, 40, 0.6);
+  background: var(--background-secondary);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 2rem;
   text-align: center;
-  color: #ffffff;
-  border: 1px solid rgba(255, 0, 230, 0.3);
-  box-shadow: 0 0 10px rgba(80, 0, 255, 0.2);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0 10px var(--shadow-color);
 }
 
 .login-prompt a {
-  color: #ff00e6;
+  color: var(--primary-color);
   text-decoration: none;
   font-weight: 600;
-  text-shadow: 0 0 5px rgba(255, 0, 230, 0.8);
+  text-shadow: 0 0 5px var(--primary-transparent);
   transition: all 0.3s ease;
 }
 
 .login-prompt a:hover {
   text-decoration: underline;
-  text-shadow: 0 0 10px rgba(255, 0, 230, 0.8);
+  text-shadow: 0 0 10px var(--primary-transparent);
 }
 
 .alert {
@@ -145,17 +145,17 @@ h3::after {
 }
 
 .alert-danger {
-  background: rgba(20, 20, 40, 0.6);
-  color: #ff00e6;
-  border: 1px solid rgba(255, 0, 230, 0.3);
-  box-shadow: 0 0 10px rgba(255, 0, 230, 0.3);
+  background: var(--background-secondary);
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+  box-shadow: 0 0 10px var(--error-color-transparent);
 }
 
 .alert-success {
-  background: rgba(20, 20, 40, 0.6);
-  color: #00ffaa;
-  border: 1px solid rgba(0, 255, 170, 0.3);
-  box-shadow: 0 0 10px rgba(0, 255, 170, 0.3);
+  background: var(--background-secondary);
+  color: var(--success-color);
+  border: 1px solid var(--success-color);
+  box-shadow: 0 0 10px var(--success-color-transparent);
 }
 
 .comments-list {
@@ -165,21 +165,21 @@ h3::after {
 .no-comments {
   text-align: center;
   padding: 2rem;
-  background: rgba(40, 40, 80, 0.5);
+  background: var(--background-secondary);
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--text-color);
   font-style: italic;
-  border: 1px solid rgba(255, 0, 230, 0.3);
-  box-shadow: 0 0 10px rgba(80, 0, 255, 0.2);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0 10px var(--shadow-color);
 }
 
 .comment-item {
-  background: rgba(40, 40, 80, 0.5);
+  background: var(--background-secondary);
   border-radius: 12px;
   margin-bottom: 1.5rem;
   padding: 1.25rem;
-  border: 1px solid rgba(255, 0, 230, 0.2);
-  box-shadow: 0 4px 15px rgba(10, 10, 26, 0.2);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 15px var(--shadow-color);
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   position: relative;
@@ -193,14 +193,14 @@ h3::after {
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #5000ff, #ff00e6);
+  background: var(--gradient-primary);
   border-radius: 4px 0 0 4px;
 }
 
 .comment-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(10, 10, 26, 0.3);
-  border-color: rgba(255, 0, 230, 0.3);
+  box-shadow: 0 8px 25px var(--shadow-color);
+  border-color: var(--primary-color);
 }
 
 .comment-header {
@@ -208,7 +208,7 @@ h3::after {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-color-light);
   padding-bottom: 0.75rem;
 }
 
@@ -232,19 +232,19 @@ h3::after {
 
 .author-name {
   font-weight: 600;
-  color: #ff00e6;
-  text-shadow: 0 0 5px rgba(255, 0, 230, 0.3);
+  color: var(--primary-color);
+  text-shadow: 0 0 5px var(--primary-transparent);
 }
 
 .comment-date {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   font-style: italic;
 }
 
 .comment-content {
   line-height: 1.6;
-  color: #ffffff;
+  color: var(--text-color);
   font-size: 1rem;
   word-break: break-word;
 }
@@ -276,18 +276,18 @@ h3::after {
 }
 
 .comment-edit-form .form-control {
-  background: rgba(26, 26, 46, 0.8);
-  border: 1px solid rgba(45, 0, 247, 0.3);
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.75rem;
-  color: #fff;
+  color: var(--text-color);
   font-size: 0.95rem;
   transition: all 0.3s ease;
 }
 
 .comment-edit-form .form-control:focus {
-  border-color: rgba(255, 0, 136, 0.5);
-  box-shadow: 0 0 10px rgba(255, 0, 136, 0.3);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 10px var(--primary-transparent);
   outline: none;
 }
 
@@ -307,24 +307,24 @@ h3::after {
 }
 
 .btn-save {
-  background: linear-gradient(45deg, #2d00f7, #6a00f4);
-  color: #fff;
-  box-shadow: 0 0 10px rgba(45, 0, 247, 0.3);
+  background: var(--gradient-secondary);
+  color: var(--secondary-foreground);
+  box-shadow: 0 0 10px var(--secondary-transparent);
 }
 
 .btn-save:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(45, 0, 247, 0.5);
+  box-shadow: 0 0 15px var(--secondary-transparent);
 }
 
 .btn-cancel {
-  background: rgba(26, 26, 46, 0.8);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--background-secondary);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
 }
 
 .btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--background-hover);
 }
 
 /* Simge butonları için stiller */
@@ -348,27 +348,27 @@ h3::after {
 }
 
 .btn-edit {
-  background: rgba(45, 0, 247, 0.1);
-  color: #2d00f7;
-  border: 1px solid rgba(45, 0, 247, 0.3);
-  box-shadow: 0 0 10px rgba(45, 0, 247, 0.2);
+  background: var(--primary-transparent);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 0 10px var(--primary-transparent);
 }
 
 .btn-edit:hover {
-  background: rgba(45, 0, 247, 0.2);
+  background: var(--primary-transparent);
   transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(45, 0, 247, 0.4);
+  box-shadow: 0 0 15px var(--primary-transparent);
 }
 
 .btn-delete {
-  background: rgba(255, 0, 136, 0.1);
-  color: #ff0088;
-  border: 1px solid rgba(255, 0, 136, 0.3);
-  box-shadow: 0 0 10px rgba(255, 0, 136, 0.2);
+  background: var(--error-color-transparent);
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+  box-shadow: 0 0 10px var(--error-color-transparent);
 }
 
 .btn-delete:hover {
-  background: rgba(255, 0, 136, 0.2);
+  background: var(--error-color-transparent);
   transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(255, 0, 136, 0.4);
+  box-shadow: 0 0 15px var(--error-color-transparent);
 }

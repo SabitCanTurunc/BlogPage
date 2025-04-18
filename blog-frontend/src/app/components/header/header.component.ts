@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { UserResponseDto } from '../../models/user-response.dto';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { ThemeService, ThemeMode } from '../../services/theme.service';
 
 @Component({
   selector: 'app-header',
@@ -23,12 +24,14 @@ export class HeaderComponent implements OnInit {
   isMenuOpen: boolean = false;
   userProfile: UserResponseDto | null = null;
   currentLanguage: string = 'tr';
+  currentTheme: ThemeMode = 'dark';
   
   constructor(
     private authService: AuthService,
     private userService: UserService,
     private router: Router,
     private translationService: TranslationService,
+    private themeService: ThemeService,
     @Inject(PLATFORM_ID) private platformId: Object,
     private elementRef: ElementRef
   ) {}
@@ -37,6 +40,10 @@ export class HeaderComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       this.translationService.currentLang$.subscribe(lang => {
         this.currentLanguage = lang;
+      });
+      
+      this.themeService.currentTheme$.subscribe(theme => {
+        this.currentTheme = theme;
       });
     }
 
@@ -61,6 +68,10 @@ export class HeaderComponent implements OnInit {
         }
       });
     }
+  }
+  
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
   
   toggleDropdown(event?: MouseEvent): void {

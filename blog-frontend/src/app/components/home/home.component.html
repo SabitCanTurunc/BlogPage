@@ -12,14 +12,7 @@
       </div>
       <h1>NeoWrite</h1> 
       <p class="hero-subtitle">{{ 'welcome' | translate }}</p>
-      <div class="hero-buttons">
-        <button *ngIf="!isLoggedIn" (click)="navigateToSignup()" class="btn-light">
-          <span class="btn-text">{{ 'signup' | translate }}</span>
-        </button>
-        <button *ngIf="!isLoggedIn" (click)="navigateToLogin()" class="btn-outline-light">
-          <span class="btn-text">{{ 'login' | translate }}</span>
-        </button>
-      </div>
+     
     </div>
   </div>
 

@@ -2,6 +2,7 @@
 @import 'ngx-toastr/toastr';
 @import 'sweetalert2/dist/sweetalert2.min.css';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import './theme-variables.css';
 
 /* You can add global styles to this file, and also import other style files */
 
@@ -24,13 +25,20 @@ body {
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
   min-height: 100vh;
-  background: #0f0f1a !important;
+  background: var(--background-color) !important;
   background-image: 
     url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%232d00f7' stroke-width='1.5' stroke-opacity='0.2'%3E%3C!-- Kalem simgesi 1 --%3E%3Cpath d='M50 120 l-5 15 l1 1 l15 -5 l-11 -11 Z M46 135 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 1 --%3E%3Cpath d='M240 50 h16 v20 h-16 v-20 M240 50 c-3 2 -3 18 0 20 M256 50 v20 M242 55 h12 M242 60 h12 M242 65 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 1 --%3E%3Cpath d='M370 150 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 2 --%3E%3Cpath d='M130 200 l-5 15 l1 1 l15 -5 l-11 -11 Z M126 215 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 2 --%3E%3Cpath d='M320 260 h16 v20 h-16 v-20 M320 260 c-3 2 -3 18 0 20 M336 260 v20 M322 265 h12 M322 270 h12 M322 275 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 2 --%3E%3Cpath d='M180 300 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 3 --%3E%3Cpath d='M80 280 l-5 15 l1 1 l15 -5 l-11 -11 Z M76 295 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 3 --%3E%3Cpath d='M150 70 h16 v20 h-16 v-20 M150 70 c-3 2 -3 18 0 20 M166 70 v20 M152 75 h12 M152 80 h12 M152 85 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 3 --%3E%3Cpath d='M300 110 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 4 --%3E%3Cpath d='M250 340 l-5 15 l1 1 l15 -5 l-11 -11 Z M246 355 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 4 --%3E%3Cpath d='M90 300 h16 v20 h-16 v-20 M90 300 c-3 2 -3 18 0 20 M106 300 v20 M92 305 h12 M92 310 h12 M92 315 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 4 --%3E%3Cpath d='M330 30 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 5 --%3E%3Cpath d='M80 20 l-5 15 l1 1 l15 -5 l-11 -11 Z M76 35 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C!-- Kitap simgesi 5 --%3E%3Cpath d='M210 140 h16 v20 h-16 v-20 M210 140 c-3 2 -3 18 0 20 M226 140 v20 M212 145 h12 M212 150 h12 M212 155 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 5 --%3E%3Cpath d='M370 290 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 6 --%3E%3Cpath d='M30 200 l-5 15 l1 1 l15 -5 l-11 -11 Z M26 215 l0 3 l3 0 Z' stroke-width='1' fill='%232d00f7' fill-opacity='0.2'/%3E%3C/g%3E%3C/svg%3E") !important;
   background-attachment: fixed !important;
   background-size: 800px 800px !important;
   background-repeat: repeat !important;
-  color: #ffffff !important;
+  color: var(--text-primary) !important;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Tema geçişleri için gerekli stiller */
+[data-theme="light"] body {
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%236f42c1' stroke-width='1.5' stroke-opacity='0.1'%3E%3C!-- Kalem simgesi 1 --%3E%3Cpath d='M50 120 l-5 15 l1 1 l15 -5 l-11 -11 Z M46 135 l0 3 l3 0 Z' stroke-width='1' fill='%236f42c1' fill-opacity='0.1'/%3E%3C!-- Kitap simgesi 1 --%3E%3Cpath d='M240 50 h16 v20 h-16 v-20 M240 50 c-3 2 -3 18 0 20 M256 50 v20 M242 55 h12 M242 60 h12 M242 65 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 1 --%3E%3Cpath d='M370 150 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 2 --%3E%3Cpath d='M130 200 l-5 15 l1 1 l15 -5 l-11 -11 Z M126 215 l0 3 l3 0 Z' stroke-width='1' fill='%236f42c1' fill-opacity='0.1'/%3E%3C!-- Kitap simgesi 2 --%3E%3Cpath d='M320 260 h16 v20 h-16 v-20 M320 260 c-3 2 -3 18 0 20 M336 260 v20 M322 265 h12 M322 270 h12 M322 275 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 2 --%3E%3Cpath d='M180 300 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 3 --%3E%3Cpath d='M80 280 l-5 15 l1 1 l15 -5 l-11 -11 Z M76 295 l0 3 l3 0 Z' stroke-width='1' fill='%236f42c1' fill-opacity='0.1'/%3E%3C!-- Kitap simgesi 3 --%3E%3Cpath d='M150 70 h16 v20 h-16 v-20 M150 70 c-3 2 -3 18 0 20 M166 70 v20 M152 75 h12 M152 80 h12 M152 85 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 3 --%3E%3Cpath d='M300 110 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 4 --%3E%3Cpath d='M250 340 l-5 15 l1 1 l15 -5 l-11 -11 Z M246 355 l0 3 l3 0 Z' stroke-width='1' fill='%236f42c1' fill-opacity='0.1'/%3E%3C!-- Kitap simgesi 4 --%3E%3Cpath d='M90 300 h16 v20 h-16 v-20 M90 300 c-3 2 -3 18 0 20 M106 300 v20 M92 305 h12 M92 310 h12 M92 315 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 4 --%3E%3Cpath d='M330 30 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 5 --%3E%3Cpath d='M80 20 l-5 15 l1 1 l15 -5 l-11 -11 Z M76 35 l0 3 l3 0 Z' stroke-width='1' fill='%236f42c1' fill-opacity='0.1'/%3E%3C!-- Kitap simgesi 5 --%3E%3Cpath d='M210 140 h16 v20 h-16 v-20 M210 140 c-3 2 -3 18 0 20 M226 140 v20 M212 145 h12 M212 150 h12 M212 155 h12' stroke-width='1' fill='none'/%3E%3C!-- Tüy simgesi 5 --%3E%3Cpath d='M370 290 c-10 15 -15 5 -5 -5 c-10 5 -5 15 5 5 c-2 10 -8 10 -10 0' stroke-width='1' fill='none'/%3E%3C!-- Kalem simgesi 6 --%3E%3Cpath d='M30 200 l-5 15 l1 1 l15 -5 l-11 -11 Z M26 215 l0 3 l3 0 Z' stroke-width='1' fill='%236f42c1' fill-opacity='0.1'/%3E%3C/g%3E%3C/svg%3E") !important;
 }
 
 app-root {
@@ -41,41 +49,44 @@ app-root {
 
 /* Bootstrap override styles */
 .form-control {
-  background-color: rgba(15, 15, 30, 0.6) !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 0, 230, 0.3) !important;
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--input-border) !important;
+  border-radius: var(--radius) !important;
 }
 
 .form-control:focus {
-  background-color: rgba(15, 15, 30, 0.8) !important;
-  color: #ffffff !important;
-  border-color: #ff00e6 !important;
-  box-shadow: 0 0 0 0.25rem rgba(255, 0, 230, 0.25) !important;
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 0.25rem var(--primary-transparent) !important;
 }
 
 .form-control::placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: var(--text-tertiary) !important;
 }
 
 .invalid-feedback {
-  color: #ff3b30 !important;
+  color: var(--destructive) !important;
 }
 
 .btn-primary {
-  background: linear-gradient(45deg, rgba(80, 0, 255, 0.7), rgba(255, 0, 230, 0.7)) !important;
-  border-color: rgba(255, 0, 230, 0.5) !important;
+  background: var(--gradient-primary) !important;
+  border-color: var(--primary) !important;
+  border-radius: var(--radius) !important;
 }
 
 .btn-primary:hover, .btn-primary:focus {
-  background: linear-gradient(45deg, rgba(80, 0, 255, 0.9), rgba(255, 0, 230, 0.9)) !important;
-  border-color: rgba(255, 0, 230, 0.8) !important;
-  box-shadow: 0 0 15px rgba(255, 0, 230, 0.5) !important;
+  background: var(--primary) !important;
+  border-color: var(--primary-dark) !important;
+  box-shadow: 0 0 15px var(--primary-transparent) !important;
 }
 
 .alert-danger {
-  background-color: rgba(255, 59, 48, 0.2) !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 59, 48, 0.5) !important;
+  background-color: var(--destructive) !important;
+  color: oklch(1 0 0) !important;
+  border-color: var(--destructive) !important;
+  border-radius: var(--radius) !important;
 }
 
 /* Özelleştirilmiş Scrollbar */
@@ -85,35 +96,35 @@ app-root {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(10, 10, 26, 0.8);
-  border-radius: 4px;
+  background: var(--scrollbar-track);
+  border-radius: calc(var(--radius) * 0.6);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #ff0088, #2d00f7);
-  border-radius: 4px;
+  background: var(--scrollbar-thumb);
+  border-radius: calc(var(--radius) * 0.6);
   transition: all 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(45deg, #ff0088, #ff5e5e);
-  box-shadow: 0 0 10px rgba(255, 0, 136, 0.5);
+  background: var(--scrollbar-thumb-hover);
+  box-shadow: 0 0 10px var(--primary-transparent);
 }
 
 ::-webkit-scrollbar-corner {
-  background: rgba(10, 10, 26, 0.8);
+  background: var(--scrollbar-track);
 }
 
 /* Firefox için scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #ff0088 rgba(10, 10, 26, 0.8);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 /* Sayfa içi scrollbar'lar için özel stil */
 .scrollable-content {
   scrollbar-width: thin;
-  scrollbar-color: #ff0088 rgba(10, 10, 26, 0.8);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 .scrollable-content::-webkit-scrollbar {
@@ -122,62 +133,62 @@ app-root {
 }
 
 .scrollable-content::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #ff0088, #2d00f7);
-  border-radius: 2px;
+  background: var(--scrollbar-thumb);
+  border-radius: calc(var(--radius) * 0.5);
 }
 
 /* Özelleştirilmiş Toastr Stilleri */
 .toast-container .ngx-toastr {
   background-image: none !important;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2) !important;
-  border-radius: 8px !important;
+  box-shadow: 0 0 20px oklch(0 0 0 / 0.2) !important;
+  border-radius: var(--radius) !important;
   padding: 15px !important;
   font-family: 'Inter', sans-serif !important;
 }
 
 .toast-success {
-  background-color: rgba(40, 167, 69, 0.95) !important;
+  background-color: var(--success-color) !important;
 }
 
 .toast-error {
-  background-color: rgba(220, 53, 69, 0.95) !important;
+  background-color: var(--error-color) !important;
 }
 
 .toast-info {
-  background-color: rgba(23, 162, 184, 0.95) !important;
+  background-color: var(--info-color) !important;
 }
 
 .toast-warning {
-  background-color: rgba(255, 193, 7, 0.95) !important;
+  background-color: var(--warning-color) !important;
 }
 
 /* SweetAlert2 Özel Stilleri */
 .modern-swal-popup {
-  border: 1px solid rgba(255, 0, 230, 0.3) !important;
-  border-radius: 16px !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  box-shadow: 0 0 30px rgba(80, 0, 255, 0.3) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius) !important;
+  backdrop-filter: var(--backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--backdrop-filter) !important;
+  box-shadow: 0 0 30px var(--primary-transparent) !important;
   font-family: 'Inter', sans-serif !important;
 }
 
 .modern-swal-title {
-  color: #ffffff !important;
+  color: var(--text-primary) !important;
   font-size: 1.5rem !important;
   font-weight: 600 !important;
   margin-bottom: 1rem !important;
 }
 
 .modern-swal-content {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: var(--text-secondary) !important;
   font-size: 1.1rem !important;
   margin-bottom: 1.5rem !important;
 }
 
 .modern-swal-confirm {
-  background: linear-gradient(45deg, #dc3545, #ff4d4d) !important;
+  background: var(--destructive) !important;
   border: none !important;
-  border-radius: 8px !important;
+  border-radius: var(--radius) !important;
   padding: 12px 24px !important;
   font-weight: 600 !important;
   letter-spacing: 0.5px !important;
@@ -186,31 +197,31 @@ app-root {
 
 .modern-swal-confirm:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4) !important;
+  box-shadow: 0 5px 15px oklch(0.704 0.191 22.216 / 0.4) !important;
 }
 
 .modern-swal-cancel {
-  background: rgba(108, 117, 125, 0.2) !important;
-  border: 1px solid rgba(108, 117, 125, 0.3) !important;
-  border-radius: 8px !important;
+  background: var(--muted) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius) !important;
   padding: 12px 24px !important;
   font-weight: 600 !important;
   letter-spacing: 0.5px !important;
-  color: #ffffff !important;
+  color: var(--text-primary) !important;
   transition: all 0.3s ease !important;
 }
 
 .modern-swal-cancel:hover {
-  background: rgba(108, 117, 125, 0.3) !important;
+  background: var(--muted-foreground) !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 5px 15px rgba(108, 117, 125, 0.2) !important;
+  box-shadow: 0 5px 15px var(--primary-transparent) !important;
 }
 
 .modern-swal-input {
-  background: rgba(40, 40, 80, 0.5) !important;
-  border: 2px solid rgba(255, 0, 230, 0.3) !important;
-  border-radius: 8px !important;
-  color: #ffffff !important;
+  background: var(--input-bg) !important;
+  border: 2px solid var(--input-border) !important;
+  border-radius: var(--radius) !important;
+  color: var(--input-text) !important;
   padding: 12px !important;
   margin-top: 1rem !important;
   font-family: 'Inter', sans-serif !important;
@@ -218,18 +229,18 @@ app-root {
 }
 
 .modern-swal-input:focus {
-  border-color: #ff00e6 !important;
-  box-shadow: 0 0 15px rgba(255, 0, 230, 0.3) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 15px var(--primary-transparent) !important;
   outline: none !important;
 }
 
 .modern-swal-input::placeholder {
-  color: rgba(255, 255, 255, 0.6) !important;
+  color: var(--text-tertiary) !important;
 }
 
 /* Sadece metin girişi yapılabilen alanlarda imleci göster */
 input, textarea, [contenteditable="true"] {
-  caret-color: #ff00e6; /* Metin girişi yapılabilen alanlarda imleci göster */
+  caret-color: var(--primary-color); /* Metin girişi yapılabilen alanlarda imleci göster */
 }
 
 /* Butonlar ve diğer tıklanabilir öğelerde imleci gizle */
@@ -242,7 +253,7 @@ button, a, .btn, .nav-link, .dropdown-item, .logo a {
 .custom-dialog-container .mat-mdc-dialog-container {
   padding: 0 !important;
   overflow: hidden !important;
-  border-radius: 12px !important;
+  border-radius: var(--radius) !important;
   background-color: transparent !important;
   box-shadow: none !important;
 }
@@ -257,7 +268,7 @@ button, a, .btn, .nav-link, .dropdown-item, .logo a {
 }
 
 .dialog-backdrop {
-  background-color: rgba(0, 0, 0, 0.85) !important;
+  background-color: oklch(0 0 0 / 0.85) !important;
   backdrop-filter: blur(5px) !important;
 }
 
@@ -270,4 +281,75 @@ button, a, .btn, .nav-link, .dropdown-item, .logo a {
   background-color: transparent !important;
   transition: transform 0.3s ease-out, opacity 0.3s ease-out;
   will-change: transform, opacity;
+}
+
+/* Bootstrap tema entegrasyonu için özel stiller */
+.btn {
+  border-radius: var(--radius) !important;
+  font-weight: 500 !important;
+  transition: all var(--transition-normal) !important;
+}
+
+.btn-secondary {
+  background-color: var(--secondary) !important;
+  border-color: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-dark) !important;
+  border-color: var(--secondary-dark) !important;
+  box-shadow: 0 0 10px var(--secondary-transparent) !important;
+}
+
+.btn-accent {
+  background-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+.btn-accent:hover {
+  background-color: var(--accent-dark) !important;
+  border-color: var(--accent-dark) !important;
+  box-shadow: 0 0 10px var(--accent-transparent) !important;
+}
+
+.card {
+  background-color: var(--card-bg) !important;
+  color: var(--card-foreground) !important;
+  border-color: var(--border-color) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+.badge {
+  font-weight: 500 !important;
+  letter-spacing: 0.3px !important;
+}
+
+.badge-primary {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+.badge-secondary {
+  background-color: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+}
+
+.list-group-item {
+  background-color: var(--card-bg) !important;
+  color: var(--card-foreground) !important;
+  border-color: var(--border-color) !important;
+}
+
+.nav-tabs .nav-link {
+  color: var(--text-primary) !important;
+  border-radius: var(--radius) var(--radius) 0 0 !important;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+  border-color: var(--accent) !important;
 }

@@ -1,59 +1,135 @@
 <div class="signup-container">
   
-  <h2>Kayıt Ol</h2>
-  
-  <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="username">Kullanıcı Adı</label>
-      <input 
-        type="text" 
-        id="username" 
-        formControlName="username" 
-        class="form-control"
-        [class.is-invalid]="signupForm.get('username')?.invalid && signupForm.get('username')?.touched">
-      <div class="invalid-feedback" *ngIf="signupForm.get('username')?.invalid && signupForm.get('username')?.touched">
-        <div *ngIf="signupForm.get('username')?.errors?.['required']">Kullanıcı adı gereklidir</div>
-        <div *ngIf="signupForm.get('username')?.errors?.['minlength']">Kullanıcı adı en az 3 karakter olmalıdır</div>
+  <div class="signup-box">
+    <h2>{{ "signup_title" | translate }}</h2>
+    <p class="subtitle">{{ "signup_subtitle" | translate }}</p>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username">{{ "username" | translate }}</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="form-control"
+          [class.is-invalid]="
+            signupForm.get('username')?.invalid &&
+            signupForm.get('username')?.touched
+          "
+          [placeholder]="'username_placeholder' | translate"
+        />
+        <div
+          class="invalid-feedback"
+          *ngIf="signupForm.get('username')?.errors?.['required'] && signupForm.get('username')?.touched"
+        >
+          {{ "username_required" | translate }}
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="signupForm.get('username')?.errors?.['minlength'] && signupForm.get('username')?.touched"
+        >
+          {{ "username_minlength" | translate }}
+        </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label for="email">E-posta</label>
-      <input 
-        type="email" 
-        id="email" 
-        formControlName="email" 
-        class="form-control"
-        [class.is-invalid]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
-      <div class="invalid-feedback" *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
-        <div *ngIf="signupForm.get('email')?.errors?.['required']">E-posta gereklidir</div>
-        <div *ngIf="signupForm.get('email')?.errors?.['email']">Geçerli bir e-posta adresi giriniz</div>
+      <div class="form-group">
+        <label for="email">{{ "email" | translate }}</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="
+            signupForm.get('email')?.invalid && signupForm.get('email')?.touched
+          "
+          [placeholder]="'email_placeholder' | translate"
+        />
+        <div
+          class="invalid-feedback"
+          *ngIf="signupForm.get('email')?.errors?.['required'] && signupForm.get('email')?.touched"
+        >
+          {{ "email_required" | translate }}
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="signupForm.get('email')?.errors?.['email'] && signupForm.get('email')?.touched"
+        >
+          {{ "email_invalid" | translate }}
+        </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label for="password">Şifre</label>
-      <input 
-        type="password" 
-        id="password" 
-        formControlName="password" 
-        class="form-control"
-        [class.is-invalid]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
-      <div class="invalid-feedback" *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
-        <div *ngIf="signupForm.get('password')?.errors?.['required']">Şifre gereklidir</div>
-        <div *ngIf="signupForm.get('password')?.errors?.['minlength']">Şifre en az 6 karakter olmalıdır</div>
+      <div class="form-group">
+        <label for="password">{{ "password" | translate }}</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [class.is-invalid]="
+            signupForm.get('password')?.invalid &&
+            signupForm.get('password')?.touched
+          "
+          [placeholder]="'password_placeholder' | translate"
+        />
+        <div
+          class="invalid-feedback"
+          *ngIf="signupForm.get('password')?.errors?.['required'] && signupForm.get('password')?.touched"
+        >
+          {{ "password_required" | translate }}
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="signupForm.get('password')?.errors?.['minlength'] && signupForm.get('password')?.touched"
+        >
+          {{ "password_minlength" | translate }}
+        </div>
       </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">{{
+          "confirm_password" | translate
+        }}</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          class="form-control"
+          [class.is-invalid]="
+            signupForm.get('confirmPassword')?.invalid &&
+            signupForm.get('confirmPassword')?.touched
+          "
+          [placeholder]="'confirm_password_placeholder' | translate"
+        />
+        <div
+          class="invalid-feedback"
+          *ngIf="signupForm.get('confirmPassword')?.errors?.['required'] && signupForm.get('confirmPassword')?.touched"
+        >
+          {{ "confirm_password_required" | translate }}
+        </div>
+        <div
+          class="invalid-feedback"
+          *ngIf="signupForm.get('confirmPassword')?.errors?.['passwordMismatch'] && signupForm.get('confirmPassword')?.touched"
+        >
+          {{ "password_mismatch" | translate }}
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="signupForm.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">{{ "signup_button" | translate }}</span>
+        <span *ngIf="isLoading">{{ "signup_loading" | translate }}</span>
+      </button>
+    </form>
+
+    <div class="alert alert-success" *ngIf="success">{{ success }}</div>
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+    <div class="mt-3">
+      {{ "already_have_account" | translate }}
+      <a routerLink="/login">{{ "login" | translate }}</a>
     </div>
-
-    <button type="submit" class="btn btn-primary" [disabled]="signupForm.invalid || isLoading">
-      {{ isLoading ? 'Kayıt Yapılıyor...' : 'Kayıt Ol' }}
-    </button>
-  </form>
-
-  <div class="alert alert-success" *ngIf="success">{{ success }}</div>
-  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
-
-  <div class="mt-3">
-    Zaten hesabınız var mı? <a routerLink="/login">Giriş Yap</a>
   </div>
-</div> 
+</div>

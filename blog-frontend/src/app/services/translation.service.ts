@@ -290,6 +290,10 @@ export class TranslationService {
       'ai_apply': 'Uygula',
       'ai_error_empty_fields': 'Lütfen AI\'ın yardımcı olabilmesi için en az bir alan doldurun.',
       'ai_error_generation': 'İçerik oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.',
+      'dark_mode': 'Karanlık Mod',
+      'light_mode': 'Aydınlık Mod',
+      'theme_changed': 'Tema değiştirildi',
+      'theme_toggle': 'Tema Değiştir',
     },
     en: {
       'home': 'Home',
@@ -557,43 +561,45 @@ export class TranslationService {
       'ai_apply': 'Apply',
       'ai_error_empty_fields': 'Please fill at least one field for AI to assist you.',
       'ai_error_generation': 'An error occurred while generating content. Please try again.',
+      'dark_mode': 'Dark Mode',
+      'light_mode': 'Light Mode',
+      'theme_changed': 'Theme changed',
+      'theme_toggle': 'Toggle Theme',
     }
   };
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     if (isPlatformBrowser(this.platformId)) {
-      const savedLang = localStorage.getItem('language');
-      if (savedLang) {
-        this.setLanguage(savedLang);
-      }
+      const storedLang = localStorage.getItem('lang') || 'tr';
+      this.currentLang.next(storedLang);
     }
   }
 
   setLanguage(lang: string) {
-    this.currentLang.next(lang);
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('language', lang);
+      localStorage.setItem('lang', lang);
+      this.currentLang.next(lang);
     }
   }
 
   getTranslation(key: string): string {
-    const keys = key.split('.');
-    let value: any = this.translations[this.currentLang.value];
-
-    for (const k of keys) {
-      if (typeof value === 'string') {
-        return value;
-      }
-      value = value[k];
-      if (!value) {
-        return key;
-      }
+    const currentLang = this.currentLang.getValue();
+    
+    // Önce mevcut dilde çeviriyi kontrol et
+    if (this.translations[currentLang] && this.translations[currentLang][key]) {
+      return this.translations[currentLang][key];
     }
-
-    return value;
+    
+    // Eğer mevcut dilde çeviri bulunamazsa varsayılan olarak Türkçe'yi kontrol et
+    if (currentLang !== 'tr' && this.translations['tr'] && this.translations['tr'][key]) {
+      return this.translations['tr'][key];
+    }
+    
+    // Hiçbir çeviri bulunamazsa anahtarı döndür
+    return key;
   }
 
   getCurrentLang(): string {
-    return this.currentLang.value;
+    return this.currentLang.getValue();
   }
 } 
