@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, AfterViewInit } from '@angular/core';
-import { ChatService } from '../../services/chat.service';
+import { ChatService, AIModel } from '../../services/chat.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpEvent, HttpEventType, HttpResponse } from '@angular/common/http';
@@ -22,6 +22,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, AfterViewInit {
   errorMessage: string | null = null;
   currentAiResponse: string = '';
   messageContainerReady: boolean = false;
+  selectedModel: AIModel = 'gemini';
 
   constructor(private chatService: ChatService) {}
 
@@ -68,7 +69,56 @@ export class ChatComponent implements OnInit, AfterViewChecked, AfterViewInit {
       }
     }
     
+    // OpenAI yanıtlarında boşluk düzeltme işlemi
+    if (this.selectedModel === 'openai' && content && !content.includes(' ')) {
+      // Eğer tek bir kelime gibi görünen uzun içerik varsa muhtemelen boşluklar eksiktir
+      // Olası kelime sınırlarına göre boşluk ekleme
+      content = this.formatOpenAIResponse(content);
+    }
+    
     return content;
+  }
+
+  // OpenAI yanıtlarındaki boşluk problemini çözmek için özel formatlama
+  private formatOpenAIResponse(text: string): string {
+    if (!text || text.includes(' ')) return text;
+    
+    // Yaygın Türkçe kelime parçalarına göre boşluk ekleme
+    const commonWordBoundaries = [
+      'Ben', 'bir', 've', 'için', 'olarak', 'ile', 'çok', 'bu', 'da', 'de', 'den', 'dan',
+      'nasıl', 'ne', 'neden', 'daha', 'olabilir', 'mı', 'mi', 'mu', 'mü', 'ama', 'fakat',
+      'veya', 'ya da', 'gibi', 'kadar', 'olduğu', 'olan', 'olduğunu', 'olarak',
+      'yardımcı', 'yardım', 'destek', 'kullanarak', 'yapay', 'zeka', 'asistan', 'olabilirim',
+      'tasarlanmış', 'insanlar', 'insan', 'dil', 'model', 'modeli'
+    ];
+
+    let formattedText = text;
+    
+    // Büyük/küçük harf duyarlı kelime sınırları kontrolü
+    commonWordBoundaries.forEach(word => {
+      // Büyük harfle başlayan kelimeleri kontrol et
+      const capitalizedWord = word.charAt(0).toUpperCase() + word.slice(1);
+      const capitalizedRegex = new RegExp(`(${capitalizedWord})`, 'g');
+      formattedText = formattedText.replace(capitalizedRegex, ' $1');
+      
+      // Küçük harfle başlayan kelimeleri kontrol et
+      const lowercaseRegex = new RegExp(`(${word})`, 'g');
+      formattedText = formattedText.replace(lowercaseRegex, ' $1');
+    });
+    
+    // Başlangıçtaki gereksiz boşluğu temizle
+    formattedText = formattedText.trim();
+    
+    // Boşluk eklenemezse orijinal metni döndür
+    if (!formattedText.includes(' ')) {
+      return text;
+    }
+    
+    return formattedText;
+  }
+
+  toggleModel(): void {
+    this.selectedModel = this.selectedModel === 'gemini' ? 'openai' : 'gemini';
   }
 
   sendMessage(): void {
@@ -81,7 +131,7 @@ export class ChatComponent implements OnInit, AfterViewChecked, AfterViewInit {
     this.currentAiResponse = '';
     this.userInput = '';
 
-    this.chatService.sendMessage(userMessage)
+    this.chatService.sendMessage(userMessage, this.selectedModel)
       .pipe(
         catchError(error => {
           console.error('Mesaj gönderme hatası:', error);

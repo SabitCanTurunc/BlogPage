@@ -92,6 +92,10 @@
   --scrollbar-thumb-hover: oklch(0 0 0 / 0.3);
   
   --backdrop-filter: blur(10px);
+  
+  /* Mobil sidebar arka planı */
+  --sidebar-bg-color: rgba(255, 255, 255, 0.5);
+  --dropdown-bg: rgba(255, 255, 255, 0.7);
 }
 
 /* Dark Theme */
@@ -170,4 +174,8 @@
   --scrollbar-track: oklch(0.141 0.005 285.823 / 0.5);
   --scrollbar-thumb: oklch(0.795 0.184 86.047 / 0.5);
   --scrollbar-thumb-hover: oklch(0.795 0.184 86.047 / 0.7);
+  
+  /* Mobil sidebar arka planı - dark mod */
+  --sidebar-bg-color: rgba(20, 20, 30, 0.5);
+  --dropdown-bg: rgba(20, 20, 30, 0.7);
 } 

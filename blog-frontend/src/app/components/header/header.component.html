@@ -11,7 +11,21 @@
     
     <nav class="main-nav" [class.show]="isMenuOpen">
       <ul class="nav-links">
-        
+        <li class="mobile-only">
+          <div class="mobile-actions">
+            <button class="mobile-theme-btn" (click)="toggleTheme()" title="{{ currentTheme === 'dark' ? 'light_mode' : 'dark_mode' | translate }}">
+              <svg *ngIf="currentTheme === 'dark'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+              </svg>
+              <svg *ngIf="currentTheme === 'light'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+              </svg>
+            </button>
+            <button class="mobile-lang-btn" (click)="toggleLanguageAndReload()" title="{{ currentLanguage === 'tr' ? 'İngilizce\'ye geç' : 'Switch to Turkish' }}">
+              {{ currentLanguage === 'tr' ? 'TR' : 'EN' }}
+            </button>
+          </div>
+        </li>
         <li class="desktop-only" *ngIf="isLoggedIn">
           <a routerLink="/create-post" class="nav-link" (click)="closeMenu()">{{ 'create_post' | translate }}</a>
         </li>
@@ -26,38 +40,36 @@
         <li class="mobile-only">
           <a routerLink="/contact" class="mobile-profile-link" (click)="closeMenu()">{{ 'contact' | translate }}</a>
         </li>
-        <li class="mobile-only">
-          <button class="mobile-theme-btn" (click)="toggleTheme()">
-            <svg *ngIf="currentTheme === 'dark'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
-            </svg>
-            <svg *ngIf="currentTheme === 'light'" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
-            </svg>
-            {{ currentTheme === 'dark' ? 'light_mode' : 'dark_mode' | translate }}
-          </button>
-        </li>
+        
         <li *ngIf="!isLoggedIn" class="mobile-auth">
           <a routerLink="/login" class="mobile-btn-login" (click)="closeMenu()">{{ 'login' | translate }}</a>
         </li>
         <li *ngIf="!isLoggedIn" class="mobile-auth">
           <a routerLink="/signup" class="mobile-btn-signup" (click)="closeMenu()">{{ 'signup' | translate }}</a>
         </li>
-        <li *ngIf="isLoggedIn" class="mobile-only">
-          <a routerLink="/profile" class="mobile-profile-link" (click)="closeMenu()">{{ 'profile' | translate }}</a>
-        </li>
         <li *ngIf="isLoggedIn && isAdmin" class="mobile-only">
           <a routerLink="/admin" class="mobile-admin-link" (click)="closeMenu()">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="admin-icon">
               <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
             </svg>
-            {{ 'admin' | translate }}
+            <span class="mobile-admin-text">{{ 'admin' | translate }}</span>
           </a>
         </li>
         <li *ngIf="isLoggedIn" class="mobile-only">
           <button class="mobile-logout-btn" (click)="logoutAndCloseAll()">{{ 'logout' | translate }}</button>
         </li>
       </ul>
+      
+      <!-- Mobil Profil Bölümü - Footer -->
+      <div *ngIf="isLoggedIn" class="mobile-only mobile-profile-footer">
+        <a routerLink="/profile" (click)="closeMenu()" class="mobile-profile-card">
+          <img [src]="userProfile?.profileImageUrl || 'https://ui-avatars.com/api/?name=' + userEmail" alt="Kullanıcı" class="mobile-profile-avatar">
+          <div class="mobile-profile-info">
+            <span class="mobile-profile-name">{{ getDisplayName() }}</span>
+            <span class="mobile-profile-email">{{ userEmail }}</span>
+          </div>
+        </a>
+      </div>
     </nav>
     <div class="user-actions desktop-only">
       <div class="theme-toggle">
@@ -91,7 +103,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="admin-icon">
               <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
             </svg>
-            {{ 'admin' | translate }}
+            <span class="admin-text">{{ 'admin' | translate }}</span>
           </a>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item logout" (click)="logoutAndCloseAll()">{{ 'logout' | translate }}</button>

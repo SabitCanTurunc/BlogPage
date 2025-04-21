@@ -5,11 +5,10 @@
   padding: 2rem 0;
   min-height: 100vh;
   background: var(--background-color);
-  background-image: radial-gradient(
-    circle at 50% 50%,
-    var(--primary-transparent) 0%,
-    var(--secondary-transparent) 100%
-  );
+  background-image: 
+    radial-gradient(circle at 10% 20%, var(--primary-transparent) 0%, transparent 30%),
+    radial-gradient(circle at 90% 80%, var(--secondary-transparent) 0%, transparent 30%),
+    url("data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%232d00f7' stroke-width='1' stroke-opacity='0.12'%3E%3C!-- Kullanıcı simgesi 1 --%3E%3Cpath d='M50 100 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 M56 106 c-9 2 -9 12 -9 12 h18 c0 0 0 -10 -9 -12' stroke-width='0.7' fill='%232d00f7' fill-opacity='0.12'/%3E%3C!-- Belge simgesi 1 --%3E%3Cpath d='M250 40 h12 v16 h-12 v-16 M250 40 l-3 3 v16 l3 -3 M262 40 v16 M250 45 h9 M250 49 h9 M250 53 h9' stroke-width='0.7' fill='none'/%3E%3C!-- E-posta simgesi 1 --%3E%3Cpath d='M350 140 h18 v16 h-18 v-16 M350 140 l9 9 l9 -9 M350 156 l6 -6 M368 156 l-6 -6' stroke-width='0.7' fill='none'/%3E%3C!-- Rozet simgesi 1 --%3E%3Cpath d='M150 200 l6 -3 l6 3 l-3 -6 l6 -3 h-6 l-3 -6 l-3 6 h-6 l6 3 z' stroke-width='0.7' fill='%232d00f7' fill-opacity='0.12'/%3E%3C!-- Kullanıcı simgesi 2 --%3E%3Cpath d='M310 260 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 M316 266 c-9 2 -9 12 -9 12 h18 c0 0 0 -10 -9 -12' stroke-width='0.7' fill='%232d00f7' fill-opacity='0.12'/%3E%3C!-- Belge simgesi 2 --%3E%3Cpath d='M180 300 h12 v16 h-12 v-16 M180 300 l-3 3 v16 l3 -3 M192 300 v16 M180 305 h9 M180 309 h9 M180 313 h9' stroke-width='0.7' fill='none'/%3E%3C!-- E-posta simgesi 2 --%3E%3Cpath d='M70 250 h18 v16 h-18 v-16 M70 250 l9 9 l9 -9 M70 266 l6 -6 M88 266 l-6 -6' stroke-width='0.7' fill='none'/%3E%3C!-- Rozet simgesi 2 --%3E%3Cpath d='M140 60 l6 -3 l6 3 l-3 -6 l6 -3 h-6 l-3 -6 l-3 6 h-6 l6 3 z' stroke-width='0.7' fill='%232d00f7' fill-opacity='0.12'/%3E%3C!-- Kullanıcı simgesi 3 --%3E%3Cpath d='M300 100 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 M306 106 c-9 2 -9 12 -9 12 h18 c0 0 0 -10 -9 -12' stroke-width='0.7' fill='%232d00f7' fill-opacity='0.12'/%3E%3C!-- Belge simgesi 3 --%3E%3Cpath d='M250 340 h12 v16 h-12 v-16 M250 340 l-3 3 v16 l3 -3 M262 340 v16 M250 345 h9 M250 349 h9 M250 353 h9' stroke-width='0.7' fill='none'/%3E%3C!-- E-posta simgesi 3 --%3E%3Cpath d='M100 30 h18 v16 h-18 v-16 M100 30 l9 9 l9 -9 M100 46 l6 -6 M118 46 l-6 -6' stroke-width='0.7' fill='none'/%3E%3C!-- Rozet simgesi 3 --%3E%3Cpath d='M330 330 l6 -3 l6 3 l-3 -6 l6 -3 h-6 l-3 -6 l-3 6 h-6 l6 3 z' stroke-width='0.7' fill='%232d00f7' fill-opacity='0.12'/%3E%3C!-- Kullanıcı simgesi 4 --%3E%3Cpath d='M80 350 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 M86 356 c-9 2 -9 12 -9 12 h18 c0 0 0 -10 -9 -12' stroke-width='0.7' fill='%232d00f7' fill-opacity='0.12'/%3E%3C/g%3E%3C/svg%3E");
   color: var(--text-color);
   font-family: 'Inter', sans-serif;
 }
@@ -52,11 +51,29 @@
   box-shadow: 0 0 30px var(--shadow-color);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, var(--primary-transparent) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, var(--secondary-transparent) 0%, transparent 50%);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .profile-header {
   text-align: center;
   margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
 }
 
 .profile-avatar {
@@ -283,10 +300,23 @@
   background: var(--card-bg);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 0 30px var(--shadow-color);
+  position: relative;
   border: 1px solid var(--border-color);
+  box-shadow: 0 0 30px var(--shadow-color);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.profile-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--gradient-primary);
+  z-index: 1;
 }
 
 h3 {

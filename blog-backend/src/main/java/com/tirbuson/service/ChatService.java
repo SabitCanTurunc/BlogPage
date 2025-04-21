@@ -86,6 +86,7 @@ public class ChatService {
                             if (!contentNode.isMissingNode() && !contentNode.isNull()) {
                                 String text = contentNode.asText();
                                 writeAndFlush(outputStream, "data: " + text + "\n\n");
+                                System.out.println("data: " + text);
                             }
                         }
                     }
@@ -103,7 +104,7 @@ public class ChatService {
     public StreamingResponseBody streamChatWithGeminAi(String question){
         return streamChatWithGeminAi(question,null);
     }
-    public StreamingResponseBody streamChatWithGeminAi(String question,String instruction) throws BaseException {
+    public StreamingResponseBody streamChatWithGeminAi(String question,String instruction) throws BaseException         {
         
         return outputStream -> {
             try {

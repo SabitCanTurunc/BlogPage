@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders, HttpEvent, HttpEventType, HttpErrorResponse } 
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
+export type AIModel = 'gemini' | 'openai';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -11,13 +13,13 @@ export class ChatService {
 
   constructor(private http: HttpClient) { }
 
-  sendMessage(question: string): Observable<HttpEvent<any>> {
+  sendMessage(question: string, model: AIModel = 'gemini'): Observable<HttpEvent<any>> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Accept': 'text/event-stream'
     });
 
-    return this.http.post(`${this.apiUrl}/gemini`, { question }, {
+    return this.http.post(`${this.apiUrl}/${model}`, { question }, {
       headers: headers,
       responseType: 'text',
       observe: 'events',

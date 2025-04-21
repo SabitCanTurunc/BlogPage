@@ -461,6 +461,10 @@
   gap: 0.5rem;
 }
 
+.mobile-admin-text {
+  color: var(--bs-warning);
+}
+
 .mobile-auth, .mobile-only {
   display: none;
 }
@@ -495,9 +499,9 @@
     width: 80%;
     max-width: 300px;
     height: 100vh;
-    background: var(--dropdown-bg);
-    backdrop-filter: var(--backdrop-filter);
-    -webkit-backdrop-filter: var(--backdrop-filter);
+    background: var(--sidebar-bg-color);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     padding: 80px 2rem 2rem;
     transition: right 0.3s ease-in-out;
     z-index: 1001;
@@ -511,6 +515,9 @@
     flex-direction: column;
     gap: 1.5rem;
     width: 100%;
+    padding-bottom: 100px;
+    overflow-y: auto;
+    max-height: calc(100vh - 80px);
   }
 
   .nav-links li a {
@@ -558,19 +565,24 @@
   .mobile-auth, .mobile-only {
     display: block;
   }
+  
+  .mobile-actions.mobile-only {
+    display: flex;
+  }
 }
 
 .admin-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--secondary);
+  color: var(--bs-warning);
   font-weight: 600;
 }
 
 .admin-icon {
   margin-right: 0;
   transition: transform 0.2s ease;
+  color: var(--bs-warning);
 }
 
 .admin-item:hover .admin-icon {
@@ -582,7 +594,7 @@
 }
 
 .admin-item:hover {
-  background: var(--secondary-transparent);
+  background: var(--bs-warning) / 0.2;
 }
 
 .language-selector {
@@ -672,25 +684,169 @@
 .mobile-theme-btn {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-  width: 100%;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   background: transparent;
   border: none;
-  border-radius: 0;
-  padding: 12px 20px;
-  font-size: 16px;
+  border-radius: 50%;
+  padding: 0;
   color: var(--text-primary);
   transition: var(--transition-normal);
-  text-align: left;
+  box-shadow: 0 0 10px var(--primary-transparent);
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+}
+
+.mobile-theme-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--primary-transparent);
+  border-radius: 50%;
+  opacity: 0;
+  transition: var(--transition-normal);
+  z-index: -1;
+}
+
+.mobile-theme-btn:hover::before {
+  opacity: 1;
 }
 
 .mobile-theme-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 21px;
+  height: 21px;
+  fill: var(--text-primary);
+  filter: drop-shadow(0 0 3px var(--primary-color));
+  transition: var(--transition-normal);
+}
+
+.mobile-theme-btn:hover svg {
+  transform: rotate(30deg);
   fill: var(--primary-color);
 }
 
 .mobile-theme-btn:hover {
+  transform: scale(1.1);
+}
+
+.admin-text {
+  color: var(--bs-warning);
+}
+
+/* Mobil Profil Bölümü - Footer */
+.mobile-profile-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  background: var(--sidebar-bg-color);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-color);
+}
+
+.mobile-profile-card {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  transition: all 0.3s;
+}
+
+.mobile-profile-card:hover {
   background: var(--primary-transparent);
+  transform: translateY(-2px);
+}
+
+.mobile-profile-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary);
+  box-shadow: 0 0 10px var(--primary-transparent);
+  transition: all 0.3s;
+}
+
+.mobile-profile-card:hover .mobile-profile-avatar {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px var(--primary-transparent);
+}
+
+.mobile-profile-info {
+  margin-left: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-profile-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.mobile-profile-email {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Mobil dil butonları konteynerı */
+.mobile-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Mobil dil değiştirme butonu */
+.mobile-lang-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  color: var(--text-primary);
+  transition: var(--transition-normal);
+  box-shadow: 0 0 10px var(--primary-transparent);
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.mobile-lang-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--primary-transparent);
+  border-radius: 50%;
+  opacity: 0;
+  transition: var(--transition-normal);
+  z-index: -1;
+}
+
+.mobile-lang-btn:hover::before {
+  opacity: 1;
+}
+
+.mobile-lang-btn:hover {
+  transform: scale(1.1);
 }  
