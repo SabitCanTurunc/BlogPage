@@ -141,8 +141,6 @@ export class UserProfileComponent implements OnInit {
                 title: this.translationService.getTranslation('error'),
                 text: this.translationService.getTranslation('post_load_error'),
                 icon: 'error',
-                background: '#1a1a2e',
-                color: '#ffffff',
                 customClass: {
                   popup: 'modern-swal-popup',
                   title: 'modern-swal-title',
@@ -161,8 +159,6 @@ export class UserProfileComponent implements OnInit {
           title: this.translationService.getTranslation('error'),
           text: this.translationService.getTranslation('profile_load_error'),
           icon: 'error',
-          background: '#1a1a2e',
-          color: '#ffffff',
           customClass: {
             popup: 'modern-swal-popup',
             title: 'modern-swal-title',
@@ -200,8 +196,6 @@ export class UserProfileComponent implements OnInit {
           title: this.translationService.getTranslation('error'),
           text: errorMessage,
           icon: 'error',
-          background: '#1a1a2e',
-          color: '#ffffff',
           customClass: {
             popup: 'modern-swal-popup',
             title: 'modern-swal-title',
@@ -239,8 +233,6 @@ export class UserProfileComponent implements OnInit {
           title: this.translationService.getTranslation('error'),
           text: errorMessage,
           icon: 'error',
-          background: '#1a1a2e',
-          color: '#ffffff',
           customClass: {
             popup: 'modern-swal-popup',
             title: 'modern-swal-title',
@@ -397,6 +389,13 @@ export class UserProfileComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: this.translationService.getTranslation('yes'),
       cancelButtonText: this.translationService.getTranslation('no'),
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title text-white',
+        htmlContainer: 'modern-swal-content text-white',
+        confirmButton: 'modern-swal-confirm',
+        cancelButton: 'modern-swal-cancel'
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         this.postService.deletePost(post.id).subscribe({
@@ -407,6 +406,12 @@ export class UserProfileComponent implements OnInit {
               title: this.translationService.getTranslation('success'),
               text: this.translationService.getTranslation('post_delete_success'),
               icon: 'success',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title text-white',
+                htmlContainer: 'modern-swal-content text-white',
+                confirmButton: 'modern-swal-confirm'
+              }
             }).then(() => {
               this.loadUserPosts(this.viewedUserEmail || this.userEmail);
             });
@@ -423,8 +428,6 @@ export class UserProfileComponent implements OnInit {
               title: this.translationService.getTranslation('error'),
               text: errorMessage,
               icon: 'error',
-              background: '#1a1a2e',
-              color: '#ffffff',
               customClass: {
                 popup: 'modern-swal-popup',
                 title: 'modern-swal-title',
@@ -453,7 +456,14 @@ export class UserProfileComponent implements OnInit {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: this.translationService.getTranslation('yes'),
-      cancelButtonText: this.translationService.getTranslation('no')
+      cancelButtonText: this.translationService.getTranslation('no'),
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title text-white',
+        htmlContainer: 'modern-swal-content text-white',
+        confirmButton: 'modern-swal-confirm',
+        cancelButton: 'modern-swal-cancel'
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         this.userService.deleteAccount({
@@ -465,7 +475,13 @@ export class UserProfileComponent implements OnInit {
               title: this.translationService.getTranslation('success'),
               text: this.translationService.getTranslation('account_delete_success'),
               icon: 'success',
-              confirmButtonText: 'OK'
+              confirmButtonText: 'OK',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content',
+                confirmButton: 'modern-swal-confirm'
+              }
             }).then(() => {
               this.authService.logout();
               this.router.navigate(['/home']);
@@ -476,7 +492,13 @@ export class UserProfileComponent implements OnInit {
               title: this.translationService.getTranslation('error'),
               text: this.translationService.getTranslation('account_delete_error'),
               icon: 'error',
-              confirmButtonText: 'OK'
+              confirmButtonText: 'OK',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content',
+                confirmButton: 'modern-swal-confirm'
+              }
             });
           }
         });
@@ -534,12 +556,11 @@ export class UserProfileComponent implements OnInit {
           title: this.translationService.getTranslation('error'),
           text: this.translationService.getTranslation('image_size_error'),
           icon: 'error',
-          background: '#1a1a2e',
-          color: '#ffffff',
           customClass: {
             popup: 'modern-swal-popup',
             title: 'modern-swal-title',
-            htmlContainer: 'modern-swal-content'
+            htmlContainer: 'modern-swal-content',
+            confirmButton: 'modern-swal-confirm'
           }
         });
         return;
@@ -551,12 +572,11 @@ export class UserProfileComponent implements OnInit {
           title: this.translationService.getTranslation('error'),
           text: this.translationService.getTranslation('image_type_error'),
           icon: 'error',
-          background: '#1a1a2e',
-          color: '#ffffff',
           customClass: {
             popup: 'modern-swal-popup',
             title: 'modern-swal-title',
-            htmlContainer: 'modern-swal-content'
+            htmlContainer: 'modern-swal-content',
+            confirmButton: 'modern-swal-confirm'
           }
         });
         return;
@@ -574,12 +594,11 @@ export class UserProfileComponent implements OnInit {
               title: this.translationService.getTranslation('success'),
               text: this.translationService.getTranslation('profile_image_updated'),
               icon: 'success',
-              background: '#1a1a2e',
-              color: '#ffffff',
               customClass: {
                 popup: 'modern-swal-popup',
                 title: 'modern-swal-title',
-                htmlContainer: 'modern-swal-content'
+                htmlContainer: 'modern-swal-content',
+                confirmButton: 'modern-swal-confirm'
               }
             });
           }
@@ -592,12 +611,11 @@ export class UserProfileComponent implements OnInit {
             title: this.translationService.getTranslation('error'),
             text: errorMessage,
             icon: 'error',
-            background: '#1a1a2e',
-            color: '#ffffff',
             customClass: {
               popup: 'modern-swal-popup',
               title: 'modern-swal-title',
-              htmlContainer: 'modern-swal-content'
+              htmlContainer: 'modern-swal-content',
+              confirmButton: 'modern-swal-confirm'
             }
           });
         }
@@ -615,12 +633,10 @@ export class UserProfileComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: this.translationService.getTranslation('yes_delete'),
       cancelButtonText: this.translationService.getTranslation('cancel'),
-      background: '#1a1a2e',
-      color: '#ffffff',
       customClass: {
         popup: 'modern-swal-popup',
-        title: 'modern-swal-title',
-        htmlContainer: 'modern-swal-content',
+        title: 'modern-swal-title text-white',
+        htmlContainer: 'modern-swal-content text-white',
         confirmButton: 'modern-swal-confirm',
         cancelButton: 'modern-swal-cancel'
       }
@@ -637,12 +653,11 @@ export class UserProfileComponent implements OnInit {
               title: this.translationService.getTranslation('success'),
               text: this.translationService.getTranslation('profile_image_deleted'),
               icon: 'success',
-              background: '#1a1a2e',
-              color: '#ffffff',
               customClass: {
                 popup: 'modern-swal-popup',
                 title: 'modern-swal-title',
-                htmlContainer: 'modern-swal-content'
+                htmlContainer: 'modern-swal-content',
+                confirmButton: 'modern-swal-confirm'
               }
             });
           },
@@ -654,12 +669,11 @@ export class UserProfileComponent implements OnInit {
               title: this.translationService.getTranslation('error'),
               text: errorMessage,
               icon: 'error',
-              background: '#1a1a2e',
-              color: '#ffffff',
               customClass: {
                 popup: 'modern-swal-popup',
                 title: 'modern-swal-title',
-                htmlContainer: 'modern-swal-content'
+                htmlContainer: 'modern-swal-content',
+                confirmButton: 'modern-swal-confirm'
               }
             });
           }
@@ -689,21 +703,14 @@ export class UserProfileComponent implements OnInit {
             // Tüm highlight'ları diziye ekle (var olanları koruyarak)
             const allHighlightIds = allHighlights.map((highlight: any) => highlight.postId);
             this.highlightedPosts = [...new Set([...this.highlightedPosts, ...allHighlightIds])];
-            console.log('Yüklenen highlight\'lar:', this.highlightedPosts);
           },
           error: (err) => {
-            console.error('Highlight yükleme hatası:', err);
-          },
-          complete: () => {
-            console.log('Highlight yükleme tamamlandı');
+            // Sessizce hata ele al
           }
         });
       },
       error: (err) => {
-        console.error('Günlük highlight yükleme hatası:', err);
-      },
-      complete: () => {
-        console.log('Günlük highlight yükleme tamamlandı');
+        // Sessizce hata ele al
       }
     });
   }
@@ -714,7 +721,6 @@ export class UserProfileComponent implements OnInit {
    */
   highlightPost(postId: number): void {
     if (!this.isOwnProfile) {
-      console.log('Kendi profilinizde değilsiniz');
       this.isHighlighting = false;
       this.highlightingPostId = null;
       return;
@@ -722,23 +728,21 @@ export class UserProfileComponent implements OnInit {
     
     // İşlem zaten devam ediyorsa ve farklı bir post işleniyorsa
     if (this.isHighlighting && this.highlightingPostId !== postId) {
-      console.log('Farklı bir post için öne çıkarma işlemi devam ediyor');
       return;
     }
     
     // Günlük limit kontrolü
     if (this.dailyHighlightCount >= 2) {
-      console.log('Günlük öne çıkarma limiti aşıldı:', this.dailyHighlightCount);
       Swal.fire({
         title: this.translationService.getTranslation('error'),
         text: this.translationService.getTranslation('daily_highlight_limit_reached'),
         icon: 'error',
-        background: '#1a1a2e',
-        color: '#ffffff',
         customClass: {
           popup: 'modern-swal-popup',
           title: 'modern-swal-title',
-          htmlContainer: 'modern-swal-content'
+          htmlContainer: 'modern-swal-content',
+          confirmButton: 'modern-swal-confirm',
+          cancelButton: 'modern-swal-cancel'
         }
       });
       // Limit aşıldıysa isHighlighting'i sıfırla
@@ -750,8 +754,6 @@ export class UserProfileComponent implements OnInit {
     this.isHighlighting = true;
     this.highlightingPostId = postId;
     
-    console.log(`Post ${postId} öne çıkarılıyor...`);
-    
     this.highlightService.highlightPost(postId).subscribe({
       next: (response) => {
         // Başarılı highlight işlemi
@@ -760,41 +762,34 @@ export class UserProfileComponent implements OnInit {
           this.dailyHighlightCount++;
         }
         
-        console.log(`Post ${postId} başarıyla öne çıkarıldı. Güncel highlight sayısı: ${this.dailyHighlightCount}`);
-        
         Swal.fire({
           title: this.translationService.getTranslation('success'),
           text: this.translationService.getTranslation('post_highlighted_success'),
           icon: 'success',
           timer: 1500,
-          background: '#1a1a2e',
-          color: '#ffffff',
           showConfirmButton: false,
           customClass: {
             popup: 'modern-swal-popup',
             title: 'modern-swal-title',
-            htmlContainer: 'modern-swal-content'
+            htmlContainer: 'modern-swal-content',
+            confirmButton: 'modern-swal-confirm'
           }
         });
       },
       error: (err) => {
-        console.error(`Post ${postId} öne çıkarılırken hata oluştu:`, err);
-        
         Swal.fire({
           title: this.translationService.getTranslation('error'),
           text: err.message || this.translationService.getTranslation('post_highlight_error'),
           icon: 'error',
-          background: '#1a1a2e',
-          color: '#ffffff',
           customClass: {
             popup: 'modern-swal-popup',
             title: 'modern-swal-title',
-            htmlContainer: 'modern-swal-content'
+            htmlContainer: 'modern-swal-content',
+            confirmButton: 'modern-swal-confirm'
           }
         });
       },
       complete: () => {
-        console.log('Öne çıkarma işlemi tamamlandı');
         this.isHighlighting = false;
         this.highlightingPostId = null;
       }
@@ -820,19 +815,16 @@ export class UserProfileComponent implements OnInit {
    */
   toggleHighlight(postId: number): void {
     if (!this.isOwnProfile) {
-      console.log('Kendi profilinizde değilsiniz');
       return;
     }
     
     // İşlem zaten devam ediyorsa ve farklı bir post işleniyorsa
     if (this.isHighlighting && this.highlightingPostId !== postId) {
-      console.log('Farklı bir post için öne çıkarma işlemi devam ediyor');
       return;
     }
     
     // Aynı post için işlem devam ediyorsa, işlemi sıfırla
     if (this.isHighlighting && this.highlightingPostId === postId) {
-      console.log('Aynı post için öne çıkarma işlemi devam ediyor, işlem sıfırlanıyor');
       this.isHighlighting = false;
       this.highlightingPostId = null;
       return;
@@ -840,21 +832,19 @@ export class UserProfileComponent implements OnInit {
     
     // Öne çıkarılmış mı kontrol et
     const isCurrentlyHighlighted = this.isHighlighted(postId);
-    console.log(`Post ${postId} öne çıkarılmış mı: ${isCurrentlyHighlighted}`);
     
     // Öne çıkarılmamış ve günlük limit dolmuşsa uyarı göster
     if (!isCurrentlyHighlighted && this.dailyHighlightCount >= 2) {
-      console.log('Günlük öne çıkarma limiti aşıldı:', this.dailyHighlightCount);
       Swal.fire({
         title: this.translationService.getTranslation('error'),
         text: this.translationService.getTranslation('daily_highlight_limit_reached'),
         icon: 'error',
-        background: '#1a1a2e',
-        color: '#ffffff',
         customClass: {
           popup: 'modern-swal-popup',
           title: 'modern-swal-title',
-          htmlContainer: 'modern-swal-content'
+          htmlContainer: 'modern-swal-content',
+          confirmButton: 'modern-swal-confirm',
+          cancelButton: 'modern-swal-cancel'
         }
       });
       return;
@@ -879,7 +869,6 @@ export class UserProfileComponent implements OnInit {
    */
   removeHighlight(postId: number): void {
     if (!this.isOwnProfile) {
-      console.log('Kendi profilinizde değilsiniz');
       this.isHighlighting = false;
       this.highlightingPostId = null;
       return;
@@ -887,11 +876,8 @@ export class UserProfileComponent implements OnInit {
     
     // İşlem zaten devam ediyorsa ve farklı bir post işleniyorsa
     if (this.isHighlighting && this.highlightingPostId !== postId) {
-      console.log('Farklı bir post için öne çıkarma işlemi devam ediyor');
       return;
     }
-    
-    console.log(`Post ${postId} öne çıkarması kaldırılıyor...`);
     
     // Silme işlemi için son kontrol modal'ı ekleyelim
     const makeDeleteRequest = () => {
@@ -905,36 +891,30 @@ export class UserProfileComponent implements OnInit {
             this.dailyHighlightCount--;
           }
           
-          console.log(`Post ${postId} öne çıkarması başarıyla kaldırıldı. Güncel highlight sayısı: ${this.dailyHighlightCount}`);
-          
           Swal.fire({
             title: this.translationService.getTranslation('success'),
             text: this.translationService.getTranslation('highlight_removed_success') || 'Öne çıkarma başarıyla kaldırıldı',
             icon: 'success',
             timer: 1500,
-            background: '#1a1a2e',
-            color: '#ffffff',
             showConfirmButton: false,
             customClass: {
               popup: 'modern-swal-popup',
               title: 'modern-swal-title',
-              htmlContainer: 'modern-swal-content'
+              htmlContainer: 'modern-swal-content',
+              confirmButton: 'modern-swal-confirm'
             }
           });
         },
         error: (err) => {
-          console.error(`Post ${postId} öne çıkarması kaldırılırken hata oluştu:`, err);
-          
           Swal.fire({
             title: this.translationService.getTranslation('error'),
             text: err.message || this.translationService.getTranslation('highlight_remove_error') || 'Öne çıkarma kaldırılırken bir hata oluştu',
             icon: 'error',
-            background: '#1a1a2e',
-            color: '#ffffff',
             customClass: {
               popup: 'modern-swal-popup',
-              title: 'modern-swal-title',
-              htmlContainer: 'modern-swal-content'
+              title: 'modern-swal-title text-white',
+              htmlContainer: 'modern-swal-content text-white',
+              confirmButton: 'modern-swal-confirm'
             }
           });
           
@@ -948,12 +928,12 @@ export class UserProfileComponent implements OnInit {
                 showCancelButton: true,
                 confirmButtonText: 'Sayfayı Yenile',
                 cancelButtonText: 'Vazgeç',
-                background: '#1a1a2e',
-                color: '#ffffff',
                 customClass: {
                   popup: 'modern-swal-popup',
-                  title: 'modern-swal-title',
-                  htmlContainer: 'modern-swal-content'
+                  title: 'modern-swal-title text-white',
+                  htmlContainer: 'modern-swal-content text-white',
+                  confirmButton: 'modern-swal-confirm',
+                  cancelButton: 'modern-swal-cancel'
                 }
               }).then((result) => {
                 if (result.isConfirmed) {
@@ -964,7 +944,6 @@ export class UserProfileComponent implements OnInit {
           }
         },
         complete: () => {
-          console.log('Öne çıkarma kaldırma işlemi tamamlandı');
           this.isHighlighting = false;
           this.highlightingPostId = null;
         }

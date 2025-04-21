@@ -106,22 +106,20 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  deleteUser(userId: number) {
+  deleteUser(userId: number): void {
     Swal.fire({
       title: 'Kullanıcıyı Sil',
-      text: 'Bu kullanıcıyı silmek istediğinize emin misiniz?',
+      text: 'Bu kullanıcıyı silmek istediğinizden emin misiniz?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Evet, Sil',
       cancelButtonText: 'İptal',
-      background: '#1a1a2e',
-      color: '#ffffff',
       confirmButtonColor: '#dc3545',
       cancelButtonColor: '#6c757d',
       customClass: {
         popup: 'modern-swal-popup',
-        title: 'modern-swal-title',
-        htmlContainer: 'modern-swal-content',
+        title: 'modern-swal-title text-white',
+        htmlContainer: 'modern-swal-content text-white',
         confirmButton: 'modern-swal-confirm',
         cancelButton: 'modern-swal-cancel'
       }
@@ -129,19 +127,37 @@ export class AdminComponent implements OnInit {
       if (result.isConfirmed) {
         this.adminService.deleteUser(userId).subscribe({
           next: () => {
-            this.loadUsers();
-            this.toastr.success('Kullanıcı başarıyla silindi', 'Başarılı', {
-              timeOut: 3000,
-              positionClass: 'toast-top-right',
-              progressBar: true
+            this.users = this.users.filter(u => u.id !== userId);
+            
+            Swal.fire({
+              title: 'Başarılı',
+              text: 'Kullanıcı başarıyla silindi',
+              icon: 'success',
+              timer: 3000,
+              showConfirmButton: false,
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title text-white',
+                htmlContainer: 'modern-swal-content text-white'
+              }
             });
           },
           error: (err) => {
-            console.error('Error deleting user', err);
-            this.toastr.error('Kullanıcı silinirken bir hata oluştu', 'Hata', {
-              timeOut: 5000,
-              positionClass: 'toast-top-right',
-              progressBar: true
+            let errorMessage = 'Kullanıcı silinirken bir hata oluştu';
+            
+            if (err.error?.message) {
+              errorMessage = err.error.message;
+            }
+            
+            Swal.fire({
+              title: 'Hata',
+              text: errorMessage,
+              icon: 'error',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title text-white',
+                htmlContainer: 'modern-swal-content text-white'
+              }
             });
           }
         });
@@ -218,14 +234,12 @@ export class AdminComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Evet, Sil',
       cancelButtonText: 'İptal',
-      background: '#1a1a2e',
-      color: '#ffffff',
       confirmButtonColor: '#dc3545',
       cancelButtonColor: '#6c757d',
       customClass: {
         popup: 'modern-swal-popup',
-        title: 'modern-swal-title',
-        htmlContainer: 'modern-swal-content',
+        title: 'modern-swal-title text-white',
+        htmlContainer: 'modern-swal-content text-white',
         confirmButton: 'modern-swal-confirm',
         cancelButton: 'modern-swal-cancel'
       }
@@ -278,14 +292,12 @@ export class AdminComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Evet, Sil',
       cancelButtonText: 'İptal',
-      background: '#1a1a2e',
-      color: '#ffffff',
       confirmButtonColor: '#dc3545',
       cancelButtonColor: '#6c757d',
       customClass: {
         popup: 'modern-swal-popup',
-        title: 'modern-swal-title',
-        htmlContainer: 'modern-swal-content',
+        title: 'modern-swal-title text-white',
+        htmlContainer: 'modern-swal-content text-white',
         confirmButton: 'modern-swal-confirm',
         cancelButton: 'modern-swal-cancel'
       }

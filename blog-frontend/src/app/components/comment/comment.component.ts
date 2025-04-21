@@ -179,12 +179,10 @@ export class CommentComponent implements OnInit {
           title: 'Hata',
           text: 'Düzenlenmek istenen yorum bulunamadı',
           icon: 'error',
-          background: '#1a1a2e',
-          color: '#ffffff',
           customClass: {
             popup: 'modern-swal-popup',
-            title: 'modern-swal-title',
-            htmlContainer: 'modern-swal-content'
+            title: 'modern-swal-title text-white',
+            htmlContainer: 'modern-swal-content text-white'
           }
         });
         return;
@@ -220,14 +218,12 @@ export class CommentComponent implements OnInit {
             title: 'Başarılı',
             text: this.authService.isAdmin() ? 'Yorum başarıyla düzenlendi' : 'Yorumunuz başarıyla güncellendi',
             icon: 'success',
-            background: '#1a1a2e',
-            color: '#ffffff',
             timer: 3000,
             showConfirmButton: false,
             customClass: {
               popup: 'modern-swal-popup',
-              title: 'modern-swal-title',
-              htmlContainer: 'modern-swal-content'
+              title: 'modern-swal-title text-white',
+              htmlContainer: 'modern-swal-content text-white'
             }
           });
         },
@@ -246,12 +242,10 @@ export class CommentComponent implements OnInit {
             title: 'Hata',
             text: errorMessage,
             icon: 'error',
-            background: '#1a1a2e',
-            color: '#ffffff',
             customClass: {
               popup: 'modern-swal-popup',
-              title: 'modern-swal-title',
-              htmlContainer: 'modern-swal-content'
+              title: 'modern-swal-title text-white',
+              htmlContainer: 'modern-swal-content text-white'
             }
           });
         }
@@ -269,14 +263,12 @@ export class CommentComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Evet, Sil',
       cancelButtonText: 'İptal',
-      background: '#1a1a2e',
-      color: '#ffffff',
       confirmButtonColor: '#dc3545',
       cancelButtonColor: '#6c757d',
       customClass: {
         popup: 'modern-swal-popup',
-        title: 'modern-swal-title',
-        htmlContainer: 'modern-swal-content',
+        title: 'modern-swal-title text-white',
+        htmlContainer: 'modern-swal-content text-white',
         confirmButton: 'modern-swal-confirm',
         cancelButton: 'modern-swal-cancel'
       }
@@ -290,14 +282,12 @@ export class CommentComponent implements OnInit {
               title: 'Başarılı',
               text: 'Yorum başarıyla silindi.',
               icon: 'success',
-              background: '#1a1a2e',
-              color: '#ffffff',
               timer: 3000,
               showConfirmButton: false,
               customClass: {
                 popup: 'modern-swal-popup',
-                title: 'modern-swal-title',
-                htmlContainer: 'modern-swal-content'
+                title: 'modern-swal-title text-white',
+                htmlContainer: 'modern-swal-content text-white'
               }
             });
           },
@@ -306,12 +296,10 @@ export class CommentComponent implements OnInit {
               title: 'Hata',
               text: 'Yorum silinirken bir hata oluştu.',
               icon: 'error',
-              background: '#1a1a2e',
-              color: '#ffffff',
               customClass: {
                 popup: 'modern-swal-popup',
-                title: 'modern-swal-title',
-                htmlContainer: 'modern-swal-content'
+                title: 'modern-swal-title text-white',
+                htmlContainer: 'modern-swal-content text-white'
               }
             });
           }

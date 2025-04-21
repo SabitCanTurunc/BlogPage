@@ -82,10 +82,51 @@ app-root {
   box-shadow: 0 0 15px var(--primary-transparent) !important;
 }
 
+.alert {
+  padding: 0.75rem 1.25rem !important;
+  margin-bottom: 1rem !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 2px 10px var(--shadow-color) !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  font-weight: 500 !important;
+}
+
 .alert-danger {
   background-color: var(--destructive) !important;
   color: oklch(1 0 0) !important;
   border-color: var(--destructive) !important;
+  border-radius: var(--radius) !important;
+  animation: shake 0.5s ease-in-out !important;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.alert-warning {
+  background-color: var(--warning-color) !important;
+  color: oklch(1 0 0) !important;
+  border-color: var(--warning-color) !important;
+  border-radius: var(--radius) !important;
+}
+
+.alert-success {
+  background-color: var(--success-color) !important;
+  color: oklch(1 0 0) !important;
+  border-color: var(--success-color) !important;
+  border-radius: var(--radius) !important;
+}
+
+.alert-info {
+  background-color: var(--info-color) !important;
+  color: oklch(1 0 0) !important;
+  border-color: var(--info-color) !important;
   border-radius: var(--radius) !important;
 }
 
@@ -185,6 +226,41 @@ app-root {
   margin-bottom: 1.5rem !important;
 }
 
+/* Tema bağımsız başlık ve içerik renkleri için özel sınıflar */
+.dark-bg .modern-swal-title, 
+.dark-bg .modern-swal-content {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .modern-swal-title.text-white, 
+[data-theme="light"] .modern-swal-content.text-white {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .modern-swal-title.text-white, 
+[data-theme="dark"] .modern-swal-content.text-white {
+  color: #ffffff !important;
+}
+
+/* Success ve Dark tema kombinasyonu için özel renkler */
+.swal2-icon.swal2-success {
+  border-color: var(--success-color) !important;
+  color: var(--success-color) !important;
+}
+
+.swal2-icon.swal2-success [class^=swal2-success-line] {
+  background-color: var(--success-color) !important;
+}
+
+.swal2-icon.swal2-success .swal2-success-ring {
+  border-color: var(--success-color) !important;
+}
+
+/* Success popup özel stili */
+.swal2-popup.swal2-modal.swal2-icon-success {
+  background-color: var(--background-color) !important;
+}
+
 .modern-swal-confirm {
   background: var(--destructive) !important;
   border: none !important;
@@ -198,6 +274,156 @@ app-root {
 .modern-swal-confirm:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 5px 15px oklch(0.704 0.191 22.216 / 0.4) !important;
+}
+
+/* Özel metin rengi sınıfları */
+.text-white {
+  color: #ffffff !important;
+}
+
+/* Özel Dialog Stilleri */
+.custom-dialog-container .mat-mdc-dialog-container {
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: var(--radius) !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.custom-dialog-container .mdc-dialog__container {
+  background-color: transparent !important;
+}
+
+.custom-dialog-container .mdc-dialog__surface {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.dialog-backdrop {
+  background-color: oklch(0 0 0 / 0.85) !important;
+  backdrop-filter: blur(5px) !important;
+}
+
+.animate-dialog .mdc-dialog__container {
+  transition: all 0.3s ease-out;
+  opacity: 1;
+}
+
+.animate-dialog .mdc-dialog__surface {
+  background-color: transparent !important;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  will-change: transform, opacity;
+}
+
+/* Bootstrap tema entegrasyonu için özel stiller */
+.btn {
+  border-radius: var(--radius) !important;
+  font-weight: 500 !important;
+  transition: all var(--transition-normal) !important;
+}
+
+.btn-secondary {
+  background-color: var(--secondary) !important;
+  border-color: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-dark) !important;
+  border-color: var(--secondary-dark) !important;
+  box-shadow: 0 0 10px var(--secondary-transparent) !important;
+}
+
+.btn-accent {
+  background-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+.btn-accent:hover {
+  background-color: var(--accent-dark) !important;
+  border-color: var(--accent-dark) !important;
+  box-shadow: 0 0 10px var(--accent-transparent) !important;
+}
+
+.card {
+  background-color: var(--card-bg) !important;
+  color: var(--card-foreground) !important;
+  border-color: var(--border-color) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+.badge {
+  font-weight: 500 !important;
+  letter-spacing: 0.3px !important;
+}
+
+.badge-primary {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+.badge-secondary {
+  background-color: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+}
+
+.list-group-item {
+  background-color: var(--card-bg) !important;
+  color: var(--card-foreground) !important;
+  border-color: var(--border-color) !important;
+}
+
+.nav-tabs .nav-link {
+  color: var(--text-primary) !important;
+  border-radius: var(--radius) var(--radius) 0 0 !important;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+  border-color: var(--accent) !important;
+}
+
+/* Alert yardımcı sınıfları */
+.error-icon {
+  flex-shrink: 0 !important;
+  color: var(--error-color) !important;
+  margin-top: 2px !important;
+}
+
+.error-text, .success-text, .warning-text, .info-text {
+  flex-grow: 1 !important;
+}
+
+.mt-3 {
+  margin-top: 1rem !important;
+}
+
+/* Success popup özel stili */
+.swal2-popup.swal2-modal.swal2-icon-success {
+  background-color: var(--background-color) !important;
+}
+
+.modern-swal-confirm {
+  background: var(--destructive) !important;
+  border: none !important;
+  border-radius: var(--radius) !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+}
+
+.modern-swal-confirm:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 15px oklch(0.704 0.191 22.216 / 0.4) !important;
+}
+
+/* Özel metin rengi sınıfları */
+.text-white {
+  color: #ffffff !important;
 }
 
 .modern-swal-cancel {
@@ -352,4 +578,19 @@ button, a, .btn, .nav-link, .dropdown-item, .logo a {
   background-color: var(--accent) !important;
   color: var(--accent-foreground) !important;
   border-color: var(--accent) !important;
+}
+
+/* Alert yardımcı sınıfları */
+.error-icon {
+  flex-shrink: 0 !important;
+  color: var(--error-color) !important;
+  margin-top: 2px !important;
+}
+
+.error-text, .success-text, .warning-text, .info-text {
+  flex-grow: 1 !important;
+}
+
+.mt-3 {
+  margin-top: 1rem !important;
 }

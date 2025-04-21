@@ -554,25 +554,7 @@ label {
   color: var(--text-secondary);
 }
 
-.alert {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  border-radius: 8px;
-}
-
-.alert-danger {
-  background: var(--background-secondary);
-  color: var(--error-color);
-  border: 1px solid var(--error-color);
-  box-shadow: 0 0 10px var(--error-color-transparent);
-}
-
-.alert-success {
-  background: var(--background-secondary);
-  color: var(--success-color);
-  border: 1px solid var(--success-color);
-  box-shadow: 0 0 10px var(--success-color-transparent);
-}
+/* Alert stilleri global styles.css dosyasında tanımlandı */
 
 .mb-4 {
   margin-bottom: 1.5rem;
