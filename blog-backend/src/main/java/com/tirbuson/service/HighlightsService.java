@@ -40,6 +40,25 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
         this.highlightMapper = highlightMapper;
     }
 
+    /**
+     * Süresi dolmuş highlight'ları filtreleyerek, aktif olmayanları işaretleyen yardımcı metod
+     * @param highlights Highlight listesi
+     */
+    private List<Highlights> filterExpiredHighlights(List<Highlights> highlights) {
+        LocalDateTime now = LocalDateTime.now();
+        return highlights.stream()
+                .map(highlight -> {
+                    // Eğer expiresAt süresi dolmuşsa highlight'ı inactive olarak işaretle
+                    if (highlight.isActive() && highlight.getExpiresAt() != null && highlight.getExpiresAt().isBefore(now)) {
+                        highlight.setActive(false);
+                        highlightsRepository.save(highlight);
+                    }
+                    return highlight;
+                })
+                .filter(Highlights::isActive) // Sadece aktif olanları filtrele
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public HighlightResponseDto createHighlight(Integer userId, HighlightRequestDto requestDto) {
         User user = userRepository.findById(userId)
@@ -51,6 +70,11 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
         // Günlük limit kontrolü
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfDay = now.with(LocalTime.MIN);
+        
+        // Önce süresi dolmuş highlight'ları kontrol et
+        List<Highlights> userHighlights = highlightsRepository.findByUser(user);
+        filterExpiredHighlights(userHighlights);
+        
         long dailyCount = highlightsRepository.countByUserAndUpdatedAtGreaterThanEqualAndIsActiveTrue(user, startOfDay);
         
         if (dailyCount >= DAILY_HIGHLIGHT_LIMIT) {
@@ -66,6 +90,8 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
             if (!existingHighlight.isActive()) {
                 existingHighlight.setActive(true);
                 existingHighlight.setSeen(false);
+                // Yeni bir süre tanımla
+                existingHighlight.setExpiresAt(LocalDateTime.now().plusHours(24));
                 Highlights updatedHighlight = highlightsRepository.save(existingHighlight);
                 return highlightMapper.convertToDto(updatedHighlight);
             } else {
@@ -79,6 +105,8 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
         highlight.setPost(post);
         highlight.setSeen(false);
         highlight.setActive(true);
+        highlight.setHighlightDate(LocalDateTime.now());
+        highlight.setExpiresAt(LocalDateTime.now().plusHours(24));
         
         Highlights savedHighlight = highlightsRepository.save(highlight);
         return highlightMapper.convertToDto(savedHighlight);
@@ -92,7 +120,10 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime sevenDaysAgo = now.minusDays(7);
         
+        // Önce aktif highlight'ları çek ve süresi dolmuşları işaretle
         List<Highlights> highlights = highlightsRepository.findByUserAndIsActiveTrueAndUpdatedAtAfterOrderByUpdatedAtDesc(user, sevenDaysAgo);
+        highlights = filterExpiredHighlights(highlights);
+        
         return highlights.stream()
                 .map(highlightMapper::convertToDto)
                 .collect(Collectors.toList());
@@ -106,7 +137,10 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfDay = now.with(LocalTime.MIN);
         
+        // Önce aktif highlight'ları çek ve süresi dolmuşları işaretle
         List<Highlights> highlights = highlightsRepository.findByUserAndUpdatedAtGreaterThanEqualAndIsActiveTrueOrderByUpdatedAtDesc(user, startOfDay);
+        highlights = filterExpiredHighlights(highlights);
+        
         return highlights.stream()
                 .map(highlightMapper::convertToDto)
                 .collect(Collectors.toList());
@@ -130,6 +164,13 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
         Highlights highlight = highlightsRepository.findById(highlightId)
                 .orElseThrow(() -> new BaseException(MessageType.HIGHLIGHT_NOT_FOUND));
         
+        // Süre kontrolü
+        if (highlight.getExpiresAt() != null && highlight.getExpiresAt().isBefore(LocalDateTime.now())) {
+            highlight.setActive(false);
+            highlightsRepository.save(highlight);
+            throw new BaseException(MessageType.HIGHLIGHT_NOT_FOUND);
+        }
+        
         if (!highlight.isActive()) {
             throw new BaseException(MessageType.HIGHLIGHT_NOT_FOUND);
         }
@@ -146,11 +187,22 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
     @Transactional
     public void deactivateExpiredHighlights() {
         LocalDateTime now = LocalDateTime.now();
+        
+        // Tüm aktif highlight'ları çek
+        List<Highlights> activeHighlights = highlightsRepository.findByIsActiveTrue();
+        
+        // expiresAt alanına göre süreleri dolmuş highlight'ları işaretle
+        for (Highlights highlight : activeHighlights) {
+            if (highlight.getExpiresAt() != null && highlight.getExpiresAt().isBefore(now)) {
+                highlight.setActive(false);
+                highlightsRepository.save(highlight);
+            }
+        }
+        
+        // Eski highlight'ları da temizleyelim (7 günden eski)
         LocalDateTime sevenDaysAgo = now.minusDays(7);
-        
-        List<Highlights> expiredHighlights = highlightsRepository.findByUpdatedAtLessThanEqualAndIsActiveTrue(sevenDaysAgo);
-        
-        for (Highlights highlight : expiredHighlights) {
+        List<Highlights> oldHighlights = highlightsRepository.findByUpdatedAtLessThanEqualAndIsActiveTrue(sevenDaysAgo);
+        for (Highlights highlight : oldHighlights) {
             highlight.setActive(false);
             highlightsRepository.save(highlight);
         }
@@ -162,6 +214,7 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
         LocalDateTime sevenDaysAgo = now.minusDays(7);
         
         List<Highlights> highlights = highlightsRepository.findByIsActiveTrueAndUpdatedAtAfterOrderByUpdatedAtDesc(sevenDaysAgo);
+        highlights = filterExpiredHighlights(highlights);
                 
         return highlights.stream()
                 .map(highlightMapper::convertToDto)
@@ -179,6 +232,7 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
         LocalDateTime sevenDaysAgo = now.minusDays(7);
         
         List<Highlights> activeHighlights = highlightsRepository.findByIsActiveTrueAndUpdatedAtAfterOrderByUpdatedAtDesc(sevenDaysAgo);
+        activeHighlights = filterExpiredHighlights(activeHighlights);
         
         return activeHighlights.stream()
                 .map(highlightMapper::convertToDto)
@@ -190,7 +244,18 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
         Highlights highlight = highlightsRepository.findById(highlightId)
                 .orElseThrow(() -> new BaseException(MessageType.HIGHLIGHT_NOT_FOUND));
         
+        // Süre kontrolü yap
+        if (highlight.getExpiresAt() != null && highlight.getExpiresAt().isBefore(LocalDateTime.now())) {
+            highlight.setActive(false);
+            Highlights updatedHighlight = highlightsRepository.save(highlight);
+            return highlightMapper.convertToDto(updatedHighlight);
+        }
+        
         highlight.setActive(!highlight.isActive());
+        // Eğer aktifleştiriliyorsa süreyi yenile
+        if (highlight.isActive()) {
+            highlight.setExpiresAt(LocalDateTime.now().plusHours(24));
+        }
         Highlights updatedHighlight = highlightsRepository.save(highlight);
         return highlightMapper.convertToDto(updatedHighlight);
     }
@@ -207,13 +272,17 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
     public Map<String, Object> getHighlightStats() {
         Map<String, Object> stats = new HashMap<>();
         
+        // Tüm aktif highlight'ları güncelle önce
+        List<Highlights> activeHighlights = highlightsRepository.findByIsActiveTrue();
+        filterExpiredHighlights(activeHighlights);
+        
         // Toplam highlight sayısı
         long totalHighlights = highlightsRepository.count();
         stats.put("totalHighlights", totalHighlights);
         
         // Aktif highlight sayısı
-        long activeHighlights = highlightsRepository.countByIsActiveTrue();
-        stats.put("activeHighlights", activeHighlights);
+        long activeHighlightCount = highlightsRepository.countByIsActiveTrue();
+        stats.put("activeHighlights", activeHighlightCount);
         
         // Son 7 gündeki highlight sayısı
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);

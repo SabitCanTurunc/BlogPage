@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/highlights")
@@ -58,5 +59,12 @@ public class HighlightsController extends BaseController<HighlightsService, High
     @PutMapping("/{highlightId}/seen")
     public ResponseEntity<HighlightResponseDto> markAsSeen(@PathVariable Integer highlightId) {
         return ResponseEntity.ok(highlightsService.markAsSeen(highlightId));
+    }
+    
+    // Yeni eklenen endpoint - manuel olarak süresi dolan highlight'ları pasif hale getir
+    @PostMapping("/deactivate-expired")
+    public ResponseEntity<Map<String, Object>> deactivateExpiredHighlights() {
+        highlightsService.deactivateExpiredHighlights();
+        return ResponseEntity.ok(Map.of("message", "Süresi dolan highlight'lar pasif hale getirildi", "success", true));
     }
 }

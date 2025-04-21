@@ -29,4 +29,10 @@ public interface HighlightsRepository extends BaseRepository<Highlights, Integer
     long countByIsActiveTrue();
     
     long countByUpdatedAtAfter(LocalDateTime date);
+    
+    // Yeni eklenen metot - tüm aktif highlight'ları getir
+    List<Highlights> findByIsActiveTrue();
+    
+    // Kullanıcıya ait tüm highlight'ları getir (aktif/pasif durumuna bakmadan)
+    List<Highlights> findByUser(User user);
 }

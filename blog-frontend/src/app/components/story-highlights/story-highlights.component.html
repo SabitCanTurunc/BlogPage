@@ -108,7 +108,7 @@
           </div>
         </div>
         
-        <!-- Navigasyon Butonları -->
+        <!-- Highlight İleri-Geri Navigasyon Butonları -->
         <div class="navigation-buttons">
           <button class="nav-btn prev-btn" *ngIf="selectedHighlightIndex > 0" (click)="prevHighlight()">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -123,17 +123,22 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Kullanıcılar Arası Navigasyon -->
-  <div class="user-navigation" *ngIf="showDialog && selectedUser">
-    <div class="user-nav-prev" *ngIf="getPreviousUser()" (click)="navigateToUser('prev')">
-      <img [src]="getPreviousUser()?.userProfileImage" [alt]="getPreviousUser()?.userName" class="user-nav-avatar">
-      <span class="user-nav-name">{{getPreviousUser()?.userName}}</span>
-    </div>
-    <div class="user-nav-next" *ngIf="getNextUser()" (click)="navigateToUser('next')">
-      <img [src]="getNextUser()?.userProfileImage" [alt]="getNextUser()?.userName" class="user-nav-avatar">
-      <span class="user-nav-name">{{getNextUser()?.userName}}</span>
+    
+    <!-- Instagram Stories Tarzı Kullanıcılar Arası Navigasyon (Dialog Dışında) -->
+    <div class="stories-user-navigation" (click)="$event.stopPropagation()">
+      <!-- Önceki Kullanıcı Butonu -->
+      <div class="story-user-nav prev-user" *ngIf="getPreviousUser()" (click)="navigateToUser('prev')">
+        <div class="story-nav-avatar-container">
+          <img [src]="getPreviousUser()?.userProfileImage" [alt]="getPreviousUser()?.userName" class="story-nav-avatar">
+        </div>
+      </div>
+      
+      <!-- Sonraki Kullanıcı Butonu -->
+      <div class="story-user-nav next-user" *ngIf="getNextUser()" (click)="navigateToUser('next')">
+        <div class="story-nav-avatar-container">
+          <img [src]="getNextUser()?.userProfileImage" [alt]="getNextUser()?.userName" class="story-nav-avatar">
+        </div>
+      </div>
     </div>
   </div>
 </div> 
