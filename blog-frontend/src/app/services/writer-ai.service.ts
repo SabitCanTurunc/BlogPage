@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpEvent } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,7 @@ import { catchError } from 'rxjs/operators';
 export class WriterAiService {
   private apiUrl = 'http://localhost:8080/writer-ai';
   private aiImageUrl = 'http://localhost:8080/ai-image';
+  private imageUrl = 'http://localhost:8080/image';
 
   constructor(private http: HttpClient) { }
 
@@ -73,6 +75,30 @@ export class WriterAiService {
       catchError(error => {
         console.error('AI Image oluşturma hatası:', error);
         return throwError(() => new Error('Görsel oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.'));
+      })
+    );
+  }
+  
+  uploadImageFromUrl(imageUrl: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    
+    console.log('Image URL gönderiliyor:', imageUrl);
+    
+    const requestData = {
+      url: imageUrl
+    };
+    
+    return this.http.post(`${this.imageUrl}/upload-from-url`, requestData, {
+      headers: headers
+    }).pipe(
+      catchError(error => {
+        console.error('URL\'den resim yükleme hatası:', error);
+        if (error.error && error.error.customException) {
+          console.error('Sunucu hata detayı:', error.error.customException);
+        }
+        return throwError(() => new Error('Görsel Cloudinary\'ye yüklenirken bir hata oluştu. Lütfen tekrar deneyin.'));
       })
     );
   }

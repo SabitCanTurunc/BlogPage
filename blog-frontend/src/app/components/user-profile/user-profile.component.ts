@@ -633,6 +633,8 @@ export class UserProfileComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: this.translationService.getTranslation('yes_delete'),
       cancelButtonText: this.translationService.getTranslation('cancel'),
+      backdrop: 'rgba(0,0,0,0.4)',
+      background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
       customClass: {
         popup: 'modern-swal-popup',
         title: 'modern-swal-title text-white',

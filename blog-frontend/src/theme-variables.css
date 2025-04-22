@@ -71,9 +71,13 @@
   --accent-transparent: oklch(0.967 0.001 286.375 / 0.2);
   
   --success-color: var(--bs-success);
+  --success-color-transparent: oklch(0.631 0.163 151.832 / 0.2);
   --warning-color: var(--bs-warning);
+  --warning-color-transparent: oklch(0.828 0.189 84.429 / 0.2);
   --error-color: var(--bs-danger);
+  --error-color-transparent: oklch(0.577 0.245 27.325 / 0.2);
   --info-color: var(--bs-info);
+  --info-color-transparent: oklch(0.6 0.118 184.704 / 0.2);
   
   --border-color: var(--border);
   --card-bg: var(--card);
@@ -163,6 +167,15 @@
   --accent-light: var(--accent);
   --accent-dark: var(--accent-foreground);
   --accent-transparent: oklch(0.274 0.006 286.033 / 0.2);
+  
+  --success-color: var(--bs-success);
+  --success-color-transparent: oklch(0.631 0.163 151.832 / 0.2);
+  --warning-color: var(--bs-warning);
+  --warning-color-transparent: oklch(0.828 0.189 84.429 / 0.2);
+  --error-color: var(--bs-danger);
+  --error-color-transparent: oklch(0.704 0.191 22.216 / 0.2);
+  --info-color: var(--bs-info);
+  --info-color-transparent: oklch(0.6 0.118 184.704 / 0.2);
   
   --card-bg: var(--card);
   --card-shadow: 0 0.125rem 0.25rem oklch(0 0 0 / 0.2);

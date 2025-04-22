@@ -18,6 +18,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 interface UploadedImage {
   url: string;
+  isAiImage?: boolean; // AI tarafından oluşturulmuş görselleri işaretlemek için
 }
 
 @Component({
@@ -460,38 +461,67 @@ export class CreatePostComponent implements OnInit {
         return;
       }
 
-      const postData = {
-        title: title,
-        content: content,
-        categoryId: parseInt(categoryId),
-        images: this.uploadedImages.map(img => img.url),
-        userEmail: userEmail
-      };
-
+      // Yükleme durumunu göster
       this.isSubmitting = true;
       this.submitError = '';
 
-      if (this.isEditMode && this.postId) {
-        this.postService.updatePost(this.postId, postData).subscribe({
-          next: (response) => {
-            this.router.navigate(['/post', response.id]);
-          },
-          error: (error) => {
-            this.handleSubmitError(error);
-            this.isSubmitting = false;
-          }
-        });
-      } else {
-        this.postService.createPost(postData).subscribe({
-          next: (response) => {
-            this.router.navigate(['/post', response.id]);
-          },
-          error: (error) => {
-            this.handleSubmitError(error);
-            this.isSubmitting = false;
-          }
-        });
+      // AI ile oluşturulan görselleri kontrol et
+      const aiImages = this.uploadedImages.filter(img => img.isAiImage);
+      
+      // Eğer AI görseli yoksa direkt olarak gönder
+      if (aiImages.length === 0) {
+        this.savePost(userEmail, title, content, categoryId);
+        return;
       }
+      
+      // AI görsellerini Cloudinary'ye yükle
+      let uploadedCount = 0;
+      let cloudinaryUrls: { [key: string]: string } = {};
+      
+      // Her bir AI görselini Cloudinary'ye yükle
+      for (let i = 0; i < aiImages.length; i++) {
+        const aiImage = aiImages[i];
+        
+        this.writerAiService.uploadImageFromUrl(aiImage.url)
+          .subscribe({
+            next: (response) => {
+              if (response && response.url) {
+                // Orijinal URL'yi yeni URL ile eşleştir
+                cloudinaryUrls[aiImage.url] = response.url;
+              }
+              
+              uploadedCount++;
+              
+              // Tüm yüklemeler tamamlandığında post'u kaydet
+              if (uploadedCount === aiImages.length) {
+                // Görsel URL'leri güncelle
+                this.uploadedImages = this.uploadedImages.map(img => {
+                  if (img.isAiImage && cloudinaryUrls[img.url]) {
+                    return { url: cloudinaryUrls[img.url], isAiImage: false };
+                  }
+                  return img;
+                });
+                
+                this.savePost(userEmail, title, content, categoryId);
+              }
+            },
+            error: (error) => {
+              console.error('Cloudinary yükleme hatası:', error);
+              uploadedCount++;
+              
+              // Hata olsa bile diğer görselleri yüklemeye devam et
+              if (uploadedCount === aiImages.length) {
+                // Sorunlu görselleri filtrele
+                this.uploadedImages = this.uploadedImages.filter(img => {
+                  return !img.isAiImage || cloudinaryUrls[img.url];
+                });
+                
+                this.savePost(userEmail, title, content, categoryId);
+              }
+            }
+          });
+      }
+
     } else {
       // Form geçerli değilse, eksik kalan ilk alana odaklan
       if (!title) {
@@ -512,6 +542,39 @@ export class CreatePostComponent implements OnInit {
       });
       
       this.submitError = this.translationService.getTranslation('form_validation_error') || 'Lütfen formdaki eksik alanları doldurun.';
+    }
+  }
+
+  // Post'u kaydetme işlemi
+  private savePost(userEmail: string, title: string, content: string, categoryId: string | number) {
+    const postData = {
+      title: title,
+      content: content,
+      categoryId: parseInt(categoryId.toString()),
+      images: this.uploadedImages.map(img => img.url),
+      userEmail: userEmail
+    };
+
+    if (this.isEditMode && this.postId) {
+      this.postService.updatePost(this.postId, postData).subscribe({
+        next: (response) => {
+          this.router.navigate(['/post', response.id]);
+        },
+        error: (error) => {
+          this.handleSubmitError(error);
+          this.isSubmitting = false;
+        }
+      });
+    } else {
+      this.postService.createPost(postData).subscribe({
+        next: (response) => {
+          this.router.navigate(['/post', response.id]);
+        },
+        error: (error) => {
+          this.handleSubmitError(error);
+          this.isSubmitting = false;
+        }
+      });
     }
   }
 
@@ -726,8 +789,13 @@ export class CreatePostComponent implements OnInit {
   
   applyAiImage() {
     if (this.aiGeneratedImageUrl) {
-      // URL'yi images dizisine ekle
-      this.uploadedImages.push({ url: this.aiGeneratedImageUrl });
+      // AI tarafından oluşturulan URL'yi direkt olarak önizleme dizisine ekle
+      this.uploadedImages.push({ 
+        url: this.aiGeneratedImageUrl,
+        isAiImage: true // AI tarafından oluşturulduğunu işaretle
+      });
+      
+      // Dialog'u kapat ve durumu sıfırla
       this.showAiImageDialog = false;
       this.aiImagePrompt = '';
       this.aiGeneratedImageUrl = '';

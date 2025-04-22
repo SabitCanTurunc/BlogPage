@@ -240,7 +240,8 @@ tr:hover {
 }
 
 .btn-danger:hover {
-  background: var(--error-color-transparent);
+  background: var(--error-color);
+  color: var(--background-color);
   transform: translateY(-2px);
   box-shadow: 0 0 15px var(--error-color-transparent);
 }
@@ -253,7 +254,8 @@ tr:hover {
 }
 
 .btn-edit:hover {
-  background: var(--primary-transparent);
+  background: var(--primary-color);
+  color: var(--background-color);
   transform: translateY(-2px);
   box-shadow: 0 0 15px var(--primary-transparent);
 }
@@ -307,8 +309,8 @@ tr:hover {
 }
 
 .btn-primary {
-  background: var(--gradient-primary-transparent);
-  color: var(--text-color);
+  background: var(--primary-transparent);
+  color: var(--primary-color);
   border: 1px solid var(--primary-color);
   padding: 0.75rem 1.5rem;
   font-weight: 600;
@@ -321,8 +323,8 @@ tr:hover {
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px var(--primary-transparent);
-  background: var(--gradient-primary);
-  color: var(--primary-foreground);
+  background: var(--primary-color);
+  color: var(--background-color);
 }
 
 .btn-primary:disabled {
@@ -377,8 +379,8 @@ tr:hover {
 }
 
 .btn-save-all {
-  background: var(--gradient-primary-transparent);
-  color: var(--text-color);
+  background: var(--primary-transparent);
+  color: var(--primary-color);
   font-size: 0.9rem;
   padding: 0.5rem 1.25rem;
   border: 1px solid var(--primary-color);
@@ -389,8 +391,8 @@ tr:hover {
 }
 
 .btn-save-all:hover {
-  background: var(--gradient-primary);
-  color: var(--primary-foreground);
+  background: var(--primary-color);
+  color: var(--background-color);
   transform: translateY(-2px);
   box-shadow: 0 4px 15px var(--primary-transparent);
 }
@@ -592,6 +594,31 @@ input:checked + .slider:before {
   transition: all 0.3s ease;
   border: none;
   cursor: pointer;
+  background: var(--background-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-icon.btn-danger {
+  background: var(--error-color-transparent);
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+}
+
+.btn-icon.btn-danger:hover {
+  background: var(--error-color);
+  color: var(--background-color);
+}
+
+.btn-icon.btn-edit {
+  background: var(--primary-transparent);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.btn-icon.btn-edit:hover {
+  background: var(--primary-color);
+  color: var(--background-color);
 }
 
 .btn-icon svg {

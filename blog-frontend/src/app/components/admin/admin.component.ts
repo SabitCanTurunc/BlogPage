@@ -114,8 +114,8 @@ export class AdminComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Evet, Sil',
       cancelButtonText: 'İptal',
-      confirmButtonColor: '#dc3545',
-      cancelButtonColor: '#6c757d',
+      backdrop: 'rgba(0,0,0,0.4)',
+      background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
       customClass: {
         popup: 'modern-swal-popup',
         title: 'modern-swal-title text-white',
@@ -135,6 +135,8 @@ export class AdminComponent implements OnInit {
               icon: 'success',
               timer: 3000,
               showConfirmButton: false,
+              backdrop: 'rgba(0,0,0,0.4)',
+              background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
               customClass: {
                 popup: 'modern-swal-popup',
                 title: 'modern-swal-title text-white',
@@ -153,6 +155,8 @@ export class AdminComponent implements OnInit {
               title: 'Hata',
               text: errorMessage,
               icon: 'error',
+              backdrop: 'rgba(0,0,0,0.4)',
+              background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
               customClass: {
                 popup: 'modern-swal-popup',
                 title: 'modern-swal-title text-white',
@@ -234,8 +238,8 @@ export class AdminComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Evet, Sil',
       cancelButtonText: 'İptal',
-      confirmButtonColor: '#dc3545',
-      cancelButtonColor: '#6c757d',
+      backdrop: 'rgba(0,0,0,0.4)',
+      background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
       customClass: {
         popup: 'modern-swal-popup',
         title: 'modern-swal-title text-white',
@@ -292,8 +296,8 @@ export class AdminComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Evet, Sil',
       cancelButtonText: 'İptal',
-      confirmButtonColor: '#dc3545',
-      cancelButtonColor: '#6c757d',
+      backdrop: 'rgba(0,0,0,0.4)',
+      background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
       customClass: {
         popup: 'modern-swal-popup',
         title: 'modern-swal-title text-white',

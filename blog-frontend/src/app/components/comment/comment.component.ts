@@ -179,6 +179,8 @@ export class CommentComponent implements OnInit {
           title: 'Hata',
           text: 'Düzenlenmek istenen yorum bulunamadı',
           icon: 'error',
+          backdrop: 'rgba(0,0,0,0.4)',
+          background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
           customClass: {
             popup: 'modern-swal-popup',
             title: 'modern-swal-title text-white',
@@ -220,6 +222,8 @@ export class CommentComponent implements OnInit {
             icon: 'success',
             timer: 3000,
             showConfirmButton: false,
+            backdrop: 'rgba(0,0,0,0.4)',
+            background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
             customClass: {
               popup: 'modern-swal-popup',
               title: 'modern-swal-title text-white',
@@ -242,6 +246,8 @@ export class CommentComponent implements OnInit {
             title: 'Hata',
             text: errorMessage,
             icon: 'error',
+            backdrop: 'rgba(0,0,0,0.4)',
+            background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
             customClass: {
               popup: 'modern-swal-popup',
               title: 'modern-swal-title text-white',
@@ -263,8 +269,8 @@ export class CommentComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Evet, Sil',
       cancelButtonText: 'İptal',
-      confirmButtonColor: '#dc3545',
-      cancelButtonColor: '#6c757d',
+      backdrop: 'rgba(0,0,0,0.4)',
+      background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
       customClass: {
         popup: 'modern-swal-popup',
         title: 'modern-swal-title text-white',
@@ -284,6 +290,8 @@ export class CommentComponent implements OnInit {
               icon: 'success',
               timer: 3000,
               showConfirmButton: false,
+              backdrop: 'rgba(0,0,0,0.4)',
+              background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
               customClass: {
                 popup: 'modern-swal-popup',
                 title: 'modern-swal-title text-white',
@@ -296,6 +304,8 @@ export class CommentComponent implements OnInit {
               title: 'Hata',
               text: 'Yorum silinirken bir hata oluştu.',
               icon: 'error',
+              backdrop: 'rgba(0,0,0,0.4)',
+              background: getComputedStyle(document.documentElement).getPropertyValue('--background-color').trim(),
               customClass: {
                 popup: 'modern-swal-popup',
                 title: 'modern-swal-title text-white',
