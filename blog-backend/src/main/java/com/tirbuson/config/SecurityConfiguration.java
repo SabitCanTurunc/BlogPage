@@ -60,6 +60,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/summary/regenerate/{postId}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/chat/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/writer-ai/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/ai-image/**").authenticated()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
@@ -74,7 +75,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:4000", "http://localhost:3000", frontendUrl));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
         configuration.setExposedHeaders(List.of("Authorization"));

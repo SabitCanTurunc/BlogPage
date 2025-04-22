@@ -13,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Image extends BaseEntity  {
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String url;
 
 
