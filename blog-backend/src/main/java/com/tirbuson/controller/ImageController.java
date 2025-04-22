@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/image")
@@ -39,5 +40,16 @@ public class ImageController extends BaseController<ImageService, Image,Integer,
             responses.add(imageService.uploadImage(file));
         }
         return ResponseEntity.ok(responses);
+    }
+    
+    @PostMapping("/upload-from-url")
+    public ResponseEntity<ImageResponseDto> uploadImageFromUrl(@RequestBody Map<String, String> request) throws IOException {
+        String imageUrl = request.get("url");
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        ImageResponseDto response = imageService.uploadAiImage(imageUrl);
+        return ResponseEntity.ok(response);
     }
 }

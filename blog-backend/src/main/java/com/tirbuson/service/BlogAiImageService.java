@@ -51,13 +51,11 @@ public class BlogAiImageService {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             
-            // HTTP durum kodunu kontrol et
             if (response.statusCode() != 200) {
                 String errorMessage = "OpenAI API Hatası: " + response.body();
                 throw new BaseException(MessageType.EXTERNAL_SERVICE_ERROR, errorMessage);
             }
             
-            // Response JSON'ı parse et
             JsonNode rootNode = objectMapper.readTree(response.body());
             JsonNode dataNode = rootNode.path("data").get(0);
             
@@ -67,7 +65,6 @@ public class BlogAiImageService {
             
             String imageUrl = dataNode.path("url").asText();
             
-            // Response dto'yu oluştur
             ImageResponseDto responseDto = new ImageResponseDto();
             responseDto.setUrl(imageUrl);
             
