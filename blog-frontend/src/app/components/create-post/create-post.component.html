@@ -40,26 +40,68 @@
         <div class="form-group">
           <div class="content-header">
             <label for="content" class="form-label">{{ 'create_post_content' | translate }} <span class="required-field">*</span></label>
-            <button type="button" class="ai-generate-btn" (click)="generateWithAI()" [disabled]="isAiGenerating || !postForm.get('title')?.value || !postForm.get('categoryId')?.value">
-              <span *ngIf="!isAiGenerating">
+            <div class="content-actions">
+              <button 
+                type="button" 
+                class="preview-toggle-btn" 
+                (click)="toggleMarkdownPreview()" 
+                title="{{ 'markdown_preview' | translate }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z"/>
+                  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
                 </svg>
-                {{ 'ai_complete' | translate }}
-              </span>
-              <span *ngIf="isAiGenerating" class="spinner-text">
-                <div class="spinner-sm">
-                  <div class="spinner-inner-sm"></div>
-                </div>
-                {{ 'ai_generating' | translate }}
-              </span>
-            </button>
+                {{ showMarkdownPreview ? ('return_to_edit' | translate) : ('preview' | translate) }}
+              </button>
+              <button 
+                type="button" 
+                class="ai-generate-btn" 
+                (click)="generateWithAI()" 
+                [disabled]="isAiGenerating || !postForm.get('title')?.value || !postForm.get('categoryId')?.value"
+                [attr.data-tooltip]="'ai_tooltip_required' | translate">
+                <span *ngIf="!isAiGenerating">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5ZM3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.58 26.58 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.933.933 0 0 1-.765.935c-.845.147-2.34.346-4.235.346-1.895 0-3.39-.2-4.235-.346A.933.933 0 0 1 3 9.219V8.062Zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a24.767 24.767 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25.286 25.286 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135Z"/>
+                    <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2V1.866ZM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5Z"/>
+                  </svg>
+                  {{ 'ai_complete' | translate }}
+                </span>
+                <span *ngIf="isAiGenerating" class="spinner-text">
+                  <div class="spinner-sm">
+                    <div class="spinner-inner-sm"></div>
+                  </div>
+                  {{ 'ai_generating' | translate }}
+                </span>
+              </button>
+            </div>
           </div>
-          <textarea 
-            id="content" 
-            class="form-control" 
-            formControlName="content" 
-            [placeholder]="'create_post_content_placeholder' | translate"></textarea>
+          
+          <!-- Markdown Editor ve Preview -->
+          <div class="content-container">
+            <!-- Normal Text Area -->
+            <textarea 
+              *ngIf="!showMarkdownPreview"
+              id="content" 
+              class="form-control" 
+              formControlName="content" 
+              [placeholder]="'create_post_content_placeholder' | translate"></textarea>
+            
+            <!-- Markdown bilgi notu -->
+            <div *ngIf="!showMarkdownPreview" class="markdown-tip">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+              </svg>
+              <span>{{ 'markdown_supported' | translate }} <strong># {{ 'markdown_header' | translate }}</strong>, <strong>**{{ 'markdown_bold' | translate }}**</strong>, <strong>*{{ 'markdown_italic' | translate }}*</strong> {{ 'markdown_and_more' | translate }}</span>
+            </div>
+            
+            <!-- Markdown Preview -->
+            <div 
+              *ngIf="showMarkdownPreview" 
+              class="markdown-preview formatted-content"
+              [innerHTML]="formatHtmlContent(postForm.get('content')?.value)">
+            </div>
+          </div>
+          
           <div class="invalid-feedback" *ngIf="postForm.get('content')?.errors?.['required'] && postForm.get('content')?.touched && !isAiGenerating">
             {{ 'create_post_content_required' | translate }}
           </div>
@@ -70,7 +112,8 @@
           <div class="ai-content-header">
             <div class="ai-badge">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z"/>
+                <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5ZM3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.58 26.58 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.933.933 0 0 1-.765.935c-.845.147-2.34.346-4.235.346-1.895 0-3.39-.2-4.235-.346A.933.933 0 0 1 3 9.219V8.062Zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a24.767 24.767 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25.286 25.286 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135Z"/>
+                <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2V1.866ZM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5Z"/>
               </svg>
               {{ 'ai_generated_content' | translate }}
             </div>
@@ -103,11 +146,21 @@
               accept="image/*"
               multiple
               #fileInput>
-            <div class="file-upload-button" (click)="fileInput.click()">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-              </svg>
-              <span>{{ 'create_post_select_image' | translate }}</span>
+            <div class="upload-buttons-container">
+              <div class="file-upload-button" (click)="fileInput.click()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                <span>{{ 'create_post_select_image' | translate }}</span>
+              </div>
+              
+              <div class="ai-image-button" (click)="generateImageWithAI()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5ZM3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.58 26.58 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.933.933 0 0 1-.765.935c-.845.147-2.34.346-4.235.346-1.895 0-3.39-.2-4.235-.346A.933.933 0 0 1 3 9.219V8.062Zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a24.767 24.767 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25.286 25.286 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135Z"/>
+                  <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2V1.866ZM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5Z"/>
+                </svg>
+                <span>{{ 'ai_generate_image' | translate }}</span>
+              </div>
             </div>
             <div class="file-upload-info">
               <small>{{ 'create_post_image_upload_info' | translate }}</small>
@@ -157,6 +210,59 @@
           {{ submitError }}
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Image Dialog -->
+<div class="ai-image-dialog-overlay" *ngIf="showAiImageDialog">
+  <div class="ai-image-dialog">
+    <div class="ai-image-dialog-header">
+      <h3>{{ 'ai_generate_image_title' | translate }}</h3>
+      <button type="button" class="close-button" (click)="closeAiImageDialog()">×</button>
+    </div>
+    <div class="ai-image-dialog-body">
+      <p>{{ 'ai_image_description' | translate }}</p>
+      <textarea 
+        [(ngModel)]="aiImagePrompt" 
+        class="ai-image-prompt" 
+        [placeholder]="'ai_image_prompt_placeholder' | translate"
+        [disabled]="isAiImageGenerating"></textarea>
+      
+      <!-- Görsel Önizleme -->
+      <div *ngIf="aiGeneratedImageUrl" class="ai-image-preview">
+        <img [src]="aiGeneratedImageUrl" [alt]="'ai_generated_image' | translate" />
+      </div>
+      
+      <div *ngIf="aiImageError" class="ai-image-error">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+        </svg>
+        {{ aiImageError }}
+      </div>
+    </div>
+    <div class="ai-image-dialog-footer">
+      <button type="button" class="cancel-button" (click)="closeAiImageDialog()" [disabled]="isAiImageGenerating">{{ 'cancel' | translate }}</button>
+      
+      <!-- Apply butonu -->
+      <button *ngIf="showApplyImageButton" type="button" class="apply-button" (click)="applyAiImage()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+        </svg>
+        {{ 'add_image' | translate }}
+      </button>
+      
+      <!-- Generate butonu -->
+      <button type="button" class="generate-button" (click)="submitAiImageGeneration()" [disabled]="isAiImageGenerating || !aiImagePrompt">
+        <span *ngIf="!isAiImageGenerating">{{ aiGeneratedImageUrl ? ('regenerate_image' | translate) : ('generate_image' | translate) }}</span>
+        <span *ngIf="isAiImageGenerating" class="spinner-text">
+          <div class="spinner-sm">
+            <div class="spinner-inner-sm"></div>
+          </div>
+          {{ 'generating' | translate }}
+        </span>
+      </button>
     </div>
   </div>
 </div>

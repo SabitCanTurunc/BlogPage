@@ -42,6 +42,13 @@ export class CreatePostComponent implements OnInit {
   isAiGenerating: boolean = false;
   aiError: string = '';
   showApplyButton: boolean = false;
+  isAiImageGenerating: boolean = false;
+  aiImageError: string = '';
+  aiImagePrompt: string = '';
+  showAiImageDialog: boolean = false;
+  aiGeneratedImageUrl: string = '';
+  showApplyImageButton: boolean = false;
+  showMarkdownPreview: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -251,10 +258,7 @@ export class CreatePostComponent implements OnInit {
       // [DONE] etiketlerini temizle
       .replace(/\[DONE\]/g, '')
       // Fazla boş satırları azalt
-      .replace(/\n{3,}/g, '\n\n')
-      // Markdown sembollerini (*,**) temizle ama içeriği koru
-      .replace(/\*\*([^*]+)\*\*/g, '$1')
-      .replace(/\*([^*]+)\*/g, '$1');
+      .replace(/\n{3,}/g, '\n\n');
     
     // Birleşik kelimeleri düzelt (küçük harften büyük harfe geçişlerde)
     // Örnek: "merhaBa" -> "merha Ba"
@@ -276,41 +280,8 @@ export class CreatePostComponent implements OnInit {
 
   applyAiContent() {
     if (this.aiGeneratedContent) {
-      // Metni tam anlamıyla temizle ve düzenle
-      let formattedContent = this.aiGeneratedContent;
-      
-      // Markdown başlık sembollerini temizle ama satır sonlarını koru
-      formattedContent = formattedContent
-        // Markdown başlık işaretlerini (#) kaldırırken başlığı koru
-        .replace(/^(#+)\s*(.*?)$/gm, '$2')
-        // "Başlık:" tarzı etiketleri düzelt
-        .replace(/^(Baş[ıi]?l[ıi]?k\s*:)\s*(.*?)$/gim, '$2')
-        // Çift yıldızları (bold) kaldır
-        .replace(/\*\*/g, '')
-        // Tek yıldızları (italic) kaldır
-        .replace(/\*/g, '')
-        // Fazla boş satırları iki boş satıra düşür
-        .replace(/\n{3,}/g, '\n\n');
-      
-      // Satır sonlarına göre birleşik kelimeleri düzelt
-      const paragraphs = formattedContent.split('\n');
-      const processedParagraphs = [];
-      
-      for (const paragraph of paragraphs) {
-        // Birleşmiş kelimeleri arayıp ayır
-        // Örnek: "kurmakiçin" -> "kurmak için"
-        const processed = paragraph.replace(/([a-zışğüçöâîû])([A-ZİŞĞÜÇÖÂÎÛ])/g, '$1 $2');
-        processedParagraphs.push(processed);
-      }
-      
-      // Düzeltilmiş paragrafları birleştir
-      formattedContent = processedParagraphs.join('\n');
-      
-      // Metin içindeki büyük harf küçük harf geçişlerinde boşluk ekleyerek birleşik kelimeleri düzelt
-      formattedContent = formattedContent.replace(/([a-zışğüçöâîû])([A-ZİŞĞÜÇÖÂÎÛ])/g, '$1 $2');
-      
-      // Form alanına uygula - form kontrollerine değerleri doğru şekilde ata
-      this.postForm.get('content')?.setValue(formattedContent);
+      // Form alanına AI içeriğini markdown formatıyla uygula
+      this.postForm.get('content')?.setValue(this.aiGeneratedContent);
       
       // Content kontrol durumunu güncelleyelim ve valid olarak işaretleyelim
       this.postForm.get('content')?.markAsDirty();
@@ -324,6 +295,9 @@ export class CreatePostComponent implements OnInit {
       this.aiGeneratedContent = '';
       this.showApplyButton = false;
       this.aiError = '';
+      
+      // Markdown önizleme modunu etkinleştir
+      this.showMarkdownPreview = true;
     }
   }
 
@@ -569,15 +543,199 @@ export class CreatePostComponent implements OnInit {
   formatHtmlContent(content: string): SafeHtml {
     if (!content) return '';
     
-    // Satır sonlarını paragraf etiketlerine dönüştürme
-    const formattedContent = content
-      .replace(/\n{2,}/g, '</p><p>') // İki veya daha fazla yeni satırı paragraf bölmesi olarak işle
-      .replace(/\n/g, '<br>'); // Tek yeni satırları <br> ile değiştir
+    // Kod bloklarını işle (önce bunları işlememiz gerekiyor çünkü içindeki markdown'ı dönüştürmek istemiyoruz)
+    const codeBlocks: string[] = [];
+    let codeBlockCounter = 0;
+    
+    // Code block'ları geçici olarak çıkart ve yerine placeholder koy
+    let processedContent = content.replace(/```([\s\S]*?)```/g, (match, code) => {
+      const placeholder = `__CODE_BLOCK_${codeBlockCounter}__`;
+      codeBlocks.push(code);
+      codeBlockCounter++;
+      return placeholder;
+    });
+    
+    // Inline code'ları geçici olarak çıkart
+    const inlineCodes: string[] = [];
+    let inlineCodeCounter = 0;
+    
+    processedContent = processedContent.replace(/`([^`]+)`/g, (match, code) => {
+      const placeholder = `__INLINE_CODE_${inlineCodeCounter}__`;
+      inlineCodes.push(code);
+      inlineCodeCounter++;
+      return placeholder;
+    });
+    
+    // Başlıkları dönüştür
+    let htmlContent = processedContent
+      .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
+      .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
+      .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
+      .replace(/^#### (.*?)$/gm, '<h4>$1</h4>');
+    
+    // Liste öğelerini işlemek için ayrıntılı yaklaşım
+    let inList = false;
+    const lines = htmlContent.split('\n');
+    const processedLines = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      // Liste öğesi mi kontrol et
+      if (line.match(/^- (.*?)$/)) {
+        const listItem = line.replace(/^- (.*?)$/, '<li>$1</li>');
+        
+        if (!inList) {
+          processedLines.push('<ul>');
+          inList = true;
+        }
+        
+        processedLines.push(listItem);
+        
+        // Son liste öğesi mi kontrol et
+        const nextLine = i < lines.length - 1 ? lines[i + 1] : null;
+        if (!nextLine || !nextLine.match(/^- (.*?)$/)) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+      } else {
+        processedLines.push(line);
+      }
+    }
+    
+    htmlContent = processedLines.join('\n');
+    
+    // Bold ve italik metinleri dönüştür
+    htmlContent = htmlContent
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      // Paragrafları dönüştür
+      .replace(/\n{2,}/g, '</p><p>')
+      // Satır sonlarını <br> olarak dönüştür
+      .replace(/\n/g, '<br>');
     
     // Son içeriği paragraf içine sarma
-    const htmlContent = `<p>${formattedContent}</p>`;
+    htmlContent = `<p>${htmlContent}</p>`;
+    
+    // Code block'ları geri koy
+    for (let i = 0; i < codeBlocks.length; i++) {
+      const code = codeBlocks[i]
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      
+      htmlContent = htmlContent.replace(
+        `__CODE_BLOCK_${i}__`, 
+        `</p><pre><code>${code}</code></pre><p>`
+      );
+    }
+    
+    // Inline code'ları geri koy
+    for (let i = 0; i < inlineCodes.length; i++) {
+      const code = inlineCodes[i]
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      
+      htmlContent = htmlContent.replace(
+        `__INLINE_CODE_${i}__`, 
+        `<code>${code}</code>`
+      );
+    }
     
     // Güvenli HTML olarak dönme
     return this.sanitizer.bypassSecurityTrustHtml(htmlContent);
+  }
+
+  generateImageWithAI() {
+    // Başlık, kategori ve içeriği al
+    const title = this.postForm.get('title')?.value ? this.postForm.get('title')?.value.trim() : '';
+    const categoryId = this.postForm.get('categoryId')?.value;
+    const content = this.postForm.get('content')?.value ? this.postForm.get('content')?.value.trim() : '';
+    
+    // Kategori adını bul
+    let categoryName = '';
+    if (categoryId) {
+      const category = this.categories.find(c => c.id === parseInt(categoryId));
+      if (category) {
+        categoryName = category.name;
+      }
+    }
+    
+    // Prompt için içeriği hazırla
+    let combinedPrompt = '';
+    
+    if (title) {
+      combinedPrompt += `Başlık: ${title}. `;
+    }
+    
+    if (categoryName) {
+      combinedPrompt += `Kategori: ${categoryName}. `;
+    }
+    
+    // İçeriğin ilk 300 karakterini al (çok uzun olmaması için)
+    if (content) {
+      const shortContent = content.length > 300 ? content.substring(0, 300) + '...' : content;
+      combinedPrompt += `İçerik: ${shortContent}`;
+    }
+    
+    // Hazır prompt ile dialogu göster
+    this.showAiImageDialog = true;
+    this.aiImagePrompt = combinedPrompt;
+    this.aiImageError = '';
+    this.aiGeneratedImageUrl = '';
+    this.showApplyImageButton = false;
+  }
+
+  closeAiImageDialog() {
+    this.showAiImageDialog = false;
+    this.aiImagePrompt = '';
+    this.aiImageError = '';
+    this.aiGeneratedImageUrl = '';
+    this.showApplyImageButton = false;
+  }
+
+  submitAiImageGeneration() {
+    if (!this.aiImagePrompt.trim()) {
+      this.aiImageError = 'Lütfen görsel açıklaması girin';
+      return;
+    }
+
+    this.isAiImageGenerating = true;
+    this.aiImageError = '';
+    this.aiGeneratedImageUrl = '';
+    this.showApplyImageButton = false;
+
+    this.writerAiService.generateImageWithAI(this.aiImagePrompt)
+      .subscribe({
+        next: (response) => {
+          if (response && response.url) {
+            // URL'yi göster ama henüz ekleme
+            this.aiGeneratedImageUrl = response.url;
+            this.showApplyImageButton = true;
+          } else {
+            this.aiImageError = 'Görsel URL alınamadı, lütfen tekrar deneyin';
+          }
+          this.isAiImageGenerating = false;
+        },
+        error: (error) => {
+          console.error('AI görsel hatası:', error);
+          this.isAiImageGenerating = false;
+          this.aiImageError = error.message || 'Görsel oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.';
+        }
+      });
+  }
+  
+  applyAiImage() {
+    if (this.aiGeneratedImageUrl) {
+      // URL'yi images dizisine ekle
+      this.uploadedImages.push({ url: this.aiGeneratedImageUrl });
+      this.showAiImageDialog = false;
+      this.aiImagePrompt = '';
+      this.aiGeneratedImageUrl = '';
+      this.showApplyImageButton = false;
+    }
+  }
+
+  toggleMarkdownPreview() {
+    this.showMarkdownPreview = !this.showMarkdownPreview;
   }
 } 

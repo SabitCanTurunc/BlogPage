@@ -16,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { SummaryDialogComponent } from '../summary-dialog/summary-dialog.component';
 import { SummaryService } from '../../services/summary.service';
 import { MatIconModule } from '@angular/material/icon';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-post-detail',
@@ -46,7 +47,8 @@ export class PostDetailComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private dialog: MatDialog,
-    private summaryService: SummaryService
+    private summaryService: SummaryService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
@@ -169,5 +171,110 @@ export class PostDetailComponent implements OnInit {
         this.openSummaryDialog();
       }
     });
+  }
+
+  formatHtmlContent(content: string): SafeHtml {
+    if (!content) return '';
+    
+    // Kod bloklarını işle (önce bunları işlememiz gerekiyor çünkü içindeki markdown'ı dönüştürmek istemiyoruz)
+    const codeBlocks: string[] = [];
+    let codeBlockCounter = 0;
+    
+    // Code block'ları geçici olarak çıkart ve yerine placeholder koy
+    let processedContent = content.replace(/```([\s\S]*?)```/g, (match, code) => {
+      const placeholder = `__CODE_BLOCK_${codeBlockCounter}__`;
+      codeBlocks.push(code);
+      codeBlockCounter++;
+      return placeholder;
+    });
+    
+    // Inline code'ları geçici olarak çıkart
+    const inlineCodes: string[] = [];
+    let inlineCodeCounter = 0;
+    
+    processedContent = processedContent.replace(/`([^`]+)`/g, (match, code) => {
+      const placeholder = `__INLINE_CODE_${inlineCodeCounter}__`;
+      inlineCodes.push(code);
+      inlineCodeCounter++;
+      return placeholder;
+    });
+    
+    // Başlıkları dönüştür
+    let htmlContent = processedContent
+      .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
+      .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
+      .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
+      .replace(/^#### (.*?)$/gm, '<h4>$1</h4>');
+    
+    // Liste öğelerini işlemek için ayrıntılı yaklaşım
+    let inList = false;
+    const lines = htmlContent.split('\n');
+    const processedLines = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      // Liste öğesi mi kontrol et
+      if (line.match(/^- (.*?)$/)) {
+        const listItem = line.replace(/^- (.*?)$/, '<li>$1</li>');
+        
+        if (!inList) {
+          processedLines.push('<ul>');
+          inList = true;
+        }
+        
+        processedLines.push(listItem);
+        
+        // Son liste öğesi mi kontrol et
+        const nextLine = i < lines.length - 1 ? lines[i + 1] : null;
+        if (!nextLine || !nextLine.match(/^- (.*?)$/)) {
+          processedLines.push('</ul>');
+          inList = false;
+        }
+      } else {
+        processedLines.push(line);
+      }
+    }
+    
+    htmlContent = processedLines.join('\n');
+    
+    // Bold ve italik metinleri dönüştür
+    htmlContent = htmlContent
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      // Paragrafları dönüştür
+      .replace(/\n{2,}/g, '</p><p>')
+      // Satır sonlarını <br> olarak dönüştür
+      .replace(/\n/g, '<br>');
+    
+    // Son içeriği paragraf içine sarma
+    htmlContent = `<p>${htmlContent}</p>`;
+    
+    // Code block'ları geri koy
+    for (let i = 0; i < codeBlocks.length; i++) {
+      const code = codeBlocks[i]
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      
+      htmlContent = htmlContent.replace(
+        `__CODE_BLOCK_${i}__`, 
+        `</p><pre><code>${code}</code></pre><p>`
+      );
+    }
+    
+    // Inline code'ları geri koy
+    for (let i = 0; i < inlineCodes.length; i++) {
+      const code = inlineCodes[i]
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      
+      htmlContent = htmlContent.replace(
+        `__INLINE_CODE_${i}__`, 
+        `<code>${code}</code>`
+      );
+    }
+    
+    // Güvenli HTML olarak dönme
+    return this.sanitizer.bypassSecurityTrustHtml(htmlContent);
   }
 }

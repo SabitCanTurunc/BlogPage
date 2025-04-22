@@ -1,8 +1,6 @@
 <div class="post-detail-container">
   <div class="post-detail-background"></div>
 
-  
-
   <div *ngIf="loading" class="loading-spinner">
     <div class="spinner">
       <div class="spinner-inner"></div>
@@ -16,60 +14,78 @@
 
   <div *ngIf="post && !loading" class="post-detail-content">
     <div class="post-header">
-      <div class="post-meta">
-        <div class="post-meta-item date">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"
-            />
-            <path
-              d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"
-            />
-          </svg>
-          {{ post.createdAt | localDate: "mediumDate" }}
-        </div>
-        <div class="post-meta-item category">
-          {{ post.categoryName }}
-        </div>
-      </div>
-
-      <h1 class="post-title">{{ post.title }}</h1>
-
-      <div class="author-action-row">
-        <div
-          class="post-author author-clickable"
-          (click)="navigateToAuthorProfile(post.userEmail)"
-        >
-          <img
-            [src]="author?.profileImageUrl || 'https://ui-avatars.com/api/?name=' + post.userEmail"
-            [alt]="author?.name || post.userEmail"
-            class="author-avatar"
-            (error)="handleImageError($event)"
-          />
-          <span class="author-name">{{ author?.name || post.userEmail }}</span>
-        </div>
+      <div class="post-cover-image">
+        <img 
+          [src]="post.images && post.images.length > 0 ? post.images[0] : 'assets/blogLogo.png'" 
+          [alt]="post.title"
+          class="cover-img"
+        />
+        <div class="cover-overlay"></div>
+        <h1 class="cover-title">{{ post.title }}</h1>
       </div>
     </div>
 
     <div class="post-body">
+      <div class="post-title-section">
+        <div class="post-meta">
+          <div class="post-meta-item date">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"
+              />
+              <path
+                d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"
+              />
+            </svg>
+            {{ post.createdAt | localDate: "mediumDate" }}
+          </div>
+          <div class="post-meta-item category">
+            {{ post.categoryName }}
+          </div>
+        </div>
+      </div>
+
       <button mat-raised-button class="summarize-button floating-button" (click)="openSummaryDialog()">
         <mat-icon>auto_awesome_summary</mat-icon>
         <span>{{ 'summarize_post' | translate }}</span>
       </button>
       
-      <pre class="post-content">{{ post.content }}</pre>
+      <div [innerHTML]="formatHtmlContent(post.content)" class="post-content"></div>
 
-      <div *ngIf="post.images && post.images.length > 0" class="post-images">
+      <div *ngIf="post.images && post.images.length > 1" class="post-images">
         <h3>{{ 'images' | translate }}</h3>
         <div class="image-grid">
-          <div *ngFor="let image of post.images" class="image-item">
+          <div *ngFor="let image of post.images.slice(1)" class="image-item">
             <img [src]="image" [alt]="'post_image' | translate" />
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="post-footer">
+      <div class="post-author-section">
+        <h3 class="author-section-title">{{ 'content_creator' | translate }}</h3>
+        <div class="author-card">
+          <div class="author-info-container">
+            <img
+              [src]="author?.profileImageUrl || 'https://ui-avatars.com/api/?name=' + post.userEmail"
+              [alt]="author?.name || post.userEmail"
+              class="author-avatar-large"
+              (error)="handleImageError($event)"
+            />
+            <div class="author-details">
+              <h4 class="author-name-large">{{ author?.name || post.userEmail }}</h4>
+              <p class="author-email">{{ post.userEmail }}</p>
+              <button class="author-profile-btn" (click)="navigateToAuthorProfile(post.userEmail)">
+                {{ 'view_profile' | translate }}
+              </button>
+            </div>
           </div>
         </div>
       </div>

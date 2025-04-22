@@ -8,6 +8,7 @@ import { catchError } from 'rxjs/operators';
 })
 export class WriterAiService {
   private apiUrl = 'http://localhost:8080/writer-ai';
+  private aiImageUrl = 'http://localhost:8080/ai-image';
 
   constructor(private http: HttpClient) { }
 
@@ -49,6 +50,29 @@ export class WriterAiService {
       catchError(error => {
         console.error('WriteAI API hatası:', error);
         return throwError(() => new Error('İçerik oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.'));
+      })
+    );
+  }
+
+  generateImageWithAI(prompt: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    // Prompt değerini güvenli hale getir
+    const sanitizedPrompt = this.sanitizeInput(prompt);
+
+    // JSON olarak gönderilecek verileri oluştur
+    const requestData = {
+      prompt: sanitizedPrompt
+    };
+
+    return this.http.post(`${this.aiImageUrl}/create`, requestData, {
+      headers: headers
+    }).pipe(
+      catchError(error => {
+        console.error('AI Image oluşturma hatası:', error);
+        return throwError(() => new Error('Görsel oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.'));
       })
     );
   }
