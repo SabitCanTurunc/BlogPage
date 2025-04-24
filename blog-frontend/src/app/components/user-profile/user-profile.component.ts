@@ -7,7 +7,9 @@ import { AuthService } from '../../services/auth.service';
 import { PostService } from '../../services/post.service';
 import { ImageService } from '../../services/image.service';
 import { HighlightService } from '../../services/highlight.service';
+import { SubscriptionService } from '../../services/subscription.service';
 import { PostResponseDto } from '../../models/post-response.dto';
+import { SubscriptionPlan, SubscriptionRequest } from '../../models/subscription-plan.model';
 import { Subscription } from 'rxjs';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LocalDatePipe } from '../../pipes/translate.pipe';
@@ -23,7 +25,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrl: './user-profile.component.css'
 })
 export class UserProfileComponent implements OnInit {
-  activeTab: 'posts' | 'account' | 'changePassword' = 'posts';
+  activeTab: 'posts' | 'account' | 'changePassword' | 'subscription' = 'posts';
   userEmail: string = '';
   isAdmin: boolean = false;
   userPosts: PostResponseDto[] = [];
@@ -33,6 +35,14 @@ export class UserProfileComponent implements OnInit {
   searchQuery: string = '';
   userProfileImage: string | null = null;
   isUploadingImage: boolean = false;
+  
+  // Abonelik bilgileri
+  currentSubscriptionPlan: SubscriptionPlan = SubscriptionPlan.ESSENTIAL;
+  targetPlan: SubscriptionPlan | null = null;
+  pendingRequests: SubscriptionRequest[] = [];
+  isPendingUpgrade: boolean = false;
+  isProcessingRequest: boolean = false;
+  subscriptionRequests: SubscriptionRequest[] = [];
   
   // Hesap güncelleme formu
   accountForm: FormGroup;
@@ -58,6 +68,12 @@ export class UserProfileComponent implements OnInit {
   isHighlighting: boolean = false; // Öne çıkarma işlemi devam ediyor mu?
   highlightingPostId: number | null = null; // Hangi post öne çıkarılıyor?
   
+  SubscriptionPlan = SubscriptionPlan; // Enum'u template'de kullanabilmek için
+  
+  // Abonelik isteklerini yükle
+  isRequestFormOpen: boolean = false;
+  requestMessage: string = '';
+  
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -66,7 +82,8 @@ export class UserProfileComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private translationService: TranslationService,
-    private highlightService: HighlightService // Yeni Highlight servisi
+    private highlightService: HighlightService,
+    private subscriptionService: SubscriptionService
   ) {
     // Hesap formu
     this.accountForm = this.fb.group({
@@ -112,6 +129,9 @@ export class UserProfileComponent implements OnInit {
         this.isOwnProfile = true;
         this.loadUserPosts(this.userEmail);
         this.loadUserProfile();
+        
+        // Kendi profili ise, abonelik isteklerini yükle
+        this.loadSubscriptionRequests();
       }
     });
     
@@ -188,6 +208,26 @@ export class UserProfileComponent implements OnInit {
           }
 
           this.isAdmin = userData.role === 'ADMIN';
+          
+          // Abonelik planını ayarla
+          if (userData.subscriptionPlan) {
+            // Backend plan değerini frontend formatına dönüştür
+            const planStr = String(userData.subscriptionPlan);
+            console.log('Backend\'den gelen plan:', planStr);
+            
+            if (planStr === 'PLUS') {
+              this.currentSubscriptionPlan = SubscriptionPlan.PREMIUM;
+            } else if (planStr === 'MAX') {
+              this.currentSubscriptionPlan = SubscriptionPlan.UNLIMITED;
+            } else if (planStr === 'ESSENTIAL') {
+              this.currentSubscriptionPlan = SubscriptionPlan.ESSENTIAL;
+            } else {
+              console.warn('Bilinmeyen plan tipi:', planStr);
+              this.currentSubscriptionPlan = SubscriptionPlan.ESSENTIAL;
+            }
+            
+            console.log('Ayarlanan frontend plan:', this.currentSubscriptionPlan);
+          }
         }
       },
       error: (err) => {
@@ -954,5 +994,183 @@ export class UserProfileComponent implements OnInit {
     
     // Fonksiyonu çağıralım
     makeDeleteRequest();
+  }
+
+  // Abonelik ile ilgili metotlar
+  loadSubscriptionRequests(): void {
+    this.subscriptionService.getUserRequests().subscribe({
+      next: (requests) => {
+        this.subscriptionRequests = requests;
+        this.isPendingUpgrade = requests.length > 0;
+      },
+      error: (err) => {
+        console.error('Abonelik istekleri yüklenirken hata oluştu:', err);
+      }
+    });
+  }
+
+  // Plan kartı sınıfını belirle (mevcut plan vb.)
+  getSubscriptionPlanClass(plan?: SubscriptionPlan): string {
+    if (!plan) return '';
+    
+    const planClass = 
+      plan === SubscriptionPlan.ESSENTIAL ? 'plan-essential' : 
+      plan === SubscriptionPlan.PREMIUM ? 'plan-premium' : 'plan-unlimited';
+    
+    if (plan === this.currentSubscriptionPlan) {
+      return `${planClass} current`;
+    }
+    
+    return planClass;
+  }
+
+  // Plan adını almak için
+  getSubscriptionPlanLabel(plan?: SubscriptionPlan): string {
+    if (!plan) plan = this.currentSubscriptionPlan;
+    
+    switch (plan) {
+      case SubscriptionPlan.ESSENTIAL:
+        return this.translationService.getTranslation('essential_plan');
+      case SubscriptionPlan.PREMIUM:
+        return this.translationService.getTranslation('premium_plan');
+      case SubscriptionPlan.UNLIMITED:
+        return this.translationService.getTranslation('unlimited_plan');
+      default:
+        return this.translationService.getTranslation('essential_plan');
+    }
+  }
+
+  // Temel plana düşürme
+  downgradeToEssential(): void {
+    this.requestPlanUpgrade(SubscriptionPlan.ESSENTIAL);
+  }
+
+  // Plan yükseltme isteği oluştur
+  requestPlanUpgrade(targetPlan: SubscriptionPlan): void {
+    this.targetPlan = targetPlan;
+    this.requestMessage = '';
+    this.isRequestFormOpen = true;
+  }
+
+  // Yükseltme isteğini onayla
+  confirmUpgrade(): void {
+    if (!this.targetPlan) return;
+    
+    this.isProcessingRequest = true;
+    
+    const request: SubscriptionRequest = {
+      requestedPlan: this.targetPlan,
+      message: this.requestMessage
+    };
+    
+    this.subscriptionService.createSubscriptionRequest(request).subscribe({
+      next: (response) => {
+        this.isProcessingRequest = false;
+        this.isRequestFormOpen = false;
+        
+        // İstek listesini yenile
+        this.loadSubscriptionRequests();
+        
+        // Bildirim göster
+        Swal.fire({
+          title: this.translationService.getTranslation('success'),
+          text: this.translationService.getTranslation('upgrade_request_success'),
+          icon: 'success',
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content'
+          }
+        });
+      },
+      error: (err) => {
+        this.isProcessingRequest = false;
+        
+        const errorMessage = err.error?.customException?.message || 
+                             err.error?.message || 
+                             this.translationService.getTranslation('upgrade_request_error');
+        
+        Swal.fire({
+          title: this.translationService.getTranslation('error'),
+          text: errorMessage,
+          icon: 'error',
+          customClass: {
+            popup: 'modern-swal-popup',
+            title: 'modern-swal-title',
+            htmlContainer: 'modern-swal-content'
+          }
+        });
+      }
+    });
+  }
+
+  // Yükseltme isteğini iptal et
+  cancelUpgrade(): void {
+    this.isRequestFormOpen = false;
+    this.targetPlan = null;
+    this.requestMessage = '';
+  }
+
+  // İstek iptalini onayla
+  cancelRequest(requestId: number): void {
+    if (!requestId) return;
+    
+    Swal.fire({
+      title: this.translationService.getTranslation('confirm_cancel_request'),
+      text: this.translationService.getTranslation('cancel_request_description'),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: this.translationService.getTranslation('yes'),
+      cancelButtonText: this.translationService.getTranslation('no'),
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title',
+        htmlContainer: 'modern-swal-content'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isProcessingRequest = true;
+        
+        this.subscriptionService.cancelRequest(requestId).subscribe({
+          next: () => {
+            this.isProcessingRequest = false;
+            
+            // İstek listesini yenile
+            this.loadSubscriptionRequests();
+            
+            Swal.fire({
+              title: this.translationService.getTranslation('success'),
+              text: this.translationService.getTranslation('cancel_request_success'),
+              icon: 'success',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
+            });
+          },
+          error: (err) => {
+            this.isProcessingRequest = false;
+            
+            const errorMessage = err.error?.customException?.message || 
+                                err.error?.message || 
+                                this.translationService.getTranslation('cancel_request_error');
+            
+            Swal.fire({
+              title: this.translationService.getTranslation('error'),
+              text: errorMessage,
+              icon: 'error',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
+            });
+          }
+        });
+      }
+    });
   }
 } 

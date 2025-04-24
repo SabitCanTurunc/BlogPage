@@ -68,6 +68,12 @@
                    accountForm.get('gender')?.value === 'FEMALE' ? ('female' | translate) : ('other' | translate) }}
               </span>
             </div>
+            <div class="info-item">
+              <span class="info-label">{{ 'subscription_plan' | translate }}:</span>
+              <span class="info-value subscription-badge" [ngClass]="getSubscriptionPlanClass()">
+                {{ getSubscriptionPlanLabel() }}
+              </span>
+            </div>
           </div>
 
           <div class="profile-stats">
@@ -86,6 +92,9 @@
             </button>
             <button class="btn btn-secondary" (click)="activeTab = 'changePassword'">
               {{ 'change_password' | translate }}
+            </button>
+            <button class="btn btn-secondary" (click)="activeTab = 'subscription'">
+              {{ 'subscription_plans' | translate }}
             </button>
             <button class="btn btn-danger" (click)="deleteAccount()">
               {{ 'delete_account' | translate }}
@@ -107,8 +116,8 @@
         <div class="profile-content">
           <!-- Yazılar Sekmesi -->
           <div *ngIf="activeTab === 'posts'" class="posts-tab">
-            <h3 *ngIf="isOwnProfile">{{ 'my_posts' | translate }}</h3>
-            <h3 *ngIf="!isOwnProfile">
+            <h2 *ngIf="isOwnProfile" class="section-title">{{ 'my_posts' | translate }}</h2>
+            <h2 *ngIf="!isOwnProfile" class="section-title">
               <span *ngIf="accountForm.get('name')?.value && accountForm.get('surname')?.value">
                 {{ accountForm.get('name')?.value }} {{ accountForm.get('surname')?.value }}
               </span>
@@ -116,7 +125,7 @@
                 {{ getDisplayedEmail() }}
               </span>
               {{ 'user_posts' | translate }}
-            </h3>
+            </h2>
 
             <div class="search-container">
               <div class="search-box">
@@ -181,7 +190,7 @@
                     [title]="(dailyHighlightCount >= 2) ? ('daily_highlight_limit_reached' | translate) : ('highlight' | translate)">
                     <span *ngIf="!isHighlighting || highlightingPostId !== post.id">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-star" viewBox="0 0 16 16">
-                        <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+                        <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
                       </svg>
                     </span>
                     <span *ngIf="isHighlighting && highlightingPostId === post.id" class="spinner-border spinner-border-sm" role="status"></span>
@@ -204,7 +213,7 @@
 
           <!-- Hesap Ayarları Sekmesi -->
           <div *ngIf="isOwnProfile && activeTab === 'account'" class="account-tab">
-            <h3>{{ 'account_settings' | translate }}</h3>
+            <h2 class="section-title">{{ 'account_settings' | translate }}</h2>
 
             <form
               [formGroup]="accountForm"
@@ -315,7 +324,7 @@
 
           <!-- Şifre Değiştirme Sekmesi -->
           <div *ngIf="isOwnProfile && activeTab === 'changePassword'" class="password-tab">
-            <h3>{{ 'change_password_title' | translate }}</h3>
+            <h2 class="section-title">{{ 'change_password_title' | translate }}</h2>
 
             <!-- Adım 1: Doğrulama Kodu Talep Et -->
             <div *ngIf="passwordChangeStep === 1">
@@ -455,6 +464,175 @@
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+
+          <!-- Abonelik Planları Sekmesi -->
+          <div *ngIf="activeTab === 'subscription'" class="subscription-section">
+            <h2 class="section-title">{{ 'subscription_management' | translate }}</h2>
+
+            <!-- Mevcut Plan (Üstte) -->
+            <div class="current-plan">
+              <h3>{{ 'current_plan' | translate }}</h3>
+              <div class="plan-details">
+                <h4>{{ getSubscriptionPlanLabel(currentSubscriptionPlan) }}</h4>
+                <span class="current-plan-badge">
+                  {{ currentSubscriptionPlan === SubscriptionPlan.ESSENTIAL ? ('free' | translate) : 
+                     currentSubscriptionPlan === SubscriptionPlan.PREMIUM ? ('premium_price' | translate) : 
+                     ('unlimited_price' | translate) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Diğer Planlar (Yan yana) -->
+            <h3 class="other-plans-title">{{ 'other_plans' | translate }}</h3>
+            <div class="plan-cards">
+              <!-- Essential Plan (Eğer mevcut plan değilse) -->
+              <div *ngIf="currentSubscriptionPlan !== SubscriptionPlan.ESSENTIAL" class="plan-card">
+                <div class="plan-header">
+                  <h3>{{ 'essential_plan' | translate }}</h3>
+                  <p class="price">{{ 'free' | translate }}</p>
+                </div>
+                <div class="plan-features">
+                  <ul>
+                    <li>{{ 'essential_feature_1' | translate }}</li>
+                    <li>{{ 'essential_feature_2' | translate }}</li>
+                    <li>{{ 'essential_feature_3' | translate }}</li>
+                  </ul>
+                </div>
+                <div class="plan-actions">
+                  <button 
+                    class="btn-action"
+                    [disabled]="isPendingUpgrade || isProcessingRequest"
+                    (click)="downgradeToEssential()">
+                    {{ 'downgrade_to_essential' | translate }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Premium Plan (Eğer mevcut plan değilse) -->
+              <div *ngIf="currentSubscriptionPlan !== SubscriptionPlan.PREMIUM" class="plan-card">
+                <div class="plan-header">
+                  <h3>{{ 'premium_plan' | translate }}</h3>
+                  <p class="price">{{ 'premium_price' | translate }}</p>
+                </div>
+                <div class="plan-features">
+                  <ul>
+                    <li>{{ 'premium_feature_1' | translate }}</li>
+                    <li>{{ 'premium_feature_2' | translate }}</li>
+                    <li>{{ 'premium_feature_3' | translate }}</li>
+                    <li>{{ 'premium_feature_4' | translate }}</li>
+                  </ul>
+                </div>
+                <div class="plan-actions">
+                  <button 
+                    *ngIf="currentSubscriptionPlan === SubscriptionPlan.ESSENTIAL" 
+                    class="btn-action"
+                    [disabled]="isPendingUpgrade || isProcessingRequest"
+                    (click)="requestPlanUpgrade(SubscriptionPlan.PREMIUM)">
+                    {{ 'upgrade_to_premium' | translate }}
+                  </button>
+                  <button 
+                    *ngIf="currentSubscriptionPlan === SubscriptionPlan.UNLIMITED" 
+                    class="btn-action"
+                    [disabled]="isPendingUpgrade || isProcessingRequest"
+                    (click)="requestPlanUpgrade(SubscriptionPlan.PREMIUM)">
+                    {{ 'downgrade_to_premium' | translate }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Unlimited Plan (Eğer mevcut plan değilse) -->
+              <div *ngIf="currentSubscriptionPlan !== SubscriptionPlan.UNLIMITED" class="plan-card">
+                <div class="plan-header">
+                  <h3>{{ 'unlimited_plan' | translate }}</h3>
+                  <p class="price">{{ 'unlimited_price' | translate }}</p>
+                </div>
+                <div class="plan-features">
+                  <ul>
+                    <li>{{ 'unlimited_feature_1' | translate }}</li>
+                    <li>{{ 'unlimited_feature_2' | translate }}</li>
+                    <li>{{ 'unlimited_feature_3' | translate }}</li>
+                    <li>{{ 'unlimited_feature_4' | translate }}</li>
+                    <li>{{ 'unlimited_feature_5' | translate }}</li>
+                  </ul>
+                </div>
+                <div class="plan-actions">
+                  <button 
+                    class="btn-action"
+                    [disabled]="isPendingUpgrade || isProcessingRequest"
+                    (click)="requestPlanUpgrade(SubscriptionPlan.UNLIMITED)">
+                    {{ 'upgrade_to_unlimited' | translate }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Plan Yükseltme Talebi Modalı -->
+            <div *ngIf="isRequestFormOpen" class="modal">
+              <div class="modal-content">
+                <h3>{{ 'upgrade_plan_title' | translate }}</h3>
+                <p>{{ 'upgrade_plan_description' | translate }}</p>
+                
+                <textarea 
+                  [(ngModel)]="requestMessage" 
+                  rows="4" 
+                  class="form-control" 
+                  [placeholder]="'upgrade_message_placeholder' | translate"
+                ></textarea>
+                
+                <div class="modal-actions">
+                  <button 
+                    class="btn btn-primary" 
+                    (click)="confirmUpgrade()" 
+                    [disabled]="isProcessingRequest">
+                    {{ isProcessingRequest ? ('sending' | translate) : ('send_request' | translate) }}
+                  </button>
+                  <button 
+                    class="btn btn-secondary" 
+                    (click)="cancelUpgrade()">
+                    {{ 'cancel' | translate }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bekleyen İstekler (En altta) -->
+            <div *ngIf="subscriptionRequests && subscriptionRequests.length > 0" class="pending-requests">
+              <h4>{{ 'pending_requests' | translate }}</h4>
+              <div class="requests-list">
+                <div *ngFor="let request of subscriptionRequests" class="request-item">
+                  <div class="request-details">
+                    <div class="request-plan">
+                      <span *ngIf="request.currentPlan === SubscriptionPlan.ESSENTIAL" class="strikethrough">{{ getSubscriptionPlanLabel(request.currentPlan) }}</span>
+                      <span *ngIf="request.currentPlan !== SubscriptionPlan.ESSENTIAL">{{ getSubscriptionPlanLabel(request.currentPlan) }}</span>
+                      <span class="arrow-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                          <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                        </svg>
+                      </span>
+                      {{ getSubscriptionPlanLabel(request.requestedPlan) }}
+                    </div>
+                    <div class="request-date">
+                      <strong>{{ 'request_date' | translate }}:</strong> {{ request.requestDate | localDate }}
+                    </div>
+                    <div *ngIf="request.message" class="request-message">
+                      <strong>{{ 'message' | translate }}:</strong> {{ request.message }}
+                    </div>
+                    <div class="request-status">
+                      <strong>{{ 'status' | translate }}:</strong> {{ 'pending' | translate }}
+                    </div>
+                  </div>
+                  <div class="request-actions">
+                    <button 
+                      class="btn btn-danger btn-sm" 
+                      (click)="cancelRequest(request.id!)"
+                      [disabled]="isProcessingRequest">
+                      {{ 'cancel_request' | translate }}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

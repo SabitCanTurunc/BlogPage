@@ -12,4 +12,5 @@ export interface UserResponseDto {
   createdAt: string;
   updatedAt: string;
   profileImageUrl?: string;
+  subscriptionPlan?: 'ESSENTIAL' | 'PREMIUM' | 'UNLIMITED';
 } 
