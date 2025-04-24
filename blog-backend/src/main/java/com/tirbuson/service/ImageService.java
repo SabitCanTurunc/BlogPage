@@ -1,7 +1,6 @@
 package com.tirbuson.service;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.Url;
 import com.cloudinary.utils.ObjectUtils;
 import com.tirbuson.dto.response.ImageResponseDto;
 import com.tirbuson.model.Image;
@@ -16,9 +15,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
 import java.util.UUID;
 
@@ -57,14 +53,12 @@ public class ImageService extends BaseService<Image,Integer, ImageRepository> {
     }
 
     public ImageResponseDto uploadAiImage(String imageUrl) throws IOException {
-        // Benzersiz bir dosya adı oluştur
         String fileName = UUID.randomUUID().toString() + ".jpg";
         File tempFile = File.createTempFile("ai_image_", ".jpg");
         
         try {
             System.out.println("AI Image URL: " + imageUrl);
             
-            // URL'den resmi indir
             try {
                 URL url = new URL(imageUrl);
                 try (BufferedInputStream in = new BufferedInputStream(url.openStream());
@@ -82,12 +76,10 @@ public class ImageService extends BaseService<Image,Integer, ImageRepository> {
                 throw new IOException("AI görselini indirirken hata oluştu: " + e.getMessage());
             }
             
-            // Dosyanın gerçekten var olduğunu ve boyutunu kontrol et
             if (!tempFile.exists() || tempFile.length() == 0) {
                 throw new IOException("İndirilen dosya bulunamadı veya boş");
             }
             
-            // Cloudinary'ye yükle
             try {
                 Map uploadResult = cloudinary.uploader().upload(tempFile,
                         ObjectUtils.asMap(
@@ -98,7 +90,6 @@ public class ImageService extends BaseService<Image,Integer, ImageRepository> {
                 String cloudinaryUrl = (String) uploadResult.get("secure_url");
                 System.out.println("Cloudinary URL: " + cloudinaryUrl);
                 
-                // Veritabanına kaydet
                 Image image = new Image();
                 image.setUrl(cloudinaryUrl);
                 
@@ -115,7 +106,6 @@ public class ImageService extends BaseService<Image,Integer, ImageRepository> {
                 throw new IOException("Cloudinary'ye yüklerken hata oluştu: " + e.getMessage());
             }
         } finally {
-            // Geçici dosyayı temizle
             if (tempFile.exists()) {
                 tempFile.delete();
             }

@@ -178,7 +178,9 @@
   color: var(--text-primary);
   background: var(--gradient-secondary-transparent);
   border: 1.5px solid var(--secondary);
-  box-shadow: 0 0 10px var(--secondary-transparent);
+  /* box-shadow: 0 0 10px var(--secondary-transparent); */
+  box-shadow: 0 0 15px var(--primary-transparent);
+
   position: relative;
   z-index: 1;
   overflow: hidden;

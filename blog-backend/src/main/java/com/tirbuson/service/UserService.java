@@ -76,6 +76,17 @@ public class UserService extends BaseService<User, Integer, UserRepository> {
         
         // Yeni bilgileri güncelle
         if (payload.getUsername() != null) {
+            // Kullanıcı adı değiştiriliyorsa benzersizlik kontrolü yap
+            if (!existingUser.getUsername().equals(payload.getUsername())) {
+                // Yeni kullanıcı adı başka bir kullanıcı tarafından kullanılıyor mu kontrol et
+                userRepository.findByUsername(payload.getUsername())
+                    .ifPresent(user -> {
+                        // Başka bir kullanıcı bu kullanıcı adını zaten kullanıyorsa hata fırlat
+                        if (!user.getId().equals(existingUser.getId())) {
+                            throw new BaseException(new ErrorMessage(MessageType.USERNAME_ALREADY_EXISTS, payload.getUsername()));
+                        }
+                    });
+            }
             existingUser.setUsername(payload.getUsername());
         }
         
@@ -99,14 +110,25 @@ public class UserService extends BaseService<User, Integer, UserRepository> {
             existingUser.setDescription(payload.getDescription());
         }
         
-        // Güncelle
-        super.update(existingUser);
-        
-        return Map.of(
-            "message", "Profil başarıyla güncellendi", 
-            "success", true,
-            "user", userMapper.convertToDto(existingUser)
-        );
+        try {
+            // Güncelle
+            super.update(existingUser);
+            
+            return Map.of(
+                "message", "Profil başarıyla güncellendi", 
+                "success", true,
+                "user", userMapper.convertToDto(existingUser)
+            );
+        } catch (Exception e) {
+            // Veritabanı kısıtı hatası - muhtemelen unique key ihlali
+            if (e.getCause() != null && e.getCause().getCause() != null && 
+                e.getCause().getCause().getMessage() != null && 
+                e.getCause().getCause().getMessage().contains("user_username_key")) {
+                throw new BaseException(new ErrorMessage(MessageType.USERNAME_ALREADY_EXISTS, payload.getUsername()));
+            }
+            // Diğer hatalar için genel bir hata fırlat
+            throw new BaseException(new ErrorMessage(MessageType.PROCESS_FAILED, e.getMessage()));
+        }
     }
     
     @Transactional

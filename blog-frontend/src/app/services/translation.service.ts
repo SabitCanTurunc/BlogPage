@@ -91,6 +91,7 @@ export class TranslationService {
       'no_account': 'Hesabınız yok mu?',
       'admin_panel': 'Admin Paneli',
       'admin_user_management': 'Kullanıcı Yönetimi',
+      'admin_category':'Kategori',
       'admin_category_management': 'Kategori Yönetimi',
       'admin_post_management': 'Post Yönetimi',
       'admin_access_denied': 'Bu sayfaya erişim yetkiniz bulunmamaktadır.',
@@ -388,6 +389,8 @@ export class TranslationService {
       'no_account': 'Don\'t have an account?',
       'admin_panel': 'Admin Panel',
       'admin_user_management': 'User Management',
+      'admin_category':'Category',
+
       'admin_category_management': 'Category Management',
       'admin_post_management': 'Post Management',
       'admin_access_denied': 'You do not have permission to access this page.',

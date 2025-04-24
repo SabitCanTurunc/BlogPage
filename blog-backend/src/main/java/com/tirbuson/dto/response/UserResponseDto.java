@@ -4,6 +4,7 @@ import com.tirbuson.dto.BaseDto;
 import com.tirbuson.model.Post;
 import com.tirbuson.model.enums.Gender;
 import com.tirbuson.model.enums.Role;
+import com.tirbuson.model.enums.SubscriptionPlan;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,4 +24,5 @@ public class UserResponseDto extends BaseDto {
     private Role role;
     private boolean enabled;
     private String profileImageUrl;
+    private SubscriptionPlan subscriptionPlan;
 }

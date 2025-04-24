@@ -46,6 +46,7 @@ public class UserMapper implements BaseMapper<User, UserResponseDto, UserRequest
         dto.setPhoneNumber(entity.getPhoneNumber());
         dto.setGender(entity.getGender());
         dto.setDescription(entity.getDescription());
+        dto.setSubscriptionPlan(entity.getSubscriptionPlan());
         
         if (entity.getProfileImage() != null) {
             dto.setProfileImageUrl(entity.getProfileImage().getUrl());

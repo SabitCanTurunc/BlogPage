@@ -3,6 +3,7 @@ package com.tirbuson.dto.request;
 import com.tirbuson.dto.BaseDto;
 import com.tirbuson.model.enums.Gender;
 import com.tirbuson.model.enums.Role;
+import com.tirbuson.model.enums.SubscriptionPlan;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -37,5 +38,6 @@ public class UserRequestDto extends BaseDto {
 
     private Role role;
     private String profileImageUrl;
+    private SubscriptionPlan subscriptionPlan;
 
 }

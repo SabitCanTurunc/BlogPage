@@ -23,7 +23,9 @@ public class SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfiguration(AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfiguration(AuthenticationProvider authenticationProvider, 
+                                JwtAuthenticationFilter jwtAuthenticationFilter)
+                                {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
@@ -41,6 +43,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/user/profile").authenticated()
                         .requestMatchers("/user/profile/{email}").permitAll()
                         .requestMatchers("/user/delete-profile-image").authenticated()
+                        .requestMatchers("/user/update-subscription-plan").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/post/**", "/category/**", "/comment/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/post/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/post/**").hasAnyRole("USER", "ADMIN")

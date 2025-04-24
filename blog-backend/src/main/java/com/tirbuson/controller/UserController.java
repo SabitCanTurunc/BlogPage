@@ -2,8 +2,11 @@ package com.tirbuson.controller;
 
 import com.tirbuson.dto.request.UserRequestDto;
 import com.tirbuson.dto.response.UserResponseDto;
+import com.tirbuson.exception.BaseException;
+import com.tirbuson.exception.MessageType;
 import com.tirbuson.mapper.UserMapper;
 import com.tirbuson.model.User;
+import com.tirbuson.model.enums.SubscriptionPlan;
 import com.tirbuson.repository.UserRepository;
 import com.tirbuson.service.UserService;
 import com.tirbuson.service.ImageService;
@@ -36,15 +39,12 @@ public class UserController extends BaseController<UserService,User,Integer, Use
     @PostMapping("/upload-profile-image")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserResponseDto> uploadProfileImage(@RequestParam("file") MultipartFile file) throws IOException {
-        // Kullanıcıyı bul
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         User user = userService.findByEmail(email);
 
-        // Resmi yükle
         var imageResponse = imageService.uploadImage(file);
         
-        // Kullanıcının profil resmini güncelle
         user.setProfileImage(imageService.findById(imageResponse.getId()));
         User updatedUser = userService.update(user);
 
@@ -63,13 +63,35 @@ public class UserController extends BaseController<UserService,User,Integer, Use
         String currentPassword = passwordData.get("currentPassword");
         String newPassword = passwordData.get("newPassword");
         
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+        
+        if (!"anonymousUser".equals(authentication.getPrincipal())) {
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+            
+            if (!isAdmin && !currentUserEmail.equals(email)) {
+                throw new BaseException(MessageType.UNAUTHORIZED_ACCESS, "Başka bir kullanıcının şifresini değiştirme yetkiniz yok");
+            }
+        }
+        
         Map<String, Object> result = userService.updatePassword(email, currentPassword, newPassword);
         return ResponseEntity.ok(result);
     }
     
     @PostMapping("/update-profile")
     public ResponseEntity<Map<String, Object>> updateProfile(@RequestBody UserRequestDto userRequestDto) {
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = authentication.getName();
+        
+        if (!"anonymousUser".equals(authentication.getPrincipal())) {
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+            
+            if (!isAdmin && !currentUserEmail.equals(userRequestDto.getEmail())) {
+                throw new BaseException(MessageType.UNAUTHORIZED_ACCESS, "Başka bir kullanıcının profilini değiştirme yetkiniz yok");
+            }
+        }
         
         Map<String, Object> result = userService.updateProfile(userRequestDto);
         return ResponseEntity.ok(result);
@@ -97,7 +119,6 @@ public class UserController extends BaseController<UserService,User,Integer, Use
 
     @GetMapping("/profile")
     public ResponseEntity<UserResponseDto> getUserProfile() {
-        // SecurityContextHolder'dan mevcut kimliği doğrulanmış kullanıcıyı al
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         
@@ -132,5 +153,59 @@ public class UserController extends BaseController<UserService,User,Integer, Use
         }
         
         return ResponseEntity.ok(Map.of("message", "Profil fotoğrafı bulunamadı", "success", false));
+    }
+
+    @PostMapping("/update-subscription-plan")
+    // @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, Object>> updateSubscriptionPlan(@RequestBody Map<String, String> requestData) {
+        String email = requestData.get("email");
+        String subscriptionPlan = requestData.get("subscriptionPlan");
+        
+        if (email == null || subscriptionPlan == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "message", "Email ve subscription plan zorunludur",
+                "success", false
+            ));
+        }
+        
+        try {
+            // Mevcut kullanıcının bilgilerini al
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String currentUserEmail = authentication.getName();
+            User currentUser = userService.findByEmail(currentUserEmail);
+            
+            // Yetki kontrolü - mevcut kullanıcı kendi planını değiştirebilir veya admin başkalarının planını değiştirebilir
+            if (!currentUserEmail.equals(email) && !currentUser.getRole().name().equals("ADMIN")) {
+                return ResponseEntity.status(403).body(Map.of(
+                    "message", "Başka bir kullanıcının abonelik planını değiştirme yetkiniz yok",
+                    "success", false
+                ));
+            }
+            
+            // Kullanıcıyı bul
+            User user = userService.findByEmail(email);
+            
+            // Subscription planı güncelle
+            user.setSubscriptionPlan(SubscriptionPlan.valueOf(subscriptionPlan.toUpperCase()));
+            
+            // Kaydet
+            User updatedUser = userService.update(user);
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Abonelik planı başarıyla güncellendi",
+                "success", true,
+                "user", userMapper.convertToDto(updatedUser)
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "message", "Geçersiz subscription plan değeri. Geçerli değerler: ESSENTIAL, PLUS, MAX",
+                "success", false
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                "message", "Abonelik planı güncellenirken bir hata oluştu: " + e.getMessage(),
+                "success", false
+            ));
+        }
     }
 }
