@@ -481,6 +481,34 @@
                      currentSubscriptionPlan === SubscriptionPlan.PREMIUM ? ('premium_price' | translate) : 
                      ('unlimited_price' | translate) }}
                 </span>
+                
+                <!-- Mevcut Plan Özellikleri -->
+                <div class="plan-features mt-3">
+                  <ul *ngIf="currentSubscriptionPlan === SubscriptionPlan.ESSENTIAL">
+                    <li>{{ 'essential_feature_1' | translate }}</li>
+                    <li>{{ 'essential_feature_2' | translate }}</li>
+                    <li>{{ 'essential_feature_3' | translate }}</li>
+                    <li>{{ 'essential_feature_4' | translate }}</li>
+                  </ul>
+                  <ul *ngIf="currentSubscriptionPlan === SubscriptionPlan.PREMIUM">
+                    <li>{{ 'premium_feature_1' | translate }}</li>
+                    <li>{{ 'premium_feature_2' | translate }}</li>
+                    <li>{{ 'premium_feature_3' | translate }}</li>
+                    <li>{{ 'premium_feature_4' | translate }}</li>
+                    <li>{{ 'premium_feature_6' | translate }}</li>
+                    <li>{{ 'premium_feature_7' | translate }}</li>
+                  </ul>
+                  <ul *ngIf="currentSubscriptionPlan === SubscriptionPlan.UNLIMITED">
+                    <li>{{ 'unlimited_feature_1' | translate }}</li>
+                    <li>{{ 'unlimited_feature_2' | translate }}</li>
+                    <li>{{ 'unlimited_feature_3' | translate }}</li>
+                    <li>{{ 'unlimited_feature_4' | translate }}</li>
+                    <li>{{ 'unlimited_feature_5' | translate }}</li>
+                    <li>{{ 'unlimited_feature_6' | translate }}</li>
+                    <li>{{ 'unlimited_feature_7' | translate }}</li>
+                    <li>{{ 'unlimited_feature_8' | translate }}</li>
+                  </ul>
+                </div>
               </div>
             </div>
 
@@ -498,6 +526,7 @@
                     <li>{{ 'essential_feature_1' | translate }}</li>
                     <li>{{ 'essential_feature_2' | translate }}</li>
                     <li>{{ 'essential_feature_3' | translate }}</li>
+                    <li>{{ 'essential_feature_4' | translate }}</li>
                   </ul>
                 </div>
                 <div class="plan-actions">
@@ -522,6 +551,8 @@
                     <li>{{ 'premium_feature_2' | translate }}</li>
                     <li>{{ 'premium_feature_3' | translate }}</li>
                     <li>{{ 'premium_feature_4' | translate }}</li>
+                    <li>{{ 'premium_feature_6' | translate }}</li>
+                    <li>{{ 'premium_feature_7' | translate }}</li>
                   </ul>
                 </div>
                 <div class="plan-actions">
@@ -555,6 +586,9 @@
                     <li>{{ 'unlimited_feature_3' | translate }}</li>
                     <li>{{ 'unlimited_feature_4' | translate }}</li>
                     <li>{{ 'unlimited_feature_5' | translate }}</li>
+                    <li>{{ 'unlimited_feature_6' | translate }}</li>
+                    <li>{{ 'unlimited_feature_7' | translate }}</li>
+                    <li>{{ 'unlimited_feature_8' | translate }}</li>
                   </ul>
                 </div>
                 <div class="plan-actions">
