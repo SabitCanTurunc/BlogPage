@@ -947,7 +947,7 @@ export class UserProfileComponent implements OnInit {
             }
           });
         },
-        error: (err) => {
+        error: (err: any) => {
           Swal.fire({
             title: this.translationService.getTranslation('error'),
             text: err.message || this.translationService.getTranslation('highlight_remove_error') || 'Öne çıkarma kaldırılırken bir hata oluştu',
@@ -1000,8 +1000,12 @@ export class UserProfileComponent implements OnInit {
   loadSubscriptionRequests(): void {
     this.subscriptionService.getUserRequests().subscribe({
       next: (requests) => {
-        this.subscriptionRequests = requests;
-        this.isPendingUpgrade = requests.length > 0;
+        // PENDING ve REJECTED durumundaki istekleri filtrele
+        this.subscriptionRequests = requests.filter(request => 
+          request.status === 'PENDING' || request.status === 'REJECTED'
+        );
+        // Sadece bekleyen istekler için isPendingUpgrade değerini ayarla
+        this.isPendingUpgrade = requests.filter(request => request.status === 'PENDING').length > 0;
       },
       error: (err) => {
         console.error('Abonelik istekleri yüklenirken hata oluştu:', err);
@@ -1157,6 +1161,69 @@ export class UserProfileComponent implements OnInit {
             const errorMessage = err.error?.customException?.message || 
                                 err.error?.message || 
                                 this.translationService.getTranslation('cancel_request_error');
+            
+            Swal.fire({
+              title: this.translationService.getTranslation('error'),
+              text: errorMessage,
+              icon: 'error',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // Reddedilen isteği sil
+  deleteRequest(requestId: number): void {
+    if (!requestId) return;
+    
+    Swal.fire({
+      title: this.translationService.getTranslation('confirm_delete'),
+      text: this.translationService.getTranslation('confirm_delete'),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: this.translationService.getTranslation('yes'),
+      cancelButtonText: this.translationService.getTranslation('no'),
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title',
+        htmlContainer: 'modern-swal-content'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isProcessingRequest = true;
+        
+        this.subscriptionService.deleteRequest(requestId).subscribe({
+          next: () => {
+            this.isProcessingRequest = false;
+            
+            // İstek listesini yenile
+            this.loadSubscriptionRequests();
+            
+            Swal.fire({
+              title: this.translationService.getTranslation('success'),
+              text: this.translationService.getTranslation('delete_success'),
+              icon: 'success',
+              customClass: {
+                popup: 'modern-swal-popup',
+                title: 'modern-swal-title',
+                htmlContainer: 'modern-swal-content'
+              }
+            });
+          },
+          error: (err: any) => {
+            this.isProcessingRequest = false;
+            
+            const errorMessage = err.error?.customException?.message || 
+                                err.error?.message || 
+                                'İstek silinirken bir hata oluştu';
             
             Swal.fire({
               title: this.translationService.getTranslation('error'),

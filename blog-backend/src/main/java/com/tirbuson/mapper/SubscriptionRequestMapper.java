@@ -17,6 +17,7 @@ public class SubscriptionRequestMapper {
         entity.setCurrentPlan(user.getSubscriptionPlan());
         entity.setRequestedPlan(dto.getRequestedPlan());
         entity.setRequestDate(LocalDateTime.now());
+        entity.setMessage(dto.getMessage());
         return entity;
     }
     
@@ -32,6 +33,7 @@ public class SubscriptionRequestMapper {
         dto.setProcessDate(entity.getProcessDate());
         dto.setAdminNote(entity.getAdminNote());
         dto.setStatus(entity.getStatus());
+        dto.setMessage(entity.getMessage());
         return dto;
     }
 } 

@@ -159,4 +159,11 @@ export class SubscriptionService {
       catchError(this.handleError)
     );
   }
+
+  // Reddedilen abonelik isteğini sil
+  deleteRequest(requestId: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${requestId}`).pipe(
+      catchError(this.handleError)
+    );
+  }
 } 

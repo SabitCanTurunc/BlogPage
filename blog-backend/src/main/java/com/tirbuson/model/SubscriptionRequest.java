@@ -39,6 +39,9 @@ public class SubscriptionRequest extends BaseEntity {
     @Column
     private String adminNote;
 
+    @Column
+    private String message;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RequestStatus status = RequestStatus.PENDING;

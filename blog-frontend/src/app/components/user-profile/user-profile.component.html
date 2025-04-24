@@ -599,7 +599,7 @@
 
             <!-- Bekleyen İstekler (En altta) -->
             <div *ngIf="subscriptionRequests && subscriptionRequests.length > 0" class="pending-requests">
-              <h4>{{ 'pending_requests' | translate }}</h4>
+              <h4>{{ 'subscription_requests' | translate }}</h4>
               <div class="requests-list">
                 <div *ngFor="let request of subscriptionRequests" class="request-item">
                   <div class="request-details">
@@ -619,16 +619,29 @@
                     <div *ngIf="request.message" class="request-message">
                       <strong>{{ 'message' | translate }}:</strong> {{ request.message }}
                     </div>
+                    <div *ngIf="request.adminNote" class="request-admin-note">
+                      <strong>{{ 'admin_note' | translate }}:</strong> {{ request.adminNote }}
+                    </div>
                     <div class="request-status">
-                      <strong>{{ 'status' | translate }}:</strong> {{ 'pending' | translate }}
+                      <strong>{{ 'status' | translate }}:</strong> 
+                      <span *ngIf="request.status === 'PENDING'" class="status-pending">{{ 'pending' | translate }}</span>
+                      <span *ngIf="request.status === 'REJECTED'" class="status-rejected">{{ 'rejected' | translate }}</span>
                     </div>
                   </div>
                   <div class="request-actions">
                     <button 
+                      *ngIf="request.status === 'PENDING'"
                       class="btn btn-danger btn-sm" 
                       (click)="cancelRequest(request.id!)"
                       [disabled]="isProcessingRequest">
                       {{ 'cancel_request' | translate }}
+                    </button>
+                    <button 
+                      *ngIf="request.status === 'REJECTED'"
+                      class="btn btn-outline-danger btn-sm" 
+                      (click)="deleteRequest(request.id!)"
+                      [disabled]="isProcessingRequest">
+                      {{ 'delete' | translate }}
                     </button>
                   </div>
                 </div>

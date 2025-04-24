@@ -16,6 +16,10 @@ import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LocalDatePipe } from '../../pipes/translate.pipe';
+import { UserService } from '../../services/user.service';
+import { TranslationService } from '../../services/translation.service';
+import { SubscriptionService } from '../../services/subscription.service';
+import { SubscriptionPlan, SubscriptionRequest } from '../../models/subscription-plan.model';
 
 @Component({
   selector: 'app-admin',
@@ -34,13 +38,16 @@ export class AdminComponent implements OnInit {
   isAdmin: boolean = false;
   currentUserId: number | null = null;
   newCategoryName: string = '';
-  selectedSection: string = 'users';
+  selectedSection: 'users' | 'categories' | 'posts' | 'subscriptions' = 'users';
   userChanges: Map<number, string> = new Map();
   categoryChanges: Map<number, string> = new Map();
   userEnabledChanges: Map<number, boolean> = new Map();
   userSearchQuery: string = '';
   categorySearchQuery: string = '';
   postSearchQuery: string = '';
+  subscriptionTab: 'pending' | 'all' = 'pending';
+  pendingSubscriptionRequests: SubscriptionRequest[] = [];
+  allSubscriptionRequests: SubscriptionRequest[] = [];
 
   constructor(
     private adminService: AdminService,
@@ -48,7 +55,10 @@ export class AdminComponent implements OnInit {
     private postService: PostService,
     private authService: AuthService,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private userService: UserService,
+    private translationService: TranslationService,
+    private subscriptionService: SubscriptionService
   ) {}
 
   ngOnInit() {
@@ -66,6 +76,8 @@ export class AdminComponent implements OnInit {
     this.loadUsers();
     this.loadCategories();
     this.loadPosts();
+    this.loadPendingSubscriptionRequests();
+    this.loadAllSubscriptionRequests();
   }
 
   loadUsers() {
@@ -330,7 +342,7 @@ export class AdminComponent implements OnInit {
   }
 
   selectSection(section: string) {
-    this.selectedSection = section;
+    this.selectedSection = section as 'users' | 'categories' | 'posts' | 'subscriptions';
   }
 
   saveAllUserChanges() {
@@ -504,5 +516,154 @@ export class AdminComponent implements OnInit {
       post.userEmail.toLowerCase().includes(query) ||
       post.categoryName.toLowerCase().includes(query)
     );
+  }
+
+  // Subscription Management
+  setSubscriptionTab(tab: 'pending' | 'all'): void {
+    this.subscriptionTab = tab;
+  }
+
+  loadPendingSubscriptionRequests(): void {
+    this.subscriptionService.getAllPendingRequests().subscribe({
+      next: (requests) => {
+        this.pendingSubscriptionRequests = requests;
+      },
+      error: (err) => {
+        console.error('Bekleyen abonelik istekleri yüklenemedi:', err);
+        this.showError('admin_load_requests_error');
+      }
+    });
+  }
+
+  loadAllSubscriptionRequests(): void {
+    this.subscriptionService.getAllRequests().subscribe({
+      next: (requests) => {
+        this.allSubscriptionRequests = requests;
+      },
+      error: (err) => {
+        console.error('Tüm abonelik istekleri yüklenemedi:', err);
+        this.showError('admin_load_requests_error');
+      }
+    });
+  }
+
+  approveRequest(requestId: number): void {
+    if (!requestId) return;
+    
+    const request = this.pendingSubscriptionRequests.find(r => r.id === requestId);
+    if (!request) return;
+    
+    this.subscriptionService.processRequest(requestId, true, request.adminNote || '').subscribe({
+      next: (response) => {
+        this.showSuccess('admin_request_approved');
+        this.loadPendingSubscriptionRequests();
+        this.loadAllSubscriptionRequests();
+      },
+      error: (err) => {
+        console.error('Abonelik isteği onaylanamadı:', err);
+        this.showError('admin_approve_request_error');
+      }
+    });
+  }
+
+  rejectRequest(requestId: number): void {
+    if (!requestId) return;
+    
+    const request = this.pendingSubscriptionRequests.find(r => r.id === requestId);
+    if (!request) return;
+    
+    this.subscriptionService.processRequest(requestId, false, request.adminNote || '').subscribe({
+      next: (response) => {
+        this.showSuccess('admin_request_rejected');
+        this.loadPendingSubscriptionRequests();
+        this.loadAllSubscriptionRequests();
+      },
+      error: (err) => {
+        console.error('Abonelik isteği reddedilemedi:', err);
+        this.showError('admin_reject_request_error');
+      }
+    });
+  }
+
+  // Mesaj detayını göstermek için dialog
+  showMessageDialog(message: string): void {
+    console.log('showMessageDialog çağrıldı, mesaj:', message);
+    Swal.fire({
+      title: this.translationService.getTranslation('admin_message'),
+      html: `<div class="message-dialog-content">${message}</div>`,
+      confirmButtonText: this.translationService.getTranslation('close'),
+      customClass: {
+        popup: 'modern-swal-popup',
+        title: 'modern-swal-title',
+        htmlContainer: 'modern-swal-content message-dialog'
+      }
+    });
+  }
+
+  getPlanClass(plan: SubscriptionPlan | undefined): string {
+    if (!plan) return '';
+    
+    switch(plan) {
+      case SubscriptionPlan.ESSENTIAL:
+        return 'plan-essential';
+      case SubscriptionPlan.PREMIUM:
+        return 'plan-premium';
+      case SubscriptionPlan.UNLIMITED:
+        return 'plan-unlimited';
+      default:
+        return '';
+    }
+  }
+
+  getPlanDisplayName(plan: SubscriptionPlan | undefined): string {
+    if (!plan) return '';
+    
+    const translations = {
+      [SubscriptionPlan.ESSENTIAL]: this.translationService.getTranslation('essential_plan'),
+      [SubscriptionPlan.PREMIUM]: this.translationService.getTranslation('premium_plan'),
+      [SubscriptionPlan.UNLIMITED]: this.translationService.getTranslation('unlimited_plan')
+    };
+    
+    return translations[plan] || String(plan);
+  }
+
+  getStatusClass(status: string | undefined): string {
+    if (!status) return '';
+    
+    switch(status) {
+      case 'PENDING':
+        return 'status-pending';
+      case 'APPROVED':
+        return 'status-approved';
+      case 'REJECTED':
+        return 'status-rejected';
+      default:
+        return '';
+    }
+  }
+
+  getStatusDisplayName(status: string | undefined): string {
+    if (!status) return '';
+    
+    if (status === 'PENDING') {
+      return this.translationService.getTranslation('pending');
+    } else if (status === 'APPROVED') {
+      return this.translationService.getTranslation('approved');
+    } else if (status === 'REJECTED') {
+      return this.translationService.getTranslation('rejected');
+    }
+    
+    return status;
+  }
+
+  // Toast notification helpers
+  showSuccess(messageKey: string): void {
+    const message = this.translationService.getTranslation(messageKey);
+    this.toastr.success(message);
+  }
+
+  showError(messageKey: string): void {
+    const message = this.translationService.getTranslation(messageKey);
+    this.toastr.error(message);
   }
 } 

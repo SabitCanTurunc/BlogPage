@@ -1459,10 +1459,19 @@ label {
 }
 
 .request-message {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin-top: 0.25rem;
-  word-break: break-word;
+  margin-bottom: 5px;
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+.request-admin-note {
+  margin-bottom: 5px;
+  font-size: 0.9em;
+  font-style: italic;
+  color: #b71c1c;
+  background-color: rgba(255, 235, 238, 0.5);
+  padding: 5px 8px;
+  border-radius: 4px;
 }
 
 .section-title {
@@ -1518,4 +1527,19 @@ label {
   100% {
     transform: scale(1.2);
   }
+}
+
+.status-pending {
+  color: var(--warning-color);
+  font-weight: 600;
+}
+
+.status-rejected {
+  color: var(--danger-color);
+  font-weight: 600;
+}
+
+.status-approved {
+  color: var(--success-color);
+  font-weight: 600;
 }

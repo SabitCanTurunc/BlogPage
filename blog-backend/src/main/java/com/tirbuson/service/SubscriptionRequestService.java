@@ -133,4 +133,29 @@ public class SubscriptionRequestService {
             "success", true
         );
     }
+    
+    @Transactional
+    public Map<String, Object> deleteRejectedRequest(Integer requestId, String userEmail) {
+        User user = userService.findByEmail(userEmail);
+        SubscriptionRequest request = subscriptionRequestRepository.findById(requestId)
+                .orElseThrow(() -> new BaseException(new ErrorMessage(MessageType.NO_RECORD_EXIST, requestId.toString())));
+        
+        // Kullanıcı kendi talebini siliyor mu kontrol et
+        if (!request.getUser().getId().equals(user.getId())) {
+            throw new BaseException(new ErrorMessage(MessageType.UNAUTHORIZED_ACCESS, "Bu isteği silme yetkiniz yok"));
+        }
+        
+        // Talep durumu kontrol et - sadece reddedilmiş talepler silinebilir
+        if (request.getStatus() != RequestStatus.REJECTED) {
+            throw new BaseException(new ErrorMessage(MessageType.INVALID_REQUEST, "Sadece reddedilmiş talepler silinebilir"));
+        }
+        
+        // Talebi sil
+        subscriptionRequestRepository.delete(request);
+        
+        return Map.of(
+            "message", "Reddedilen abonelik talebi başarıyla silindi",
+            "success", true
+        );
+    }
 } 

@@ -1,7 +1,7 @@
 <div class="admin-container">
   <div class="admin-sidebar">
     <div class="sidebar-header">
-      <h3>{{ 'admin_panel' | translate }}</h3>
+      <h2 class="section-title">{{ 'admin_panel' | translate }}</h2>
     </div>
     <nav class="sidebar-nav">
       <button 
@@ -34,6 +34,16 @@
         </svg>
         {{ 'admin_post_management' | translate }}
       </button>
+      <button 
+        (click)="selectSection('subscriptions')" 
+        [class.active]="selectedSection === 'subscriptions'"
+        class="nav-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M5.5 2A3.5 3.5 0 0 0 2 5.5v5A3.5 3.5 0 0 0 5.5 14h5a3.5 3.5 0 0 0 3.5-3.5V8a.5.5 0 0 1 1 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-5A4.5 4.5 0 0 1 1 10.5v-5A4.5 4.5 0 0 1 5.5 1H8a.5.5 0 0 1 0 1H5.5z"/>
+          <path d="M16 3a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+        </svg>
+        {{ 'admin_subscription_management' | translate }}
+      </button>
     </nav>
   </div>
 
@@ -46,7 +56,7 @@
       <!-- Kullanıcı Yönetimi -->
       <div *ngIf="selectedSection === 'users'" class="admin-section">
         <div class="section-header">
-          <h3>{{ 'admin_user_management' | translate }}</h3>
+          <h2 class="section-title">{{ 'admin_user_management' | translate }}</h2>
           <div class="search-container">
             <input type="text" 
                    [(ngModel)]="userSearchQuery" 
@@ -123,7 +133,7 @@
       <!-- Kategori Yönetimi -->
       <div *ngIf="selectedSection === 'categories'" class="admin-section">
         <div class="section-header">
-          <h3>{{ 'admin_category_management' | translate }}</h3>
+          <h2 class="section-title">{{ 'admin_category_management' | translate }}</h2>
           <div class="search-container">
             <input type="text" 
                    [(ngModel)]="categorySearchQuery" 
@@ -186,7 +196,7 @@
       <!-- Post Yönetimi -->
       <div *ngIf="selectedSection === 'posts'" class="admin-section">
         <div class="section-header">
-          <h3>{{ 'admin_post_management' | translate }}</h3>
+          <h2 class="section-title">{{ 'admin_post_management' | translate }}</h2>
           <div class="search-container">
             <input type="text" 
                    [(ngModel)]="postSearchQuery" 
@@ -237,6 +247,152 @@
                         <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11v1z"/>
                       </svg>
                     </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Abonelik İstekleri Yönetimi -->
+      <div *ngIf="selectedSection === 'subscriptions'" class="admin-section">
+        <div class="section-header">
+          <h2 class="section-title">{{ 'admin_subscription_management' | translate }}</h2>
+        </div>
+        
+        <div class="tabs">
+          <button 
+            (click)="setSubscriptionTab('pending')" 
+            [class.active]="subscriptionTab === 'pending'"
+            class="tab-button">
+            {{ 'admin_pending_requests' | translate }}
+          </button>
+          <button 
+            (click)="setSubscriptionTab('all')" 
+            [class.active]="subscriptionTab === 'all'"
+            class="tab-button">
+            {{ 'admin_all_requests' | translate }}
+          </button>
+        </div>
+        
+        <div *ngIf="subscriptionTab === 'pending'" class="subscription-table">
+          <div *ngIf="pendingSubscriptionRequests.length === 0" class="no-data">
+            {{ 'admin_no_pending_requests' | translate }}
+          </div>
+          <table *ngIf="pendingSubscriptionRequests.length > 0">
+            <thead>
+              <tr>
+                <th>{{ 'admin_id' | translate }}</th>
+                <th>{{ 'admin_user' | translate }}</th>
+                <th>{{ 'admin_current_plan' | translate }}</th>
+                <th>{{ 'admin_requested_plan' | translate }}</th>
+                <th>{{ 'admin_request_date' | translate }}</th>
+                <th>{{ 'admin_message' | translate }}</th>
+                <th>{{ 'admin_actions' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let request of pendingSubscriptionRequests">
+                <td>{{ request.id }}</td>
+                <td>
+                  <span class="user-info">{{ request.username || request.email }}</span>
+                </td>
+                <td>
+                  <span [ngClass]="getPlanClass(request.currentPlan)">
+                    {{ getPlanDisplayName(request.currentPlan) }}
+                  </span>
+                </td>
+                <td>
+                  <span [ngClass]="getPlanClass(request.requestedPlan)">
+                    {{ getPlanDisplayName(request.requestedPlan) }}
+                  </span>
+                </td>
+                <td>{{ request.requestDate | localDate }}</td>
+                <td class="message-cell">
+                  <div class="message-content" (click)="request.message && showMessageDialog(request.message)">
+                    {{ request.message ? (request.message | slice:0:50) + (request.message.length > 50 ? '...' : '') : ('admin_no_message' | translate) }}
+                    <button *ngIf="request.message && request.message.length > 50" 
+                      (click)="$event.stopPropagation(); showMessageDialog(request.message)" 
+                      class="view-more-btn">
+                      {{ 'view_more' | translate }}
+                    </button>
+                  </div>
+                </td>
+                <td class="action-buttons">
+                  <div class="admin-note-input">
+                    <input 
+                      type="text" 
+                      [(ngModel)]="request.adminNote" 
+                      [placeholder]="'admin_note_placeholder' | translate"
+                      class="form-input small-input">
+                  </div>
+                  <button (click)="approveRequest(request.id ?? 0)" class="btn btn-approve">
+                    {{ 'admin_approve' | translate }}
+                  </button>
+                  <button (click)="rejectRequest(request.id ?? 0)" class="btn btn-reject">
+                    {{ 'admin_reject' | translate }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div *ngIf="subscriptionTab === 'all'" class="subscription-table">
+          <div *ngIf="allSubscriptionRequests.length === 0" class="no-data">
+            {{ 'admin_no_subscription_requests' | translate }}
+          </div>
+          <table *ngIf="allSubscriptionRequests.length > 0">
+            <thead>
+              <tr>
+                <th>{{ 'admin_id' | translate }}</th>
+                <th>{{ 'admin_user' | translate }}</th>
+                <th>{{ 'admin_current_plan' | translate }}</th>
+                <th>{{ 'admin_requested_plan' | translate }}</th>
+                <th>{{ 'admin_request_date' | translate }}</th>
+                <th>{{ 'admin_process_date' | translate }}</th>
+                <th>{{ 'admin_status' | translate }}</th>
+                <th>{{ 'admin_message' | translate }}</th>
+                <th>{{ 'admin_note' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let request of allSubscriptionRequests">
+                <td>{{ request.id }}</td>
+                <td>
+                  <span class="user-info">{{ request.username || request.email }}</span>
+                </td>
+                <td>
+                  <span [ngClass]="getPlanClass(request.currentPlan)">
+                    {{ getPlanDisplayName(request.currentPlan) }}
+                  </span>
+                </td>
+                <td>
+                  <span [ngClass]="getPlanClass(request.requestedPlan)">
+                    {{ getPlanDisplayName(request.requestedPlan) }}
+                  </span>
+                </td>
+                <td>{{ request.requestDate | localDate }}</td>
+                <td>{{ request.processDate ? (request.processDate | localDate) : '-' }}</td>
+                <td>
+                  <span [ngClass]="getStatusClass(request.status)">
+                    {{ getStatusDisplayName(request.status) }}
+                  </span>
+                </td>
+                <td class="message-cell">
+                  <div class="message-content" (click)="request.message && showMessageDialog(request.message)">
+                    {{ request.message ? (request.message | slice:0:50) + (request.message.length > 50 ? '...' : '') : ('admin_no_message' | translate) }}
+                    <button *ngIf="request.message && request.message.length > 50" 
+                      (click)="$event.stopPropagation(); showMessageDialog(request.message)" 
+                      class="view-more-btn">
+                      {{ 'view_more' | translate }}
+                    </button>
+                  </div>
+                </td>
+                <td>
+                  <div class="note-content">
+                    {{ request.adminNote || ('admin_no_note' | translate) }}
                   </div>
                 </td>
               </tr>

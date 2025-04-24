@@ -81,4 +81,14 @@ public class SubscriptionRequestController {
         SubscriptionRequestResponseDto response = subscriptionRequestService.processRequest(requestId, approved, adminNote);
         return ResponseEntity.ok(response);
     }
+    
+    @DeleteMapping("/{requestId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, Object>> deleteRejectedRequest(@PathVariable Integer requestId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        
+        Map<String, Object> response = subscriptionRequestService.deleteRejectedRequest(requestId, email);
+        return ResponseEntity.ok(response);
+    }
 } 
