@@ -12,6 +12,7 @@ public enum MessageType {
     COMMENT_NOT_FOUND("1004", "Yorum bulunamadı"),
     CATEGORY_NOT_FOUND("1005", "Kategori bulunamadı"),
     HIGHLIGHT_NOT_FOUND("1006", "Highlight bulunamadı"),
+    SUBSCRIPTION_REQUEST_NOT_FOUND("1007", "Abonelik talebi bulunamadı"),
 
     // 2xxx - Geçersiz İstek / Validasyon Hataları (400)
     INVALID_REQUEST("2001", "Geçersiz istek formatı"),
@@ -26,6 +27,7 @@ public enum MessageType {
     MISSING_REQUIRED_FIELD("2010", "Lütfen tüm zorunlu alanları doldurun"),
     DAILY_HIGHLIGHT_LIMIT_EXCEEDED("2011", "Günlük highlight limitine ulaştınız (2 post)"),
     HIGHLIGHT_ALREADY_EXISTS("2012", "Bu post zaten highlight edilmiş"),
+    PENDING_REQUEST_EXISTS("2013", "Zaten bekleyen bir abonelik talebiniz bulunmaktadır"),
 
     // 3xxx - Yetkilendirme Hataları (401)
     INVALID_CREDENTIALS("3001", "E-posta adresi veya şifre hatalı"),

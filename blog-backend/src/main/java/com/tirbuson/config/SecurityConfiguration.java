@@ -43,7 +43,15 @@ public class SecurityConfiguration {
                         .requestMatchers("/user/profile").authenticated()
                         .requestMatchers("/user/profile/{email}").permitAll()
                         .requestMatchers("/user/delete-profile-image").authenticated()
-                        .requestMatchers("/user/update-subscription-plan").permitAll()
+                        .requestMatchers("/user/update-subscription-plan").hasRole("ADMIN")
+                        
+                        // Abonelik isteği endpoint'leri
+                        .requestMatchers("/subscription-request/create").authenticated()
+                        .requestMatchers("/subscription-request/user-requests").authenticated()
+                        .requestMatchers("/subscription-request/cancel/{requestId}").authenticated()
+                        .requestMatchers("/subscription-request/pending").hasRole("ADMIN")
+                        .requestMatchers("/subscription-request/all").hasRole("ADMIN")
+                        .requestMatchers("/subscription-request/process/{requestId}").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/post/**", "/category/**", "/comment/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/post/**").hasAnyRole("USER", "ADMIN")
