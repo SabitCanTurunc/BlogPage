@@ -14,6 +14,42 @@ export class HighlightService {
   constructor(private http: HttpClient) { }
 
   /**
+   * Kullanıcının abonelik planına göre günlük highlight limitini döndürür
+   * @param subscriptionPlan Kullanıcının abonelik planı (ESSENTIAL, PLUS, MAX)
+   * @returns {number} Highlight limiti (MAX için -1, yani sınırsız)
+   */
+  getDailyHighlightLimit(subscriptionPlan: string): number {
+    switch (subscriptionPlan) {
+      case 'ESSENTIAL':
+        return 1;
+      case 'PLUS':
+        return 2;
+      case 'MAX':
+        return -1; // Sınırsız için -1 kullanıyoruz
+      default:
+        return 1; // Varsayılan olarak ESSENTIAL limiti
+    }
+  }
+
+  /**
+   * Kullanıcının abonelik planına göre limit bilgisini içeren metin döndürür
+   * @param subscriptionPlan Kullanıcının abonelik planı (ESSENTIAL, PLUS, MAX)
+   * @returns {string} Limit bilgi metni
+   */
+  getHighlightLimitInfo(subscriptionPlan: string): string {
+    switch (subscriptionPlan) {
+      case 'ESSENTIAL':
+        return 'Essential: günlük limit 1 post';
+      case 'PLUS':
+        return 'Plus: günlük limit 2 post';
+      case 'MAX':
+        return 'Max: sınırsız';
+      default:
+        return 'Essential: günlük limit 1 post';
+    }
+  }
+
+  /**
    * Bir postu öne çıkar
    * @param postId Öne çıkarılacak postun ID'si
    * @returns Observable<any>

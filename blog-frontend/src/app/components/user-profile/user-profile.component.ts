@@ -762,9 +762,8 @@ export class UserProfileComponent implements OnInit {
    * @param postId Öne çıkarılacak post ID'si
    */
   highlightPost(postId: number): void {
+    // İşlem kontrolü
     if (!this.isOwnProfile) {
-      this.isHighlighting = false;
-      this.highlightingPostId = null;
       return;
     }
     
@@ -773,8 +772,8 @@ export class UserProfileComponent implements OnInit {
       return;
     }
     
-    // Günlük limit kontrolü
-    if (this.dailyHighlightCount >= 2) {
+    // Kullanıcının abonelik planına göre limit kontrolü
+    if (!this.canAddMoreHighlights()) {
       Swal.fire({
         title: this.translationService.getTranslation('error'),
         text: this.translationService.getTranslation('daily_highlight_limit_reached'),
@@ -875,8 +874,11 @@ export class UserProfileComponent implements OnInit {
     // Öne çıkarılmış mı kontrol et
     const isCurrentlyHighlighted = this.isHighlighted(postId);
     
+    // Kullanıcının abonelik planına göre limit kontrolü
+    const canAddMoreHighlights = this.canAddMoreHighlights();
+    
     // Öne çıkarılmamış ve günlük limit dolmuşsa uyarı göster
-    if (!isCurrentlyHighlighted && this.dailyHighlightCount >= 2) {
+    if (!isCurrentlyHighlighted && !canAddMoreHighlights) {
       Swal.fire({
         title: this.translationService.getTranslation('error'),
         text: this.translationService.getTranslation('daily_highlight_limit_reached'),
@@ -1239,5 +1241,24 @@ export class UserProfileComponent implements OnInit {
         });
       }
     });
+  }
+
+  /**
+   * Kullanıcının daha fazla highlight ekleyip ekleyemeyeceğini kontrol eder
+   * @returns {boolean} Daha fazla highlight eklenebilir mi?
+   */
+  canAddMoreHighlights(): boolean {
+    // MAX aboneliğine sahip kullanıcılar sınırsız highlight yapabilir
+    if (this.currentSubscriptionPlan === SubscriptionPlan.MAX) {
+      return true;
+    }
+    
+    // PLUS aboneliğine sahip kullanıcılar günlük 2 highlight yapabilir
+    if (this.currentSubscriptionPlan === SubscriptionPlan.PLUS) {
+      return this.dailyHighlightCount < 2;
+    }
+    
+    // ESSENTIAL aboneliğine sahip kullanıcılar günlük 1 highlight yapabilir
+    return this.dailyHighlightCount < 1;
   }
 } 

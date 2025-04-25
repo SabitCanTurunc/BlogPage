@@ -67,4 +67,11 @@ public class HighlightsController extends BaseController<HighlightsService, High
         highlightsService.deactivateExpiredHighlights();
         return ResponseEntity.ok(Map.of("message", "Süresi dolan highlight'lar pasif hale getirildi", "success", true));
     }
+    
+    // MAX kullanıcılar için debug endpoint
+    @GetMapping("/debug/max-user")
+    public ResponseEntity<Map<String, Object>> getMaxUserDebugInfo(
+            @RequestAttribute("userId") Integer userId) {
+        return ResponseEntity.ok(highlightsService.getMaxUserDebugInfo(userId));
+    }
 }

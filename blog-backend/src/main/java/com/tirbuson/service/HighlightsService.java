@@ -8,6 +8,7 @@ import com.tirbuson.mapper.HighlightMapper;
 import com.tirbuson.model.Highlights;
 import com.tirbuson.model.Post;
 import com.tirbuson.model.User;
+import com.tirbuson.model.enums.SubscriptionPlan;
 import com.tirbuson.repository.HighlightsRepository;
 import com.tirbuson.repository.PostRepository;
 import com.tirbuson.repository.UserRepository;
@@ -30,7 +31,8 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
     private final PostRepository postRepository;
     private final HighlightMapper highlightMapper;
     
-    private static final int DAILY_HIGHLIGHT_LIMIT = 2;
+    private static final int ESSENTIAL_DAILY_HIGHLIGHT_LIMIT = 1;
+    private static final int PLUS_DAILY_HIGHLIGHT_LIMIT = 2;
 
     public HighlightsService(HighlightsRepository repository, HighlightsRepository highlightsRepository, UserRepository userRepository, PostRepository postRepository, HighlightMapper highlightMapper) {
         super(repository);
@@ -67,19 +69,35 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
         Post post = postRepository.findById(requestDto.getPostId())
                 .orElseThrow(() -> new BaseException(MessageType.POST_NOT_FOUND));
 
-        // Günlük limit kontrolü
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startOfDay = now.with(LocalTime.MIN);
-        
         // Önce süresi dolmuş highlight'ları kontrol et
         List<Highlights> userHighlights = highlightsRepository.findByUser(user);
         filterExpiredHighlights(userHighlights);
         
+        // Kullanıcının abonelik planına göre günlük limit kontrolü
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfDay = now.with(LocalTime.MIN);
         long dailyCount = highlightsRepository.countByUserAndUpdatedAtGreaterThanEqualAndIsActiveTrue(user, startOfDay);
         
-        if (dailyCount >= DAILY_HIGHLIGHT_LIMIT) {
-            throw new BaseException(MessageType.DAILY_HIGHLIGHT_LIMIT_EXCEEDED);
+        // Abonelik planı kontrolü - MAX planı için logla
+        if (user.getSubscriptionPlan() == SubscriptionPlan.MAX) {
+            System.out.println("MAX plan kullanıcısı (ID: " + userId + ") highlight oluşturuyor. Günlük count: " + dailyCount);
         }
+        
+        // Abonelik planına göre limit kontrolü
+        if (user.getSubscriptionPlan() == null || user.getSubscriptionPlan() == SubscriptionPlan.ESSENTIAL) {
+            // ESSENTIAL: 1 highlight
+            if (dailyCount >= ESSENTIAL_DAILY_HIGHLIGHT_LIMIT) {
+                throw new BaseException(MessageType.DAILY_HIGHLIGHT_LIMIT_EXCEEDED, 
+                    "Essential: günlük limit 1 post.");
+            }
+        } else if (user.getSubscriptionPlan() == SubscriptionPlan.PLUS) {
+            // PLUS: 2 highlight
+            if (dailyCount >= PLUS_DAILY_HIGHLIGHT_LIMIT) {
+                throw new BaseException(MessageType.DAILY_HIGHLIGHT_LIMIT_EXCEEDED,
+                    "Plus: günlük limit 2 post.");
+            }
+        }
+        // MAX kullanıcılar için limit kontrolü yok (sınırsız)
 
         // Post'un daha önce highlight edilip edilmediğini kontrol et
         Highlights existingHighlight = highlightsRepository.findFirstByUserAndPostOrderByUpdatedAtDesc(user, post)
@@ -294,5 +312,55 @@ public class HighlightsService extends BaseService<Highlights,Integer,Highlights
         stats.put("dailyAverage", dailyAverage);
         
         return stats;
+    }
+
+    /**
+     * MAX kullanıcılar için tüm highlight'ları getir (debug için)
+     * @param userId Kullanıcı ID
+     * @return MAX kullanıcının tüm highlight'ları ve ilgili bilgiler
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> getMaxUserDebugInfo(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(MessageType.USER_NOT_FOUND));
+        
+        if (user.getSubscriptionPlan() != SubscriptionPlan.MAX) {
+            throw new BaseException(MessageType.UNAUTHORIZED_ACCESS, "Bu işlem sadece MAX abonelik için kullanılabilir");
+        }
+        
+        Map<String, Object> debugInfo = new HashMap<>();
+        debugInfo.put("userId", userId);
+        debugInfo.put("email", user.getEmail());
+        debugInfo.put("subscriptionPlan", user.getSubscriptionPlan().toString());
+        
+        // Tüm highlight'ları getir
+        List<Highlights> allHighlights = highlightsRepository.findByUser(user);
+        
+        // Günlük highlight'ları getir
+        LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
+        long dailyCount = highlightsRepository.countByUserAndUpdatedAtGreaterThanEqualAndIsActiveTrue(user, startOfDay);
+        
+        // Son 7 günlük highlight'ları getir
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        long recentHighlights = highlightsRepository.countByUserAndUpdatedAtGreaterThanEqualAndIsActiveTrue(user, sevenDaysAgo);
+        
+        debugInfo.put("totalHighlightCount", allHighlights.size());
+        debugInfo.put("activeHighlightCount", allHighlights.stream().filter(Highlights::isActive).count());
+        debugInfo.put("dailyHighlightCount", dailyCount);
+        debugInfo.put("last7DaysHighlightCount", recentHighlights);
+        
+        // Highlight ID'lerini getir
+        debugInfo.put("activeHighlightIds", allHighlights.stream()
+                .filter(Highlights::isActive)
+                .map(Highlights::getId)
+                .collect(Collectors.toList()));
+        
+        // Günlük highlight ID'lerini getir
+        List<Highlights> dailyHighlights = highlightsRepository.findByUserAndUpdatedAtGreaterThanEqualAndIsActiveTrueOrderByUpdatedAtDesc(user, startOfDay);
+        debugInfo.put("dailyHighlightIds", dailyHighlights.stream()
+                .map(Highlights::getId)
+                .collect(Collectors.toList()));
+        
+        return debugInfo;
     }
 }

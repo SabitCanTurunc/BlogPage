@@ -25,7 +25,7 @@ public enum MessageType {
     INVALID_USERNAME_FORMAT("2008", "Kullanıcı adı en az 3, en fazla 20 karakter olmalı ve özel karakter içermemelidir"),
     PASSWORD_MISMATCH("2009", "Girdiğiniz şifreler eşleşmiyor"),
     MISSING_REQUIRED_FIELD("2010", "Lütfen tüm zorunlu alanları doldurun"),
-    DAILY_HIGHLIGHT_LIMIT_EXCEEDED("2011", "Günlük highlight limitine ulaştınız (2 post)"),
+    DAILY_HIGHLIGHT_LIMIT_EXCEEDED("2011", "Günlük highlight limitine ulaştınız."),
     HIGHLIGHT_ALREADY_EXISTS("2012", "Bu post zaten highlight edilmiş"),
     PENDING_REQUEST_EXISTS("2013", "Zaten bekleyen bir abonelik talebiniz bulunmaktadır"),
 
