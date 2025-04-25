@@ -15,6 +15,9 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { TranslationService } from '../../services/translation.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import Swal from 'sweetalert2';
+import { UserService } from '../../services/user.service';
+import { UserResponseDto } from '../../models/user-response.dto';
 
 interface UploadedImage {
   url: string;
@@ -50,6 +53,9 @@ export class CreatePostComponent implements OnInit {
   aiGeneratedImageUrl: string = '';
   showApplyImageButton: boolean = false;
   showMarkdownPreview: boolean = false;
+  
+  // Kullanıcının abonelik planını saklayacak özellik
+  userSubscriptionPlan: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -61,7 +67,8 @@ export class CreatePostComponent implements OnInit {
     private translationService: TranslationService,
     private router: Router,
     private route: ActivatedRoute,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private userService: UserService
   ) {
     this.postForm = this.fb.group({
       title: ['', Validators.required],
@@ -342,6 +349,18 @@ export class CreatePostComponent implements OnInit {
 
     this.isLoggedIn = true;
     this.loadCategories();
+    
+    // Kullanıcı profil bilgilerini al ve abonelik planı özelliğini doldur
+    this.userService.getUserProfile().subscribe({
+      next: (userData: UserResponseDto) => {
+        if (userData && userData.subscriptionPlan) {
+          this.userSubscriptionPlan = userData.subscriptionPlan;
+        }
+      },
+      error: (error: any) => {
+        console.error('Kullanıcı profili yüklenirken hata:', error);
+      }
+    });
   }
 
   loadCategories() {
@@ -712,6 +731,23 @@ export class CreatePostComponent implements OnInit {
   }
 
   generateImageWithAI() {
+    // MAX abonelik planı kontrolü
+    if (this.userSubscriptionPlan !== 'MAX') {
+      this.aiImageError = this.translationService.getTranslation('feature_max_only') || 
+                          'Bu özellik sadece MAX abonelik planına sahip kullanıcılar için erişilebilir.';
+      
+      // Kullanıcıya bir uyarı göster
+      Swal.fire({
+        title: this.translationService.getTranslation('feature_restricted') || 'Kısıtlı Özellik',
+        text: this.translationService.getTranslation('feature_max_only') || 
+              'AI ile görsel üretme özelliği sadece MAX abonelik planına sahip kullanıcılar için erişilebilir.',
+        icon: 'warning',
+        confirmButtonText: this.translationService.getTranslation('ok') || 'Tamam'
+      });
+      
+      return;
+    }
+    
     // Başlık, kategori ve içeriği al
     const title = this.postForm.get('title')?.value ? this.postForm.get('title')?.value.trim() : '';
     const categoryId = this.postForm.get('categoryId')?.value;

@@ -127,9 +127,9 @@ export class PostDetailComponent implements OnInit {
       '<div class="premium-content-backdrop"></div>' +
       '<div class="premium-content-inner">' +
       '<div class="premium-icon">🔒</div>' +
-      '<h3>Premium İçerik</h3>' +
-      '<p>Bu içeriğin tamamını görmek için Plus veya Max aboneliğe sahip olmanız gerekiyor.</p>' +
-      '<a href="/profile" class="upgrade-button">Aboneliğimi Yükselt</a>' +
+      '<h3>{{ "premium_content" | translate }}</h3>' +
+      '<p>{{ "premium_content_info" | translate }}</p>' +
+      '<a href="/profile" class="upgrade-button">{{ "upgrade_plan" | translate }}</a>' +
       '</div>' +
       '</div>';
   }

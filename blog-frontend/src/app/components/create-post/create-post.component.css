@@ -898,6 +898,47 @@ textarea.form-control {
   color: var(--secondary-foreground);
 }
 
+/* Devre dışı AI görsel üretme butonu */
+.ai-image-button-disabled {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #e0e0e0, #c0c0c0);
+  color: #666;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  opacity: 0.8;
+}
+
+.ai-image-button-disabled:hover {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.ai-image-button-disabled svg {
+  color: #666;
+}
+
+.ai-image-button-disabled .premium-badge {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  background-color: #f39c12;
+  color: white;
+  border-radius: 10px;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+}
+
 /* AI Image Dialog */
 .ai-image-dialog-overlay {
   position: fixed;
