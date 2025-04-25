@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { Observable, throwError, of } from 'rxjs';
+import { catchError, tap, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { ErrorHandlerUtil } from '../utils/error-handler.util';
 import { User } from '../models/user.model';
 import { UserResponseDto } from '../models/user-response.dto';
+import { SubscriptionPlan } from '../models/subscription-plan.model';
 
 @Injectable({
   providedIn: 'root'
@@ -87,6 +88,30 @@ export class UserService {
   getUserProfileByEmail(email: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/profile/${email}`).pipe(
       catchError(this.handleError)
+    );
+  }
+
+  // Kullanıcının aktif abonelik planını getir
+  getCurrentUserSubscriptionPlan(): Observable<SubscriptionPlan> {
+    return this.getUserProfile().pipe(
+      map(user => {
+        if (!user || !user.subscriptionPlan) {
+          return SubscriptionPlan.ESSENTIAL;
+        }
+        return user.subscriptionPlan as SubscriptionPlan;
+      }),
+      catchError(error => {
+        console.error('Abonelik planı alınırken hata:', error);
+        return of(SubscriptionPlan.ESSENTIAL);
+      })
+    );
+  }
+  
+  // Kullanıcının Premium içeriklere erişim hakkı olup olmadığını kontrol et
+  hasPremiumAccess(): Observable<boolean> {
+    return this.getCurrentUserSubscriptionPlan().pipe(
+      map(plan => plan === SubscriptionPlan.PLUS || plan === SubscriptionPlan.MAX),
+      catchError(() => of(false))
     );
   }
 } 

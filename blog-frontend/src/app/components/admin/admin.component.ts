@@ -606,9 +606,9 @@ export class AdminComponent implements OnInit {
     switch(plan) {
       case SubscriptionPlan.ESSENTIAL:
         return 'plan-essential';
-      case SubscriptionPlan.PREMIUM:
+      case SubscriptionPlan.PLUS:
         return 'plan-premium';
-      case SubscriptionPlan.UNLIMITED:
+      case SubscriptionPlan.MAX:
         return 'plan-unlimited';
       default:
         return '';
@@ -620,8 +620,8 @@ export class AdminComponent implements OnInit {
     
     const translations = {
       [SubscriptionPlan.ESSENTIAL]: this.translationService.getTranslation('essential_plan'),
-      [SubscriptionPlan.PREMIUM]: this.translationService.getTranslation('premium_plan'),
-      [SubscriptionPlan.UNLIMITED]: this.translationService.getTranslation('unlimited_plan')
+      [SubscriptionPlan.PLUS]: this.translationService.getTranslation('premium_plan'),
+      [SubscriptionPlan.MAX]: this.translationService.getTranslation('unlimited_plan')
     };
     
     return translations[plan] || String(plan);

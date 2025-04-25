@@ -1295,3 +1295,53 @@
   margin-left: 0 !important;
 }
 
+/* Premium rozetleri için stiller */
+.premium-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(218, 165, 32, 0.9);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 2;
+}
+
+.premium-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.premium-badge-text {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 10px;
+  background-color: rgba(218, 165, 32, 0.9);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+  gap: 4px;
+  vertical-align: middle;
+}
+
+.premium-badge-text svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Görsel içeren kartlar için göreceli konumlandırma */
+.post-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+

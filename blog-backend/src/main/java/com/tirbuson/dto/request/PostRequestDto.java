@@ -26,4 +26,7 @@ public class PostRequestDto extends BaseDto {
 //    @NotBlank(message = "categoryId can not be empty")
     private Integer categoryId;
     private List<String> images;
+    
+    // Varsayılan olarak false olarak ayarlanmış premium içerik işareti
+    private Boolean isPremium = false;
 }

@@ -34,6 +34,10 @@ public class PostMapper implements BaseMapper<Post, PostResponseDto, PostRequest
         post.setUser(userService.findByEmail(postRequestDto.getUserEmail()));
         post.setCategory(categoryService.findById(postRequestDto.getCategoryId()));
         
+        if (postRequestDto.getIsPremium() != null) {
+            post.setPremium(postRequestDto.getIsPremium());
+        }
+        
         List<Image> images = new ArrayList<>();
         if (postRequestDto.getImages() != null) {
             for (String imageUrl : postRequestDto.getImages()) {
@@ -66,6 +70,8 @@ public class PostMapper implements BaseMapper<Post, PostResponseDto, PostRequest
         
         postResponseDto.setCreatedAt(entity.getCreatedAt());
         postResponseDto.setUpdatedAt(entity.getUpdatedAt());
+        
+        postResponseDto.setPremium(entity.isPremium());
         
         List<String> imageUrls = new ArrayList<>();
         if (entity.getImages() != null) {

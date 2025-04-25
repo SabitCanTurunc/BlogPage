@@ -1423,4 +1423,109 @@
 
 .like-count {
   font-weight: 500;
+}
+
+.premium-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: rgba(218, 165, 32, 0.9);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  z-index: 5;
+}
+
+.premium-badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Premium içerik mesajı stilleri */
+.premium-content-message {
+  position: relative;
+  text-align: center;
+  padding: 3rem 2rem;
+  margin: 2rem 0;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 0 30px var(--primary-transparent);
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Buğulu arka plan efekti */
+.premium-content-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029');
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px);
+  z-index: -1;
+  opacity: 0.2;
+}
+
+.premium-content-inner {
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(5px);
+  padding: 2rem;
+  border-radius: 12px;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.premium-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+.premium-content-message h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+  font-family: 'Montserrat', sans-serif;
+  text-shadow: 0 0 10px var(--primary-transparent);
+}
+
+.premium-content-message p {
+  font-size: 1.2rem;
+  color: white;
+  margin-bottom: 1.5rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.upgrade-button {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px var(--primary-transparent);
+  border: none;
+  cursor: pointer;
+}
+
+.upgrade-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px var(--primary-transparent);
 } 

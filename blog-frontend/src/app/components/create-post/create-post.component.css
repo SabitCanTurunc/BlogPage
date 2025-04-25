@@ -1331,3 +1331,41 @@ textarea.form-control {
     filter: drop-shadow(0 0 0 var(--secondary-transparent));
   }
 }
+
+/* Premium içerik seçeneği stilleri */
+.premium-option {
+  background-color: rgba(218, 165, 32, 0.1);
+  border: 1px solid rgba(218, 165, 32, 0.3);
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+}
+
+.premium-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.premium-label {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  gap: 8px;
+  color: #8a6d00;
+  margin-left: 8px;
+}
+
+.premium-label svg {
+  color: goldenrod;
+}
+
+.premium-info {
+  margin-top: 5px;
+  margin-left: 32px;
+  color: #6c757d;
+}
+
+.form-check-input:checked {
+  background-color: goldenrod;
+  border-color: goldenrod;
+}

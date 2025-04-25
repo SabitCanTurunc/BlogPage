@@ -211,14 +211,14 @@ export class UserProfileComponent implements OnInit {
           
           // Abonelik planını ayarla
           if (userData.subscriptionPlan) {
-            // Backend plan değerini frontend formatına dönüştür
+            // Backend ve frontend aynı plan isimlerini kullanıyor
             const planStr = String(userData.subscriptionPlan);
             console.log('Backend\'den gelen plan:', planStr);
             
             if (planStr === 'PLUS') {
-              this.currentSubscriptionPlan = SubscriptionPlan.PREMIUM;
+              this.currentSubscriptionPlan = SubscriptionPlan.PLUS;
             } else if (planStr === 'MAX') {
-              this.currentSubscriptionPlan = SubscriptionPlan.UNLIMITED;
+              this.currentSubscriptionPlan = SubscriptionPlan.MAX;
             } else if (planStr === 'ESSENTIAL') {
               this.currentSubscriptionPlan = SubscriptionPlan.ESSENTIAL;
             } else {
@@ -1019,7 +1019,7 @@ export class UserProfileComponent implements OnInit {
     
     const planClass = 
       plan === SubscriptionPlan.ESSENTIAL ? 'plan-essential' : 
-      plan === SubscriptionPlan.PREMIUM ? 'plan-premium' : 'plan-unlimited';
+      plan === SubscriptionPlan.PLUS ? 'plan-premium' : 'plan-unlimited';
     
     if (plan === this.currentSubscriptionPlan) {
       return `${planClass} current`;
@@ -1035,9 +1035,9 @@ export class UserProfileComponent implements OnInit {
     switch (plan) {
       case SubscriptionPlan.ESSENTIAL:
         return this.translationService.getTranslation('essential_plan');
-      case SubscriptionPlan.PREMIUM:
+      case SubscriptionPlan.PLUS:
         return this.translationService.getTranslation('premium_plan');
-      case SubscriptionPlan.UNLIMITED:
+      case SubscriptionPlan.MAX:
         return this.translationService.getTranslation('unlimited_plan');
       default:
         return this.translationService.getTranslation('essential_plan');

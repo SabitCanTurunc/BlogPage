@@ -11,4 +11,5 @@ export interface PostResponseDto {
   images: string[];
   createdAt: string;
   updatedAt: string;
+  premium: boolean;
 } 

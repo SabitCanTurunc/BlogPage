@@ -36,10 +36,10 @@ export class SubscriptionService {
     switch(plan) {
       case SubscriptionPlan.ESSENTIAL:
         return 'ESSENTIAL';
-      case SubscriptionPlan.PREMIUM:
-        return 'PLUS';  // Backend'de PREMIUM yerine PLUS kullanılıyor
-      case SubscriptionPlan.UNLIMITED:
-        return 'MAX';   // Backend'de UNLIMITED yerine MAX kullanılıyor
+      case SubscriptionPlan.PLUS:
+        return 'PLUS';  // Frontend ve backend aynı isimleri kullanıyor
+      case SubscriptionPlan.MAX:
+        return 'MAX';   // Frontend ve backend aynı isimleri kullanıyor
       default:
         return 'ESSENTIAL';
     }
@@ -62,11 +62,11 @@ export class SubscriptionService {
         case 'ESSENTIAL':
           planToConvert = SubscriptionPlan.ESSENTIAL;
           break;
-        case 'PREMIUM':
-          planToConvert = SubscriptionPlan.PREMIUM;
+        case 'PLUS':
+          planToConvert = SubscriptionPlan.PLUS;
           break;
-        case 'UNLIMITED':
-          planToConvert = SubscriptionPlan.UNLIMITED;
+        case 'MAX':
+          planToConvert = SubscriptionPlan.MAX;
           break;
         default:
           console.error('Bilinmeyen plan tipi:', planToConvert);
@@ -100,31 +100,9 @@ export class SubscriptionService {
         // Backend yanıtını loglayalım
         console.log('Backend\'den gelen abonelik istekleri (ham):', JSON.stringify(requests));
         
-        // Backend'den gelen plan değerlerini frontend formatına dönüştür
+        // Backend ve frontend aynı plan isimlerini kullanıyor, dönüştürmeye gerek yok
         if (requests && requests.length > 0) {
-          requests.forEach(request => {
-            // String karşılaştırmaları kullanmalıyız
-            const currentPlanStr = String(request.currentPlan);
-            const requestedPlanStr = String(request.requestedPlan);
-            
-            // currentPlan dönüşümü
-            if (currentPlanStr === 'PLUS') {
-              request.currentPlan = SubscriptionPlan.PREMIUM as any;
-            } else if (currentPlanStr === 'MAX') {
-              request.currentPlan = SubscriptionPlan.UNLIMITED as any;
-            }
-            
-            // requestedPlan dönüşümü
-            if (requestedPlanStr === 'PLUS') {
-              request.requestedPlan = SubscriptionPlan.PREMIUM;
-            } else if (requestedPlanStr === 'MAX') {
-              request.requestedPlan = SubscriptionPlan.UNLIMITED;
-            } else if (requestedPlanStr === 'ESSENTIAL') {
-              request.requestedPlan = SubscriptionPlan.ESSENTIAL;
-            }
-          });
-          
-          console.log('Dönüştürülen abonelik istekleri:', JSON.stringify(requests));
+          console.log('Abonelik istekleri:', JSON.stringify(requests));
         }
       }),
       catchError(this.handleError)

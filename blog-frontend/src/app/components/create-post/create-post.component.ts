@@ -66,7 +66,8 @@ export class CreatePostComponent implements OnInit {
     this.postForm = this.fb.group({
       title: ['', Validators.required],
       content: ['', Validators.required],
-      categoryId: ['', Validators.required]
+      categoryId: ['', Validators.required],
+      premium: [false]
     });
   }
 
@@ -308,7 +309,8 @@ export class CreatePostComponent implements OnInit {
         this.postForm.patchValue({
           title: post.title,
           content: post.content,
-          categoryId: post.categoryId.toString()
+          categoryId: post.categoryId.toString(),
+          premium: post.premium
         });
         
         if (post.images && post.images.length > 0) {
@@ -468,7 +470,7 @@ export class CreatePostComponent implements OnInit {
       // AI ile oluşturulan görselleri kontrol et
       const aiImages = this.uploadedImages.filter(img => img.isAiImage);
       
-      // Eğer AI görseli yoksa direkt olarak gönder
+      // Eğer AI görselleri yoksa direkt olarak gönder
       if (aiImages.length === 0) {
         this.savePost(userEmail, title, content, categoryId);
         return;
@@ -550,9 +552,10 @@ export class CreatePostComponent implements OnInit {
     const postData = {
       title: title,
       content: content,
-      categoryId: parseInt(categoryId.toString()),
+      categoryId: categoryId,
       images: this.uploadedImages.map(img => img.url),
-      userEmail: userEmail
+      userEmail: userEmail,
+      premium: this.postForm.get('premium')?.value || false
     };
 
     if (this.isEditMode && this.postId) {

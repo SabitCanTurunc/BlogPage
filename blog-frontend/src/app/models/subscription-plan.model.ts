@@ -1,7 +1,7 @@
 export enum SubscriptionPlan {
   ESSENTIAL = 'ESSENTIAL',
-  PREMIUM = 'PREMIUM',
-  UNLIMITED = 'UNLIMITED'
+  PLUS = 'PLUS',
+  MAX = 'MAX'
 }
 
 export interface SubscriptionPlanDetails {
@@ -24,4 +24,4 @@ export interface SubscriptionRequest {
   adminNote?: string;
   status?: 'PENDING' | 'APPROVED' | 'REJECTED';
   message?: string; // Kullanıcının isteği için açıklama
-} 
+}

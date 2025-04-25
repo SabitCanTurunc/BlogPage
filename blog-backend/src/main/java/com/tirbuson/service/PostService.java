@@ -34,22 +34,17 @@ public class PostService extends BaseService<Post,Integer, PostRepository>{
         return repository.getPostsByUser_Id(userId);
     }
     
-    // Sayfalama ile tüm postları getir
     public Page<Post> getAllPosts(Pageable pageable) {
         return repository.findAll(pageable);
     }
     
-    // Sayfalama ile kategori bazında postları getir
     public Page<Post> getPostsByCategory(String categoryName, Pageable pageable) {
         return repository.findByCategory_Name(categoryName, pageable);
     }
     
-    // Tüm kategorileri getir
     public List<String> getAllCategories() {
         try {
-            // Tüm kategorileri çek
             List<Category> categories = categoryRepository.findAll();
-            // Kategori isimlerini listeye dönüştür
             return categories.stream()
                    .map(Category::getName)
                    .sorted()
@@ -59,20 +54,16 @@ public class PostService extends BaseService<Post,Integer, PostRepository>{
         }
     }
     
-    // Popüler yazarları getir (en çok yazısı olan 5 yazar)
     public List<String> getPopularAuthors() {
         try {
-            // Tüm yazıları getir
             List<Post> allPosts = repository.findAll();
             
-            // Her yazarın yazı sayısını hesapla
             Map<String, Long> authorPostCounts = allPosts.stream()
                 .collect(Collectors.groupingBy(
                     post -> post.getUser().getEmail(),
                     Collectors.counting()
                 ));
             
-            // Yazı sayısına göre sırala ve ilk 5 yazarı döndür
             return authorPostCounts.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(5)
@@ -83,10 +74,8 @@ public class PostService extends BaseService<Post,Integer, PostRepository>{
         }
     }
     
-    // Son eklenen 5 yazıyı getir
     public List<Post> getRecentPosts() {
         try {
-            // Son 5 yazıyı getir
             Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
             Page<Post> recentPostsPage = repository.findAll(pageable);
             return recentPostsPage.getContent();
@@ -95,16 +84,12 @@ public class PostService extends BaseService<Post,Integer, PostRepository>{
         }
     }
     
-    // İçerikte veya başlıkta arama yap
     public List<Post> searchPosts(String query) {
         try {
-            // Arama terimini küçük harfe çevir
             String searchQuery = query.toLowerCase();
             
-            // Tüm yazıları getir
             List<Post> allPosts = repository.findAll();
             
-            // İçerikte veya başlıkta arama terimini içeren yazıları filtrele
             return allPosts.stream()
                 .filter(post -> 
                     post.getTitle().toLowerCase().contains(searchQuery) || 
@@ -124,11 +109,9 @@ public class PostService extends BaseService<Post,Integer, PostRepository>{
         ownershipService.verifyOwnership(id, repository);
         Post post = findById(id);
         if (post != null && post.getImages() != null) {
-            // Önce tüm resimleri sil
             for (Image image : post.getImages()) {
                 imageService.deleteById(image.getId());
             }
-            // Sonra postu sil
             super.deleteById(id);
         }
     }

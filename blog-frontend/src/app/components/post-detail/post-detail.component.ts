@@ -9,14 +9,16 @@ import { UserResponseDto } from '../../models/user-response.dto';
 import { CommentComponent } from '../comment/comment.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LocalDatePipe } from '../../pipes/translate.pipe';
-import { forkJoin } from 'rxjs';
-import { catchError, of } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { SummaryDialogComponent } from '../summary-dialog/summary-dialog.component';
 import { SummaryService } from '../../services/summary.service';
 import { MatIconModule } from '@angular/material/icon';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { SubscriptionPlan } from '../../models/subscription-plan.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-post-detail',
@@ -40,6 +42,8 @@ export class PostDetailComponent implements OnInit {
   author: UserResponseDto | null = null;
   error: string = '';
   loading: boolean = true;
+  hasFullAccess: boolean = false;
+  truncatedContent: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -48,7 +52,8 @@ export class PostDetailComponent implements OnInit {
     private router: Router,
     private dialog: MatDialog,
     private summaryService: SummaryService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -63,16 +68,70 @@ export class PostDetailComponent implements OnInit {
     this.loading = true;
     this.error = '';
 
-    this.postService.getPostById(id).subscribe({
-      next: (post: PostResponseDto) => {
-        this.post = post;
-        this.loadAuthorInfo(post.userEmail);
-      },
-      error: (error) => {
-        this.error = 'post_load_error';
-        this.loading = false;
-      }
-    });
+    // Önce kullanıcının abonelik planını kontrol et
+    if (this.authService.isLoggedIn()) {
+      this.userService.hasPremiumAccess().pipe(
+        tap(hasPremium => {
+          this.hasFullAccess = hasPremium;
+        }),
+        switchMap(() => this.postService.getPostById(id))
+      ).subscribe({
+        next: (post: PostResponseDto) => {
+          this.post = post;
+          
+          // Premium içerik için erişim kontrolü
+          if (post.premium && !this.hasFullAccess) {
+            // Premium içeriği yarıya indir
+            this.truncateContent(post.content);
+          }
+          
+          this.loadAuthorInfo(post.userEmail);
+        },
+        error: (error) => {
+          this.error = 'post_load_error';
+          this.loading = false;
+        }
+      });
+    } else {
+      // Giriş yapmamış kullanıcılar için (temel erişim)
+      this.hasFullAccess = false;
+      this.postService.getPostById(id).subscribe({
+        next: (post: PostResponseDto) => {
+          this.post = post;
+          
+          // Premium içerik kontrolü
+          if (post.premium) {
+            this.truncateContent(post.content);
+          }
+          
+          this.loadAuthorInfo(post.userEmail);
+        },
+        error: (error) => {
+          this.error = 'post_load_error';
+          this.loading = false;
+        }
+      });
+    }
+  }
+
+  // İçeriği belirli bir uzunluğa kesme
+  truncateContent(content: string) {
+    if (!content) return;
+    
+    // İçeriği yarıya indirme
+    const contentLength = content.length;
+    const halfLength = Math.floor(contentLength / 2);
+    
+    this.truncatedContent = content.substring(0, halfLength) + 
+      '\n\n<div class="premium-content-message">' +
+      '<div class="premium-content-backdrop"></div>' +
+      '<div class="premium-content-inner">' +
+      '<div class="premium-icon">🔒</div>' +
+      '<h3>Premium İçerik</h3>' +
+      '<p>Bu içeriğin tamamını görmek için Plus veya Max aboneliğe sahip olmanız gerekiyor.</p>' +
+      '<a href="/profile" class="upgrade-button">Aboneliğimi Yükselt</a>' +
+      '</div>' +
+      '</div>';
   }
 
   loadAuthorInfo(email: string) {
@@ -176,12 +235,15 @@ export class PostDetailComponent implements OnInit {
   formatHtmlContent(content: string): SafeHtml {
     if (!content) return '';
     
+    // Premium içerik kontrolü - Premium içerik ve kullanıcı aboneliği yoksa kısaltılmış içeriği kullan
+    const contentToFormat = (this.post?.premium && !this.hasFullAccess) ? this.truncatedContent : content;
+    
     // Kod bloklarını işle (önce bunları işlememiz gerekiyor çünkü içindeki markdown'ı dönüştürmek istemiyoruz)
     const codeBlocks: string[] = [];
     let codeBlockCounter = 0;
     
     // Code block'ları geçici olarak çıkart ve yerine placeholder koy
-    let processedContent = content.replace(/```([\s\S]*?)```/g, (match, code) => {
+    let processedContent = contentToFormat.replace(/```([\s\S]*?)```/g, (match, code) => {
       const placeholder = `__CODE_BLOCK_${codeBlockCounter}__`;
       codeBlocks.push(code);
       codeBlockCounter++;

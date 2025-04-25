@@ -22,6 +22,8 @@ public class Post extends BaseEntity implements Ownable{
     @Column(nullable = false,columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false)
+    private boolean isPremium = false;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade= CascadeType.PERSIST)
     @JoinColumn(name = "user_id")

@@ -17,4 +17,5 @@ public class PostResponseDto extends BaseDto {
     private Integer categoryId;
     private String categoryName;
     private List<String> images;
+    private boolean isPremium;
 }
