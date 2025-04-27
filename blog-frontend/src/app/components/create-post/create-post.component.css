@@ -902,41 +902,30 @@ textarea.form-control {
 .ai-image-button-disabled {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #e0e0e0, #c0c0c0);
-  color: #666;
-  border: none;
-  border-radius: 50px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  font-family: 'Poppins', sans-serif;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  color: #777;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: not-allowed;
+  font-size: 0.85rem;
+  transition: all 0.2s;
   position: relative;
-  opacity: 0.8;
-}
-
-.ai-image-button-disabled:hover {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .ai-image-button-disabled svg {
-  color: #666;
+  opacity: 0.6;
 }
 
 .ai-image-button-disabled .premium-badge {
-  font-size: 10px;
+  background-color: #b39ddb;
+  color: #4a148c;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  margin-left: 4px;
   font-weight: bold;
-  padding: 2px 6px;
-  background-color: #f39c12;
-  color: white;
-  border-radius: 10px;
-  position: absolute;
-  top: -8px;
-  right: -8px;
 }
 
 /* AI Image Dialog */
@@ -1409,4 +1398,64 @@ textarea.form-control {
 .form-check-input:checked {
   background-color: goldenrod;
   border-color: goldenrod;
+}
+
+/* AI Generate Button Disabled */
+.ai-generate-btn-disabled {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  color: #777;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: not-allowed;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.ai-generate-btn-disabled svg {
+  opacity: 0.6;
+}
+
+.ai-generate-btn-disabled .premium-badge {
+  background-color: #ffe082;
+  color: #7c5900;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+/* Image Button Disabled */
+.ai-image-button-disabled {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  color: #777;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: not-allowed;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.ai-image-button-disabled svg {
+  opacity: 0.6;
+}
+
+.ai-image-button-disabled .premium-badge {
+  background-color: #b39ddb;
+  color: #4a148c;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  margin-left: 4px;
+  font-weight: bold;
 }

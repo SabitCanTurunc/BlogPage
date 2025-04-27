@@ -3,11 +3,15 @@ package com.tirbuson.controller;
 import com.tirbuson.dto.request.ContentWriterAiRequestDto;
 import com.tirbuson.exception.BaseException;
 import com.tirbuson.exception.MessageType;
+import com.tirbuson.model.User;
+import com.tirbuson.model.enums.SubscriptionPlan;
 import com.tirbuson.service.BlogWriterAiService;
+import com.tirbuson.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -18,9 +22,11 @@ import java.util.Map;
 @RequestMapping("writer-ai")
 public class BlogWriterAiController {
     private final BlogWriterAiService blogWriterAiService;
+    private final UserService userService;
 
-    public BlogWriterAiController(BlogWriterAiService blogWriterAiService) {
+    public BlogWriterAiController(BlogWriterAiService blogWriterAiService, UserService userService) {
         this.blogWriterAiService = blogWriterAiService;
+        this.userService = userService;
     }
 
     @PostMapping(value = "/gemini", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -31,6 +37,16 @@ public class BlogWriterAiController {
             // Request null check
             if (requestMsg == null) {
                 throw new BaseException(MessageType.MISSING_REQUIRED_FIELD, "İstek içeriği boş olamaz");
+            }
+            
+            // Kullanıcının abonelik planını kontrol et
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+            User user = userService.findByEmail(userEmail);
+            
+            // Kullanıcının PLUS veya MAX abonelik planına sahip olup olmadığını kontrol et
+            if (user.getSubscriptionPlan() != SubscriptionPlan.PLUS && user.getSubscriptionPlan() != SubscriptionPlan.MAX) {
+                throw new BaseException(MessageType.UNAUTHORIZED_ACCESS, "AI İçerik oluşturma özelliği sadece PLUS ve MAX aboneliklerine sahip kullanıcılar tarafından kullanılabilir");
             }
 
             // Stream işlemini saran bir wrapper oluştur

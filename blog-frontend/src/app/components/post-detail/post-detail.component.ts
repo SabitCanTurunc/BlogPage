@@ -122,14 +122,19 @@ export class PostDetailComponent implements OnInit {
     const contentLength = content.length;
     const halfLength = Math.floor(contentLength / 2);
     
+    // Translation Service'den çevirileri al 
+    const premiumContentText = 'Premium İçerik';
+    const premiumContentInfoText = 'Premium içerikler sadece premium üyelere gösterilir.';
+    const upgradePlanText = 'Abonelik Yükselt';
+    
     this.truncatedContent = content.substring(0, halfLength) + 
       '\n\n<div class="premium-content-message">' +
       '<div class="premium-content-backdrop"></div>' +
       '<div class="premium-content-inner">' +
       '<div class="premium-icon">🔒</div>' +
-      '<h3>{{ "premium_content" | translate }}</h3>' +
-      '<p>{{ "premium_content_info" | translate }}</p>' +
-      '<a href="/profile" class="upgrade-button">{{ "upgrade_plan" | translate }}</a>' +
+      '<h3>' + premiumContentText + '</h3>' +
+      '<p>' + premiumContentInfoText + '</p>' +
+      '<a href="/profile" class="upgrade-button">' + upgradePlanText + '</a>' +
       '</div>' +
       '</div>';
   }

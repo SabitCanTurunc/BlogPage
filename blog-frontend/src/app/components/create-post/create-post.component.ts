@@ -143,6 +143,13 @@ export class CreatePostComponent implements OnInit {
     // Daha önce görüntülenen hataları temizle
     this.submitError = '';
     
+    // Kullanıcının AI özelliğini kullanma yetkisini kontrol et
+    if (!this.canUseAiContentGeneration()) {
+      this.aiError = this.translationService.getTranslation('ai_feature_required_plus_subscription') || 
+        "AI ile içerik oluşturma özelliği sadece PLUS ve MAX aboneliklerine sahip kullanıcılar tarafından kullanılabilir.";
+      return;
+    }
+    
     // Form değerlerini al ve güvenli şekilde temizle
     const title = this.postForm.get('title')?.value ? this.postForm.get('title')?.value.trim() : '';
     let categoryId = '';
@@ -152,8 +159,6 @@ export class CreatePostComponent implements OnInit {
     if (rawCategoryId && /^\d+$/.test(rawCategoryId.toString())) {
       categoryId = rawCategoryId.toString();
     }
-    
-    // Content alanını kontrol etmeye gerek yok, AI ile oluşturulacak
     
     // Başlık kontrolü
     if (!title) {
@@ -337,30 +342,33 @@ export class CreatePostComponent implements OnInit {
   }
 
   checkAuth() {
-    const token = this.authService.getToken();
+    this.isLoggedIn = this.authService.isLoggedIn();
     
-    if (!token) {
-      this.isLoggedIn = false;
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 2000);
-      return;
-    }
-
-    this.isLoggedIn = true;
-    this.loadCategories();
-    
-    // Kullanıcı profil bilgilerini al ve abonelik planı özelliğini doldur
-    this.userService.getUserProfile().subscribe({
-      next: (userData: UserResponseDto) => {
-        if (userData && userData.subscriptionPlan) {
-          this.userSubscriptionPlan = userData.subscriptionPlan;
-        }
-      },
-      error: (error: any) => {
-        console.error('Kullanıcı profili yüklenirken hata:', error);
+    if (this.isLoggedIn) {
+      // Kullanıcı giriş yapmışsa kategorileri yükle
+      this.loadCategories();
+      
+      // Kullanıcının email adresini al
+      const userEmail = this.authService.getUserEmail();
+      
+      if (userEmail) {
+        // Kullanıcının profil bilgilerini ve abonelik planını al
+        this.userService.getUserProfile().subscribe({
+          next: (response: UserResponseDto) => {
+            this.userSubscriptionPlan = response.subscriptionPlan || 'ESSENTIAL';
+            console.log('Kullanıcı abonelik planı:', this.userSubscriptionPlan);
+          },
+          error: (error) => {
+            console.error('Kullanıcı profili alınamadı:', error);
+            // Hata durumunda varsayılan olarak ESSENTIAL planı kullan
+            this.userSubscriptionPlan = 'ESSENTIAL';
+          }
+        });
+      } else {
+        // Kullanıcı email bilgisi yoksa varsayılan olarak ESSENTIAL planı kullan
+        this.userSubscriptionPlan = 'ESSENTIAL';
       }
-    });
+    }
   }
 
   loadCategories() {
@@ -574,7 +582,7 @@ export class CreatePostComponent implements OnInit {
       categoryId: categoryId,
       images: this.uploadedImages.map(img => img.url),
       userEmail: userEmail,
-      premium: this.postForm.get('premium')?.value || false
+      isPremium: this.postForm.get('premium')?.value || false
     };
 
     if (this.isEditMode && this.postId) {
@@ -731,20 +739,15 @@ export class CreatePostComponent implements OnInit {
   }
 
   generateImageWithAI() {
-    // MAX abonelik planı kontrolü
-    if (this.userSubscriptionPlan !== 'MAX') {
-      this.aiImageError = this.translationService.getTranslation('feature_max_only') || 
-                          'Bu özellik sadece MAX abonelik planına sahip kullanıcılar için erişilebilir.';
-      
-      // Kullanıcıya bir uyarı göster
+    // Kullanıcının AI görsel oluşturma yetkisini kontrol et
+    if (!this.canUseAiImageGeneration()) {
       Swal.fire({
-        title: this.translationService.getTranslation('feature_restricted') || 'Kısıtlı Özellik',
-        text: this.translationService.getTranslation('feature_max_only') || 
-              'AI ile görsel üretme özelliği sadece MAX abonelik planına sahip kullanıcılar için erişilebilir.',
-        icon: 'warning',
+        title: this.translationService.getTranslation('ai_image_feature_max_only') || 'MAX Abonelik Gerekli',
+        text: this.translationService.getTranslation('ai_image_feature_max_description') || 
+          'AI ile görsel oluşturma özelliği sadece MAX aboneliğine sahip kullanıcılar tarafından kullanılabilir.',
+        icon: 'info',
         confirmButtonText: this.translationService.getTranslation('ok') || 'Tamam'
       });
-      
       return;
     }
     
@@ -844,5 +847,15 @@ export class CreatePostComponent implements OnInit {
 
   toggleMarkdownPreview() {
     this.showMarkdownPreview = !this.showMarkdownPreview;
+  }
+
+  // Kullanıcının AI içerik oluşturma yetkisi olup olmadığını kontrol eden yeni metod
+  canUseAiContentGeneration(): boolean {
+    return this.userSubscriptionPlan === 'PLUS' || this.userSubscriptionPlan === 'MAX';
+  }
+
+  // Kullanıcının AI görsel oluşturma yetkisi olup olmadığını kontrol eden yeni metod
+  canUseAiImageGeneration(): boolean {
+    return this.userSubscriptionPlan === 'MAX';
   }
 } 
